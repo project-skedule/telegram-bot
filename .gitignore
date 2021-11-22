@@ -1,0 +1,15 @@
+# workspace files
+/.vscode
+# dev
+/.vscode
+/.idea
+# secret keys
+.properties
+.env
+# dump data
+*.pickle
+__pycache__
+/data
+*.log
+# Markdown tool
+.obsidian

@@ -1,0 +1,220 @@
+from aiogram.dispatcher import FSMContext
+from aiogram.types import CallbackQuery, Message
+
+from ..api import (
+    get_canteen_timetable,
+    get_ring_timetable,
+    get_student_day_of_week,
+    get_student_next_lesson,
+    get_student_today,
+    get_student_tomorrow,
+    get_student_week,
+)
+from ..bot import bot, dp
+from ..keyboards import (
+    CHILD_DAY_OF_WEEK_KEYBOARD,
+    CHILD_MAIN_KEYBOARD,
+    CHILD_MISC_MENU_FIRST_KEYBOARD,
+    PARENT_MISC_MENU_FIRST_KEYBOARD,
+    cf,
+    get_child_keyboard,
+)
+from ..logger import logger
+from ..some_functions import send_message
+from ..states import States
+from ..text_loader import Texts
+
+
+async def register_parent_handlers():
+    @dp.callback_query_handler(
+        cf.filter(action=["choose_child"]),
+        state=[
+            States.add_more_childs,
+            States.child_menu,
+            States.find_menu,
+            States.find_day_of_week,
+            States.parent_misc_menu_first,
+            States.show_childs,
+        ],
+    )
+    async def choose_child_handler(call: CallbackQuery):
+        await States.choose_child.set()
+        message = call.message
+        await send_message(
+            message, "choose child", await get_child_keyboard(message.chat.id)
+        )
+        await call.answer()
+
+    # ==============================
+    @dp.callback_query_handler(
+        cf.filter(action=["child_menu"]),
+        state=[
+            States.choose_child,
+            States.child_day_of_week,
+            States.child_misc_menu_first,
+        ],
+    )
+    async def child_menu_handler(
+        call: CallbackQuery, callback_data: dict, state: FSMContext
+    ):
+        await States.child_menu.set()
+        message = call.message
+        if callback_data["data"] != "0":
+            await state.update_data({"child": callback_data["data"]})
+        await send_message(
+            message,
+            f"child menu {(await state.get_data())['child']}",
+            CHILD_MAIN_KEYBOARD,
+        )
+        await call.answer()
+
+    # ==============================
+    @dp.callback_query_handler(
+        cf.filter(action=["child_day_of_week"]),
+        state=[States.child_menu],
+    )
+    async def child_day_of_week_handler(call: CallbackQuery):
+        await States.child_day_of_week.set()
+        message = call.message
+        await send_message(
+            message,
+            text=Texts.select_day_of_week,
+            keyboard=CHILD_DAY_OF_WEEK_KEYBOARD,
+            parse_mode="markdown",
+        )
+
+        await call.answer()
+
+    # ==============================
+    @dp.callback_query_handler(
+        cf.filter(action=["child_choose_day_of_week"]),
+        state=[States.child_day_of_week],
+    )
+    async def child_day_of_week_handler(
+        call: CallbackQuery, callback_data: dict, state: FSMContext
+    ):
+        await States.child_menu.set()
+        message = call.message
+        text = await get_student_day_of_week(
+            (await state.get_data())["child"], callback_data["data"]
+        )
+        await send_message(
+            message, text=text, keyboard=CHILD_MAIN_KEYBOARD, parse_mode="markdown"
+        )
+        await call.answer()
+
+    # =============================
+    @dp.callback_query_handler(
+        cf.filter(action=["child_misc_menu_first"]),
+        state=[States.child_menu],
+    )
+    async def child_misc_menu_first_handler(call: CallbackQuery, callback_data: dict):
+        await States.child_misc_menu_first.set()
+        message = call.message
+        await send_message(
+            message,
+            text="child misc menu #1",
+            keyboard=CHILD_MISC_MENU_FIRST_KEYBOARD,
+            parse_mode="markdown",
+        )
+        await call.answer()
+
+    # =============================
+    @dp.callback_query_handler(
+        cf.filter(action=["parent_misc_menu_first"]),
+        state=[States.choose_child],
+    )
+    async def parent_misc_menu_first_handler(call: CallbackQuery, callback_data: dict):
+        await States.parent_misc_menu_first.set()
+        message = call.message
+        await send_message(
+            message,
+            text="parent misc menu #1",
+            keyboard=PARENT_MISC_MENU_FIRST_KEYBOARD,
+            parse_mode="markdown",
+        )
+        await call.answer()
+
+    # ~=============================
+    @dp.callback_query_handler(
+        cf.filter(action=["next_lesson"]),
+        state=[States.child_menu],
+    )
+    async def student_next_lesson_handler(call: CallbackQuery, state: FSMContext):
+        await States.child_menu.set()
+        message = call.message
+        text = await get_student_next_lesson((await state.get_data())["child"])
+        await send_message(
+            message, text=text, keyboard=CHILD_MAIN_KEYBOARD, parse_mode="markdown"
+        )
+        await call.answer()
+
+    # =============================
+    @dp.callback_query_handler(
+        cf.filter(action=["today"]),
+        state=[States.child_menu],
+    )
+    async def student_today_handler(call: CallbackQuery, state: FSMContext):
+        await States.child_menu.set()
+        message = call.message
+        text = await get_student_today((await state.get_data())["child"])
+        await send_message(
+            message, text=text, keyboard=CHILD_MAIN_KEYBOARD, parse_mode="markdown"
+        )
+        await call.answer()
+
+    # =============================
+    @dp.callback_query_handler(
+        cf.filter(action=["tomorrow"]),
+        state=[States.child_menu],
+    )
+    async def student_tomorrow_handler(call: CallbackQuery, state: FSMContext):
+        await States.child_menu.set()
+        message = call.message
+        text = await get_student_tomorrow((await state.get_data())["child"])
+        await send_message(
+            message, text=text, keyboard=CHILD_MAIN_KEYBOARD, parse_mode="markdown"
+        )
+        await call.answer()
+
+    # =============================
+    @dp.callback_query_handler(
+        cf.filter(action=["week"]),
+        state=[States.child_menu],
+    )
+    async def student_week_handler(call: CallbackQuery, state: FSMContext):
+        await States.child_menu.set()
+        message = call.message
+        text = await get_student_week((await state.get_data())["child"])
+        await send_message(
+            message, text=text, keyboard=CHILD_MAIN_KEYBOARD, parse_mode="markdown"
+        )
+        await call.answer()
+
+    # =============================
+    @dp.callback_query_handler(
+        cf.filter(action=["ring_timetable"]),
+        state=[States.child_misc_menu_first],
+    )
+    async def student_ring_timetable_handler(call: CallbackQuery, state: FSMContext):
+        await States.child_menu.set()
+        message = call.message
+        text = await get_ring_timetable((await state.get_data())["child"])
+        await send_message(
+            message, text=text, keyboard=CHILD_MAIN_KEYBOARD, parse_mode="markdown"
+        )
+        await call.answer()
+
+    # =============================
+    @dp.callback_query_handler(
+        cf.filter(action=["canteen_timetable"]),
+        state=[States.child_misc_menu_first],
+    )
+    async def student_canteen_timetable_handler(call: CallbackQuery, state: FSMContext):
+        await States.child_menu.set()
+        message = call.message
+        text = await get_canteen_timetable((await state.get_data())["child"])
+        await send_message(
+            message, text=text, keyboard=CHILD_MAIN_KEYBOARD, parse_mode="markdown"
+        )
+        await call.answer()

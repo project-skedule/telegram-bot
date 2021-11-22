@@ -1,0 +1,219 @@
+from aiogram.dispatcher import FSMContext
+from aiogram.types import CallbackQuery, Message
+from ..text_loader import Texts
+from ..api import (
+    get_canteen_timetable,
+    get_ring_timetable,
+    get_student_day_of_week,
+    get_student_next_lesson,
+    get_student_today,
+    get_student_tomorrow,
+    get_student_week,
+)
+from ..bot import bot, dp
+from ..keyboards import (
+    STUDENT_DAY_OF_WEEK_KEYBOARD,
+    STUDENT_MAIN_KEYBOARD,
+    STUDENT_MISC_MENU_FIRST_KEYBOARD,
+    STUDENT_MISC_MENU_SECOND_KEYBOARD,
+    cf,
+)
+from ..logger import logger
+from ..some_functions import send_message
+from ..states import States
+
+
+async def register_student_handlers():
+    @dp.callback_query_handler(
+        cf.filter(action=["student_menu"]),
+        state=[
+            States.find_menu,
+            States.find_day_of_week,
+            States.student_day_of_week,
+            States.student_misc_menu_first,
+            States.student_misc_menu_second,
+        ],
+    )
+    async def student_menu_handler(call: CallbackQuery):
+        await States.student_menu.set()
+        message = call.message
+        await send_message(
+            message,
+            text="student menu",
+            keyboard=STUDENT_MAIN_KEYBOARD,
+            parse_mode="markdown",
+        )
+        await call.answer()
+
+    # ==============================
+    @dp.callback_query_handler(
+        cf.filter(action=["student_day_of_week"]),
+        state=[States.student_menu],
+    )
+    async def student_day_of_week_handler(call: CallbackQuery):
+        await States.student_day_of_week.set()
+        message = call.message
+        await send_message(
+            message,
+            text=Texts.select_day_of_week,
+            keyboard=STUDENT_DAY_OF_WEEK_KEYBOARD,
+            parse_mode="markdown",
+        )
+        await call.answer()
+
+    # ==============================
+    @dp.callback_query_handler(
+        cf.filter(action=["student_choose_day_of_week"]),
+        state=[States.student_day_of_week],
+    )
+    async def student_choose_day_of_week_handler(
+        call: CallbackQuery, callback_data: dict
+    ):
+        await States.student_menu.set()
+        message = call.message
+        text = await get_student_day_of_week(
+            user_id=message.chat.id, day=callback_data["data"]
+        )
+        await send_message(
+            message,
+            text=text,
+            keyboard=STUDENT_MAIN_KEYBOARD,
+            parse_mode="markdown",
+        )
+        await call.answer()
+
+    # =============================
+    @dp.callback_query_handler(
+        cf.filter(action=["student_misc_menu_first"]),
+        state=[States.student_menu, States.student_misc_menu_second],
+    )
+    async def student_misc_menu_first_handler(call: CallbackQuery, callback_data: dict):
+        await States.student_misc_menu_first.set()
+        message = call.message
+        await send_message(
+            message,
+            text="student misc menu #1",
+            keyboard=STUDENT_MISC_MENU_FIRST_KEYBOARD,
+            parse_mode="markdown",
+        )
+        await call.answer()
+
+    # =============================
+    @dp.callback_query_handler(
+        cf.filter(action=["student_misc_menu_second"]),
+        state=[States.student_misc_menu_first],
+    )
+    async def student_misc_menu_second_handler(
+        call: CallbackQuery, callback_data: dict
+    ):
+        await States.student_misc_menu_second.set()
+        message = call.message
+        await send_message(
+            message,
+            text="student misc menu #2",
+            keyboard=STUDENT_MISC_MENU_SECOND_KEYBOARD,
+            parse_mode="markdown",
+        )
+        await call.answer()
+
+    # =============================
+    @dp.callback_query_handler(
+        cf.filter(action=["next_lesson"]),
+        state=[States.student_menu],
+    )
+    async def student_next_lesson_handler(call: CallbackQuery):
+        await States.student_menu.set()
+        message = call.message
+        text = await get_student_next_lesson(user_id=message.chat.id)
+        await send_message(
+            message,
+            text=text,
+            keyboard=STUDENT_MAIN_KEYBOARD,
+            parse_mode="markdown",
+        )
+        await call.answer()
+
+    # =============================
+    @dp.callback_query_handler(
+        cf.filter(action=["today"]),
+        state=[States.student_menu],
+    )
+    async def student_today_handler(call: CallbackQuery):
+        await States.student_menu.set()
+        message = call.message
+        text = await get_student_today(user_id=message.chat.id)
+        await send_message(
+            message,
+            text=text,
+            keyboard=STUDENT_MAIN_KEYBOARD,
+            parse_mode="markdown",
+        )
+        await call.answer()
+
+    # =============================
+    @dp.callback_query_handler(
+        cf.filter(action=["tomorrow"]),
+        state=[States.student_menu],
+    )
+    async def student_tomorrow_handler(call: CallbackQuery):
+        await States.student_menu.set()
+        message = call.message
+        text = await get_student_tomorrow(user_id=message.chat.id)
+        await send_message(
+            message,
+            text=text,
+            keyboard=STUDENT_MAIN_KEYBOARD,
+            parse_mode="markdown",
+        )
+        await call.answer()
+
+    # =============================
+    @dp.callback_query_handler(
+        cf.filter(action=["week"]),
+        state=[States.student_menu],
+    )
+    async def student_week_handler(call: CallbackQuery):
+        await States.student_menu.set()
+        message = call.message
+        text = await get_student_week(user_id=message.chat.id)
+        await send_message(
+            message,
+            text=text,
+            keyboard=STUDENT_MAIN_KEYBOARD,
+            parse_mode="markdown",
+        )
+        await call.answer()
+
+    # =============================
+    @dp.callback_query_handler(
+        cf.filter(action=["ring_timetable"]),
+        state=[States.student_misc_menu_first],
+    )
+    async def student_ring_timetable_handler(call: CallbackQuery):
+        await States.student_menu.set()
+        message = call.message
+        text = await get_ring_timetable(message.chat.id)
+        await send_message(
+            message,
+            text=text,
+            keyboard=STUDENT_MAIN_KEYBOARD,
+            parse_mode="markdown",
+        )
+        await call.answer()
+
+    # =============================
+    @dp.callback_query_handler(
+        cf.filter(action=["canteen_timetable"]),
+        state=[States.student_misc_menu_second],
+    )
+    async def student_canteen_timetable_handler(call: CallbackQuery):
+        await States.student_menu.set()
+        message = call.message
+        text = await get_canteen_timetable(message.chat.id)
+        await send_message(
+            message,
+            text=text,
+            keyboard=STUDENT_MAIN_KEYBOARD,
+            parse_mode="markdown",
+        )
+        await call.answer()
