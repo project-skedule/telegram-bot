@@ -15,9 +15,9 @@ RUN pip install --no-cache-dir --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Create App folder 
-RUN mkdir /skedule
-WORKDIR /skedule
+RUN mkdir /skedule-telegram
+WORKDIR /skedule-telegram
 # copy all files
-COPY . /skedule/
+COPY . /skedule-telegram/
 # Run app
 CMD ["python3", "main.py"]
