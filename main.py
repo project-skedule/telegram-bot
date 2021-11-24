@@ -10,6 +10,17 @@ from src.handlers.administration_handlers import register_administration_handler
 from src.handlers.find_handlers import register_find_handlers
 from src.handlers.registration_handlers import register_registration_handlers
 from os import getenv
+from aiohttp import web
+
+routes = web.RouteTableDef()
+
+@routes.get('/')
+async def healthcheck(request):
+    return web.Response(text="Healthy")
+app = web.Application()
+app.add_routes(routes)
+web.run_app(app)    
+
 
 async def run():
     await register_error_handlers()
@@ -24,6 +35,7 @@ async def run():
 
     # await aiogram.executor.start_polling(dp, skip_updates=True)
     await dp.start_polling()
+    
 
 
 async def zmq():
