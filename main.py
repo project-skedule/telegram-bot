@@ -14,12 +14,15 @@ from aiohttp import web
 
 routes = web.RouteTableDef()
 
-@routes.get('/')
+
+@routes.get("/")
 async def healthcheck(request):
     return web.Response(text="Healthy")
+
+
 app = web.Application()
 app.add_routes(routes)
-web.run_app(app)    
+web.run_app(app)
 
 
 async def run():
@@ -35,11 +38,10 @@ async def run():
 
     # await aiogram.executor.start_polling(dp, skip_updates=True)
     await dp.start_polling()
-    
 
 
 async def zmq():
-    context = azmq.Context();
+    context = azmq.Context()
     socket = context.socket(zmq.SUB)
     port = getenv("ZMQ_PORT")
     host = getenv("ZMQ_HOST")
@@ -59,11 +61,11 @@ async def zmq():
         for id in ids:
             await bot.send_message(chat_id=id, text=text, parse_mode="markdown", **args)
 
+
 async def main():
     bot_service = main_loop.create_task(run())
     zmq_service = main_loop.create_task(zmq())
     await asyncio.wait([bot_service, zmq_service])
-
 
 
 if __name__ == "__main__":
