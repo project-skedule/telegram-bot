@@ -1,8 +1,8 @@
 from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery, Message
-from ..text_loader import Texts
+from src.texts import Texts
 
-from ..api import (
+from src.api import (
     get_student_day_of_week,
     get_student_next_lesson,
     get_student_today,
@@ -15,8 +15,8 @@ from ..api import (
     get_teacher_week,
 )
 
-from ..bot import bot, dp
-from ..keyboards import (
+from src.bot import bot, dp
+from src.keyboards import (
     FIND_DAY_OF_WEEK_KEYBOARD,
     FIND_MAIN_KEYBOARD,
     FIND_STUDENT_SUBMIT_KEYBOARD,
@@ -27,9 +27,9 @@ from ..keyboards import (
     get_find_enter_letter_keyboard,
     get_find_enter_parallel_keyboard,
 )
-from ..logger import logger
-from ..some_functions import dispatcher_menu, is_find_for_student, send_message
-from ..states import States
+from src.logger import logger
+from src.some_functions import dispatcher_menu, is_find_for_student, send_message
+from src.states import States
 
 
 async def register_find_handlers():
@@ -168,7 +168,7 @@ async def register_find_handlers():
         cf.filter(action=["find_choose_day_of_week"]),
         state=[States.find_day_of_week],
     )
-    async def find_day_of_week_handler(
+    async def find_choose_day_of_week_handler(
         call: CallbackQuery, state: FSMContext, callback_data: dict
     ):
         message = call.message
@@ -180,7 +180,7 @@ async def register_find_handlers():
             )
         else:
             text = await get_teacher_day_of_week(
-                class_name=(await state.get_data()["teacher"]), day=day_of_week
+                teacher_name=(await state.get_data()["teacher"]), day=day_of_week
             )
 
         await dispatcher_menu(message, role, text)
@@ -203,7 +203,7 @@ async def register_find_handlers():
             )
         else:
             text = await get_teacher_next_lesson(
-                class_name=(await state.get_data())["teacher"]
+                teacher_name=(await state.get_data())["teacher"]
             )
 
         await dispatcher_menu(message, role, text)
@@ -223,7 +223,7 @@ async def register_find_handlers():
             text = await get_student_today(class_name=(await state.get_data())["class"])
         else:
             text = await get_teacher_today(
-                class_name=(await state.get_data())["teacher"]
+                teacher_name=(await state.get_data())["teacher"]
             )
 
         await dispatcher_menu(message, role, text)
@@ -245,7 +245,7 @@ async def register_find_handlers():
             )
         else:
             text = await get_teacher_tomorrow(
-                class_name=(await state.get_data())["teacher"]
+                teacher_name=(await state.get_data())["teacher"]
             )
 
         await dispatcher_menu(message, role, text)
@@ -265,7 +265,7 @@ async def register_find_handlers():
             text = await get_student_week(class_name=(await state.get_data())["class"])
         else:
             text = await get_teacher_week(
-                class_name=(await state.get_data())["teacher"]
+                teacher_name=(await state.get_data())["teacher"]
             )
 
         await dispatcher_menu(message, role, text)
@@ -282,7 +282,7 @@ async def register_find_handlers():
             States.find_teacher_submit,
         ],
     )
-    async def find_input_teacher_handler(
+    async def find_enter_teacher_handler(
         call: CallbackQuery, state: FSMContext, callback_data: dict
     ):
         await States.find_input_teacher.set()

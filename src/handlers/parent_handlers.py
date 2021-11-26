@@ -1,7 +1,7 @@
 from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery, Message
 
-from ..api import (
+from src.api import (
     get_canteen_timetable,
     get_ring_timetable,
     get_student_day_of_week,
@@ -10,8 +10,8 @@ from ..api import (
     get_student_tomorrow,
     get_student_week,
 )
-from ..bot import bot, dp
-from ..keyboards import (
+from src.bot import bot, dp
+from src.keyboards import (
     CHILD_DAY_OF_WEEK_KEYBOARD,
     CHILD_MAIN_KEYBOARD,
     CHILD_MISC_MENU_FIRST_KEYBOARD,
@@ -19,10 +19,10 @@ from ..keyboards import (
     cf,
     get_child_keyboard,
 )
-from ..logger import logger
-from ..some_functions import send_message
-from ..states import States
-from ..text_loader import Texts
+from src.logger import logger
+from src.some_functions import send_message
+from src.states import States
+from src.texts import Texts
 
 
 async def register_parent_handlers():
@@ -90,7 +90,7 @@ async def register_parent_handlers():
         cf.filter(action=["child_choose_day_of_week"]),
         state=[States.child_day_of_week],
     )
-    async def child_day_of_week_handler(
+    async def child_choose_day_of_week_handler(
         call: CallbackQuery, callback_data: dict, state: FSMContext
     ):
         await States.child_menu.set()

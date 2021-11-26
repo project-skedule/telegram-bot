@@ -3,7 +3,7 @@ from typing import List, Tuple
 from aiogram.types.inline_keyboard import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.callback_data import CallbackData
 
-from .api import (
+from src.api import (
     get_allowed_group,
     get_allowed_letter,
     get_allowed_parallel,
@@ -231,7 +231,7 @@ async def get_child_keyboard(name: int):  # TODO add api
         for child_name, child_id in children.items()
     ]
 
-    keyboard += [("parent menu #1", cf.new(action="parent_misc_menu_first", data=0))]
+    keyboard += [[("parent menu #1", cf.new(action="parent_misc_menu_first", data=0))]]
     return generate_markup(keyboard)
 
 
@@ -333,7 +333,15 @@ FIND_DAY_OF_WEEK_KEYBOARD = generate_markup(
 async def find_get_teachers_keyboard(teacher):
     teachers = await get_similar_teachers(teacher)
     return generate_markup(
-        [[(teacher["name"], cf.new(action="find_choose_teacher", data=teacher["id"]))] for teacher in teachers]
+        [
+            [
+                (
+                    teacher["name"],
+                    cf.new(action="find_choose_teacher", data=teacher["id"]),
+                )
+            ]
+            for teacher in teachers
+        ]
     )
 
 

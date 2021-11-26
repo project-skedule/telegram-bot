@@ -4,7 +4,7 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 # from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.contrib.fsm_storage.redis import RedisStorage
 
-from .config import TELEGRAM_TOKEN
+from src.config import TELEGRAM_TOKEN
 
 bot = Bot(token=TELEGRAM_TOKEN)
 

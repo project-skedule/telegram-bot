@@ -1,16 +1,16 @@
 from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery, Message
-from ..text_loader import Texts
-from ..api import get_canteen_timetable, get_ring_timetable
-from ..bot import bot, dp
-from ..keyboards import (
+from src.texts import Texts
+from src.api import get_canteen_timetable, get_ring_timetable
+from src.bot import bot, dp
+from src.keyboards import (
     ADMINISTRATION_MENU_FIRST_KEYBOARD,
     ADMINISTRATION_MENU_SECOND_KEYBOARD,
     cf,
 )
-from ..logger import logger
-from ..some_functions import send_message
-from ..states import States
+from src.logger import logger
+from src.some_functions import send_message
+from src.states import States
 
 
 async def register_administration_handlers():

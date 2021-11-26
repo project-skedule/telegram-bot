@@ -1,6 +1,6 @@
 import asyncio
 from typing import Union
-from .logger import logger
+from src.logger import logger
 
 import aiohttp
 import ujson

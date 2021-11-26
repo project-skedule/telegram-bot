@@ -1,7 +1,7 @@
 from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery, Message
-from ..text_loader import Texts
-from ..api import (
+from src.texts import Texts
+from src.api import (
     get_children,
     is_registered,
     register_administration,
@@ -10,8 +10,8 @@ from ..api import (
     register_teacher,
 )
 
-from ..bot import bot, dp
-from ..keyboards import (
+from src.bot import bot, dp
+from src.keyboards import (
     ADD_MORE_CHILDREN_KEYBOARD,
     ADMINISTRATION_MENU_FIRST_KEYBOARD,
     CHOOSE_ROLE_KEYBOARD,
@@ -28,9 +28,9 @@ from ..keyboards import (
     get_schools_keyboard,
     get_teachers_keyboard,
 )
-from ..logger import logger
-from ..some_functions import send_message
-from ..states import States
+from src.logger import logger
+from src.some_functions import send_message
+from src.states import States
 
 
 async def register_registration_handlers():
@@ -365,7 +365,7 @@ async def register_registration_handlers():
         await States.teacher_menu.set()
         school = (await state.get_data())["school"]
         teacher = (await state.get_data())["teacher"]
-        await register_teacher(message.chat.id, school, teacher)
+        await register_teacher(message.chat.id, teacher)
         await send_message(
             message,
             text=f"You successfully registered as {teacher}",
