@@ -8,7 +8,7 @@
 -i https://pypi.org/simple
 aiogram==2.15
 aiohttp==3.7.4.post0
-aioredis==1.3.0
+aioredis
 async-timeout==3.0.1
 attrs==21.2.0
 babel==2.9.1

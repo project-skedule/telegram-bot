@@ -10,10 +10,10 @@ from src.handlers.administration_handlers import register_administration_handler
 from src.handlers.find_handlers import register_find_handlers
 from src.handlers.registration_handlers import register_registration_handlers
 from os import getenv
-from aiohttp import web
+import aiohttp
 
-routes = web.RouteTableDef()
 
+<<<<<<< HEAD
 
 @routes.get("/")
 async def healthcheck(request):
@@ -23,7 +23,21 @@ async def healthcheck(request):
 app = web.Application()
 app.add_routes(routes)
 web.run_app(app)
+=======
+>>>>>>> dev_tg
 
+async def web():
+    
+    app = aiohttp.web.Application()
+    app.add_routes([
+        aiohttp.web.get('/', lambda req: aiohttp.web.Response(text='Healthy')),
+    ])
+
+    runner = aiohttp.web.AppRunner(app)
+    await runner.setup()
+    
+    await aiohttp.web.TCPSite(runner).start()
+    await asyncio.Event().wait()
 
 async def run():
     await register_error_handlers()
@@ -65,7 +79,8 @@ async def zmq():
 async def main():
     bot_service = main_loop.create_task(run())
     zmq_service = main_loop.create_task(zmq())
-    await asyncio.wait([bot_service, zmq_service])
+    web_service = main_loop.create_task(web())
+    await asyncio.wait([zmq_service, web_service, bot_service])
 
 
 if __name__ == "__main__":
