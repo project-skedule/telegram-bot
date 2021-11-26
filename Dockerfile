@@ -10,8 +10,8 @@ ENV TZ="Europe/Moscow"
 
 ENV PIP_DISABLE_PIP_VERSION_CHECK=on 
 ENV PIP_DEFAULT_TIMEOUT=100 
-COPY requirements.txt ./
 RUN pip install --no-cache-dir --upgrade pip
+COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Create App folder 
