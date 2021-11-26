@@ -112,7 +112,7 @@ async def register_find_handlers():
         message = call.message
         await send_message(
             message,
-            Texts.confirm_class(subclass=(await state.get_data())["class"]),
+            Texts.confirm_class.format(subclass=(await state.get_data())["class"]),
             FIND_STUDENT_SUBMIT_KEYBOARD,
         )
 
