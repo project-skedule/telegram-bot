@@ -135,7 +135,7 @@ async def register_parent_handlers():
         message = call.message
         await send_message(
             message,
-            text=Texts.parent_main_menu___,  # NOTE: why so many underscores
+            text=Texts.parent_main_menu,  # NOTE: why so many underscores
             keyboard=PARENT_MISC_MENU_FIRST_KEYBOARD,
             parse_mode="markdown",
         )

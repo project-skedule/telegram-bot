@@ -320,7 +320,7 @@ async def register_find_handlers():
     ):
         await States.find_teacher_submit.set()
         message = call.message
-        Texts.confirm_teacher_from_list.format(teacher_name=callback_data["data"])
+        text=Texts.confirm_teacher_from_list.format(teacher_name=callback_data["data"])
         await state.update_data({"teacher": callback_data["data"]})
         await send_message(
             message,
