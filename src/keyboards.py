@@ -21,7 +21,7 @@ def generate_markup(
     """Generate markup from variants.
     Variants must have certain structure. Firsly, variants is a `List` each element of which is a `List` too.
     Variants itself contains `ROW`s for buttons, which are `List`s.
-    Every `ROW` contains elements - `Tuple`, identifing button. Number of buttons in row is a number of columns.
+    Every `ROW` contains elements - `Tuple`, identifying button. Number of buttons in row is a number of columns.
     Button is a tuple of `str` - text for button and `CallbackData` for callbacks.
     Valid variants:
     [
