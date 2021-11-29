@@ -134,9 +134,9 @@ async def register_find_handlers():
         message = call.message
 
         if await is_find_for_student(state):
-            text = f"поиск ученика: `{(await state.get_data())['class']}`"
+            text = f"Расписание ученика `{(await state.get_data())['class']}` класса"
         else:
-            text = f"поиск учителя: `{(await state.get_data())['teacher']}`"
+            text = f"Расписание учителя `{(await state.get_data())['teacher']}`"
         await send_message(
             message,
             text,
@@ -174,6 +174,7 @@ async def register_find_handlers():
         message = call.message
         role = (await state.get_data())["role"]
         day_of_week = callback_data["data"]
+        # FIX: format
         if await is_find_for_student(state):
             text = await get_student_day_of_week(
                 class_name=(await state.get_data()["class"]), day=day_of_week
@@ -197,6 +198,7 @@ async def register_find_handlers():
         message = call.message
         role = (await state.get_data())["role"]
         day_of_week = callback_data["data"]
+        # FIX: format
         if await is_find_for_student(state):
             text = await get_student_next_lesson(
                 class_name=(await state.get_data())["class"]
@@ -219,6 +221,7 @@ async def register_find_handlers():
     ):
         message = call.message
         role = (await state.get_data())["role"]
+        # FIX: format
         if await is_find_for_student(state):
             text = await get_student_today(class_name=(await state.get_data())["class"])
         else:
@@ -239,6 +242,7 @@ async def register_find_handlers():
     ):
         message = call.message
         role = (await state.get_data())["role"]
+        # FIX: format
         if await is_find_for_student(state):
             text = await get_student_tomorrow(
                 class_name=(await state.get_data())["class"]
@@ -261,6 +265,7 @@ async def register_find_handlers():
     ):
         message = call.message
         role = (await state.get_data())["role"]
+        # FIX: format
         if await is_find_for_student(state):
             text = await get_student_week(class_name=(await state.get_data())["class"])
         else:
@@ -315,7 +320,7 @@ async def register_find_handlers():
     ):
         await States.find_teacher_submit.set()
         message = call.message
-        text = f"sure? {callback_data['data']}"
+        Texts.confirm_teacher_from_list.format(teacher_name=callback_data["data"])
         await state.update_data({"teacher": callback_data["data"]})
         await send_message(
             message,
