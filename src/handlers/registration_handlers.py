@@ -53,28 +53,28 @@ async def register_registration_handlers():
             if data["role"] == "Parent":
                 await States.choose_child.set()
                 await message.answer(
-                    text="choose child",
+                    text=Texts.choose_children,
                     reply_markup=await get_child_keyboard(message.chat.id),
                     parse_mode="markdown",
                 )
             elif data["role"] == "Student":
                 await States.student_menu.set()
                 await message.answer(
-                    text="student menu",
+                    text=Texts.student_main_menu,
                     reply_markup=STUDENT_MAIN_KEYBOARD,
                     parse_mode="markdown",
                 )
             elif data["role"] == "Teacher":
                 await States.teacher_menu.set()
                 await message.answer(
-                    text="teacher menu",
+                    text=Texts.teacher_main_menu,
                     reply_markup=TEACHER_MAIN_KEYBOARD,
                     parse_mode="markdown",
                 )
             elif data["role"] == "Administration":
                 await States.administration_menu_first.set()
                 await message.answer(
-                    text="administration menu #1",
+                    text=Texts.admin_main_menu,
                     reply_markup=ADMINISTRATION_MENU_FIRST_KEYBOARD,
                     parse_mode="markdown",
                 )
@@ -123,7 +123,7 @@ async def register_registration_handlers():
         await send_message(
             message,
             text="input school",
-            keyboard=None,
+            keyboard=None,  # FIX: why `None` is here?
             parse_mode="markdown",
         )
         await call.answer()
@@ -137,7 +137,7 @@ async def register_registration_handlers():
     async def input_school_message(message: Message):
         await States.choose_school.set()
         await message.answer(
-            text=f"school like {message.text}",
+            text=f"school like {message.text}",  # FIX: add format for schools like entered
             reply_markup=(await get_schools_keyboard(message.text)),
             parse_mode="markdown",
         )
@@ -169,14 +169,17 @@ async def register_registration_handlers():
             await send_message(
                 message,
                 text=Texts.enter_name,
-                keyboard=None,
+                keyboard=None,  # FIX: why `None`
                 parse_mode="markdown",
             )
         elif role == "Administration":
             await States.administration_submit.set()
+            text = Texts.confirm_for_admin.format(
+                school_name=(await state.get_data())["school"]
+            )
             await send_message(
                 message,
-                text=f"submit Administration from {(await state.get_data())['school']}",
+                text=text,
                 keyboard=SUBMIT_ADMINISTRATION_KEYBOARD,
                 parse_mode="markdown",
             )
@@ -191,7 +194,7 @@ async def register_registration_handlers():
     async def choose_teacher_handler(message: Message, state: FSMContext):
         await States.choose_teacher.set()
         await message.answer(
-            text="choose from:",
+            text="Choose teacher ",  # FIX: text for choosing teacher from list
             reply_markup=await get_teachers_keyboard(message.text),
             parse_mode="markdown",
         )
@@ -206,7 +209,9 @@ async def register_registration_handlers():
     ):
         await States.teacher_submit.set()
         message = call.message
-        text = f"sure? {callback_data['data']}"
+        text = Texts.confirm_teacher_from_list.format(
+            teachear_name=callback_data["data"]
+        )
         await state.update_data({"teacher": callback_data["data"]})
         await send_message(
             message,
@@ -317,7 +322,8 @@ async def register_registration_handlers():
             children = await get_children(message.chat.id)
             await send_message(
                 message,
-                text="\n".join(children.keys()) + "\nwanna more?",
+                text="\n".join(children.keys())
+                + "\nwanna more?",  # FIX: children names from redis
                 keyboard=ADD_MORE_CHILDREN_KEYBOARD,
                 parse_mode="markdown",
             )
@@ -347,7 +353,8 @@ async def register_registration_handlers():
         children = await get_children(message.chat.id)
         await send_message(
             message,
-            text="\n".join(children.keys()) + "\nwanna more?",
+            text="\n".join(children.keys())
+            + "\nwanna more?",  # FIX: children names from redis
             keyboard=ADD_MORE_CHILDREN_KEYBOARD,
             parse_mode="markdown",
         )
@@ -368,7 +375,7 @@ async def register_registration_handlers():
         await register_teacher(message.chat.id, teacher)
         await send_message(
             message,
-            text=f"You successfully registered as {teacher}",
+            text=Texts.successful_reg_teacher.format(teacher_name=teacher),
             keyboard=TEACHER_MAIN_KEYBOARD,
             parse_mode="markdown",
         )
@@ -388,7 +395,7 @@ async def register_registration_handlers():
         await register_administration(message.chat.id, school)
         await send_message(
             message,
-            text=f"You successfully registered as administration from {school}",
+            text=Texts.successful_reg_admin.format(school_name=school),
             keyboard=ADMINISTRATION_MENU_FIRST_KEYBOARD,
             parse_mode="markdown",
         )
