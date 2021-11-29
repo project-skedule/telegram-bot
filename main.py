@@ -13,31 +13,21 @@ from os import getenv
 import aiohttp
 
 
-<<<<<<< HEAD
-
-@routes.get("/")
-async def healthcheck(request):
-    return web.Response(text="Healthy")
-
-
-app = web.Application()
-app.add_routes(routes)
-web.run_app(app)
-=======
->>>>>>> dev_tg
-
 async def web():
-    
+
     app = aiohttp.web.Application()
-    app.add_routes([
-        aiohttp.web.get('/', lambda req: aiohttp.web.Response(text='Healthy')),
-    ])
+    app.add_routes(
+        [
+            aiohttp.web.get("/", lambda req: aiohttp.web.Response(text="Healthy")),
+        ]
+    )
 
     runner = aiohttp.web.AppRunner(app)
     await runner.setup()
-    
+
     await aiohttp.web.TCPSite(runner).start()
     await asyncio.Event().wait()
+
 
 async def run():
     await register_error_handlers()
