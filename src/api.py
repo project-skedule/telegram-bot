@@ -79,30 +79,36 @@ async def get_teacher_day_of_week(user_id=None, teacher_name=None, day=None):
 
 
 async def get_student_next_lesson(user_id=None, class_name=None):
+    # FIX: get from reddis teacher_id/subclass_id
     if user_id is not None:
         class_name = await get_student_class(user_id)
     return f"next lesson for {class_name}"
 
 
 async def get_student_today(user_id=None, class_name=None):
+
+    # FIX: get from reddis teacher_id/subclass_id
     if user_id is not None:
         class_name = await get_student_class(user_id)
     return f"today for {class_name}"
 
 
 async def get_student_tomorrow(user_id=None, class_name=None):
+    # FIX: get from reddis teacher_id/subclass_id
     if user_id is not None:
         class_name = await get_student_class(user_id)
     return f"tomorrow for {class_name}"
 
 
 async def get_student_week(user_id=None, class_name=None):
+    # FIX: get from reddis teacher_id/subclass_id
     if user_id is not None:
         class_name = await get_student_class(user_id)
     return f"week for {class_name}"
 
 
 async def get_student_day_of_week(user_id=None, class_name=None, day=None):
+    # FIX: get from reddis teacher_id/subclass_id
     if user_id is not None:
         class_name = await get_student_class(user_id)
     return f"day of week #{day} for {class_name}"
@@ -111,12 +117,34 @@ async def get_student_day_of_week(user_id=None, class_name=None, day=None):
 # ~=============================
 
 
-async def get_ring_timetable(name: int):
-    return f"*РАСПИСАНИЕ ЗВОНКОВ* for {name}:\nНОМЕР    ВРЕМЯ                ПЕРЕМЕНА\n0 урок      08:15 - 08:55      5\n1 урок      09:00 - 09:40      10\n2 урок      09:50 - 10:30      15\n3 урок      10:45 - 11:25      15\n4 урок      11:40 - 12:20      20\n5 урок      12:40 - 13:20      20\n6 урок      13:40 - 14:20      20\n7 урок      14:40 - 15:20      10\n8 урок      15:30 - 16:10"
+async def get_ring_timetable(telegram_id: int):
+    # FIX: get school id from reddis
+    school_id = 1
+    data = await get_request("/info/lessontimetable/all", data={"school_id": school_id})
+
+    # return f"*РАСПИСАНИЕ ЗВОНКОВ* for {name}:\nНОМЕР    ВРЕМЯ                ПЕРЕМЕНА\n0 урок      08:15 - 08:55      5\n1 урок      09:00 - 09:40      10\n2 урок      09:50 - 10:30      15\n3 урок      10:45 - 11:25      15\n4 урок      11:40 - 12:20      20\n5 урок      12:40 - 13:20      20\n6 урок      13:40 - 14:20      20\n7 урок      14:40 - 15:20      10\n8 урок      15:30 - 16:10"
+    return data["data"]
 
 
-async def get_canteen_timetable(name: int):
-    return f"*1 КОРПУС:*\n\n*БУФЕТ* for {name}:\nПонедельник-пятница - 9:00 - 15:00\nСуббота - 10:00 - 14:00\n\nСТОЛОВАЯ:\n\n*РАСПИСАНИЕ ЗАВТРАКОВ:*\n10ые классы - 9:40 - 9:50\n11ые классы - 10:30 - 10:45\n\n*РАСПИСАНИЕ ОБЕДОВ:*\n10ые классы - 12:20 - 12:40\n11ые классы - 13:20 - 13:40\n\n\n*2 КОРПУС:*\n\n*СТОЛОВАЯ:*\n\n*РАСПИСАНИЕ ЗАВТРАКОВ:*\n8ые классы - 9:40 - 9:50\n9ые классы - 10:30 - 10:45\n10-11ые классы - 11:25 - 11:40\n\n*РАСПИСАНИЕ ОБЕДОВ:*\n8ые классы - 12:20 - 12:40\n9ые классы - 13:20 - 13:40\n10-11ые классы - 14:20 - 14:40"
+async def get_canteen_timetable(telegram_id: int):
+    # FIX : get school_id from reddis
+    school_id = 1
+
+    corpuses = await get_request(
+        "/api/info/corpuses/all", data={"school_id": school_id}
+    )
+    corpuses = list(map(lambda c: (c["name"], c["id"]), corpuses["data"]))
+
+    canteen_texts = {}
+    for corpus_name, corpus_id in corpuses:
+        canteen_text = await get_request(
+            "/api/info/corpus/canteen", data={"corpus_id": corpus_id}
+        )
+        canteen_texts[corpus_name] = canteen_text["data"]
+
+    return canteen_texts
+
+    # return f"*1 КОРПУС:*\n\n*БУФЕТ* for {name}:\nПонедельник-пятница - 9:00 - 15:00\nСуббота - 10:00 - 14:00\n\nСТОЛОВАЯ:\n\n*РАСПИСАНИЕ ЗАВТРАКОВ:*\n10ые классы - 9:40 - 9:50\n11ые классы - 10:30 - 10:45\n\n*РАСПИСАНИЕ ОБЕДОВ:*\n10ые классы - 12:20 - 12:40\n11ые классы - 13:20 - 13:40\n\n\n*2 КОРПУС:*\n\n*СТОЛОВАЯ:*\n\n*РАСПИСАНИЕ ЗАВТРАКОВ:*\n8ые классы - 9:40 - 9:50\n9ые классы - 10:30 - 10:45\n10-11ые классы - 11:25 - 11:40\n\n*РАСПИСАНИЕ ОБЕДОВ:*\n8ые классы - 12:20 - 12:40\n9ые классы - 13:20 - 13:40\n10-11ые классы - 14:20 - 14:40"
 
 
 # ~=============================
