@@ -27,7 +27,7 @@ async def register_administration_handlers():
         message = call.message
         await send_message(
             message,
-            text="administration menu #1",
+            text=Texts.admin_main_menu,
             keyboard=ADMINISTRATION_MENU_FIRST_KEYBOARD,
             parse_mode="markdown",
         )
@@ -43,7 +43,7 @@ async def register_administration_handlers():
         message = call.message
         await send_message(
             message,
-            text="administration menu #2",
+            text=Texts.admin_misc_menu,
             keyboard=ADMINISTRATION_MENU_SECOND_KEYBOARD,
             parse_mode="markdown",
         )
@@ -56,7 +56,18 @@ async def register_administration_handlers():
     )
     async def administration_ring_timetable_handler(call: CallbackQuery):
         message = call.message
-        text = await get_ring_timetable(message.chat.id)
+
+        data = await get_ring_timetable(message.chat.id)
+        # FIX: add break
+        text = Texts.rings_timetable_header + "".join(
+            Texts.rings_timetable_format.format(
+                lesson_number=lsn["number"],
+                time=lsn["time_start"] + " - " + lsn["time_end"],
+                _break="",
+            )
+            for lsn in data
+        )
+
         await send_message(
             message,
             text=text,
@@ -72,7 +83,13 @@ async def register_administration_handlers():
     )
     async def administration_canteen_timetable_handler(call: CallbackQuery):
         message = call.message
-        text = await get_canteen_timetable(message.chat.id)
+        canteens = await get_canteen_timetable(message.chat.id)
+        text = Texts.canteen_timetable_header + "".join(
+            Texts.canteen_timetable_format.format(
+                corpus_name=corpus_name, canteen_text=canteen_text
+            )
+            for corpus_name, canteen_text in canteens.items()
+        )
         await send_message(
             message,
             text=text,
