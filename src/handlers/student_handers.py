@@ -4,11 +4,11 @@ from src.texts import Texts
 from src.api import (
     get_canteen_timetable,
     get_ring_timetable,
-    get_student_day_of_week,
-    get_student_next_lesson,
-    get_student_today,
-    get_student_tomorrow,
-    get_student_week,
+    get_user_day_of_week,
+    get_user_next_lesson,
+    get_user_today,
+    get_user_tomorrow,
+    get_user_week,
 )
 from src.bot import bot, dp
 from src.keyboards import (
@@ -71,8 +71,8 @@ async def register_student_handlers():
     ):
         await States.student_menu.set()
         message = call.message
-        text = await get_student_day_of_week(
-            user_id=message.chat.id, day=callback_data["data"]
+        text = await get_user_day_of_week(
+            telegram_id=message.chat.id, day_of_week=callback_data["data"], is_searching=False
         )
         await send_message(
             message,
@@ -125,7 +125,7 @@ async def register_student_handlers():
         await States.student_menu.set()
         message = call.message
         # FIX format Texts.lesson_format
-        text = await get_student_next_lesson(user_id=message.chat.id)
+        text = await get_user_next_lesson(telegram_id=message.chat.id, is_searching=False)
         await send_message(
             message,
             text=text,
@@ -144,7 +144,7 @@ async def register_student_handlers():
         message = call.message
         # TODO format
         Texts.today_timetable
-        text = await get_student_today(user_id=message.chat.id)
+        text = await get_user_today(telegram_id=message.chat.id, is_searching=True)
         await send_message(
             message,
             text=text,
@@ -162,7 +162,7 @@ async def register_student_handlers():
         await States.student_menu.set()
         message = call.message
         # FIX format
-        text = await get_student_tomorrow(user_id=message.chat.id)
+        text = await get_user_tomorrow(telegram_id=message.chat.id, is_searching=False)
         await send_message(
             message,
             text=text,
@@ -180,7 +180,7 @@ async def register_student_handlers():
         await States.student_menu.set()
         message = call.message
         # FIX format
-        text = await get_student_week(user_id=message.chat.id)
+        text = await get_user_week(telegram_id=message.chat.id, is_searching=False)
 
         await send_message(
             message,
