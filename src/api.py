@@ -276,9 +276,9 @@ async def register_teacher(telegram_id, teacher_id):
     await save(data)
 
 
-async def register_administration(user_id, school_id):
+async def register_administration(telegram_id, school_id):
     data = await post_request(
-        "/registration/administration", {"telegram_id": user_id, "school_id": school_id}
+        "/registration/administration", {"telegram_id": telegram_id, "school_id": school_id}
     )
     await save(data)
 

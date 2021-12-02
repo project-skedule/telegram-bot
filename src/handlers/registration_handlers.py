@@ -317,7 +317,7 @@ async def register_registration_handlers():
 
         role = (await state.get_data())["role"]
         if role == "Parent":
-            await register_child(message.chat.id, school, class_name)
+            await register_child(telegram_id=message.chat.id, subclass_id=class_name)
             await States.show_childs.set()
             children = await get_children(message.chat.id)
             await send_message(
@@ -328,7 +328,7 @@ async def register_registration_handlers():
                 parse_mode="markdown",
             )
         elif role == "Student":
-            await register_student(message.chat.id, school, class_name)
+            await register_student(telegram_id=message.chat.id, subclass_id=class_name)
             await States.student_menu.set()
             await send_message(
                 message,
@@ -372,7 +372,7 @@ async def register_registration_handlers():
         await States.teacher_menu.set()
         school = (await state.get_data())["school"]
         teacher = (await state.get_data())["teacher"]
-        await register_teacher(message.chat.id, teacher)
+        await register_teacher(telegram_id=message.chat.id, teacher_id=teacher)
         await send_message(
             message,
             text=Texts.successful_reg_teacher.format(teacher_name=teacher),
@@ -392,7 +392,7 @@ async def register_registration_handlers():
         message = call.message
         await States.administration_menu_first.set()
         school = (await state.get_data())["school"]
-        await register_administration(message.chat.id, school)
+        await register_administration(telegram_id=message.chat.id, school_id=school)
         await send_message(
             message,
             text=Texts.successful_reg_admin.format(school_name=school),
