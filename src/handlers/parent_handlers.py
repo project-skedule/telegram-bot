@@ -4,11 +4,11 @@ from aiogram.types import CallbackQuery, Message
 from src.api import (
     get_canteen_timetable,
     get_ring_timetable,
-    get_student_day_of_week,
-    get_student_next_lesson,
-    get_student_today,
-    get_student_tomorrow,
-    get_student_week,
+    get_user_day_of_week,
+    get_user_next_lesson,
+    get_user_today,
+    get_user_tomorrow,
+    get_user_week,
 )
 from src.bot import bot, dp
 from src.keyboards import (
@@ -101,9 +101,8 @@ async def register_parent_handlers():
         await States.child_menu.set()
         message = call.message
         # FIX format
-        text = await get_student_day_of_week(
-            (await state.get_data())["child"], callback_data["data"]
-        )
+        text = await get_user_day_of_week(
+            telegram_id=(await state.get_data())["child"], day_of_week=callback_data["data"], is_searching=False)
         await send_message(
             message, text=text, keyboard=CHILD_MAIN_KEYBOARD, parse_mode="markdown"
         )
@@ -135,7 +134,7 @@ async def register_parent_handlers():
         message = call.message
         await send_message(
             message,
-            text=Texts.parent_main_menu,  # NOTE: why so many underscores
+            text=Texts.parent_main_menu,
             keyboard=PARENT_MISC_MENU_FIRST_KEYBOARD,
             parse_mode="markdown",
         )
@@ -150,7 +149,7 @@ async def register_parent_handlers():
         await States.child_menu.set()
         message = call.message
         # FIX format
-        text = await get_student_next_lesson((await state.get_data())["child"])
+        text = await get_user_next_lesson(telegram_id=(await state.get_data())["child"], is_searching=False)
         await send_message(
             message, text=text, keyboard=CHILD_MAIN_KEYBOARD, parse_mode="markdown"
         )
@@ -165,7 +164,7 @@ async def register_parent_handlers():
         await States.child_menu.set()
         message = call.message
         # FIX: format
-        text = await get_student_today((await state.get_data())["child"])
+        text = await get_user_today(telegram_id=(await state.get_data())["child"], is_searching=False)
         await send_message(
             message, text=text, keyboard=CHILD_MAIN_KEYBOARD, parse_mode="markdown"
         )
@@ -180,7 +179,7 @@ async def register_parent_handlers():
         await States.child_menu.set()
         message = call.message
         # FIX format
-        text = await get_student_tomorrow((await state.get_data())["child"])
+        text = await get_user_tomorrow(telegram_id=(await state.get_data())["child"], is_searching=False)
         await send_message(
             message, text=text, keyboard=CHILD_MAIN_KEYBOARD, parse_mode="markdown"
         )
@@ -195,7 +194,7 @@ async def register_parent_handlers():
         await States.child_menu.set()
         message = call.message
         # FIX: format
-        text = await get_student_week((await state.get_data())["child"])
+        text = await get_user_week(telegram_id=(await state.get_data())["child"], is_searching=False)
         await send_message(
             message, text=text, keyboard=CHILD_MAIN_KEYBOARD, parse_mode="markdown"
         )
