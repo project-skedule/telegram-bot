@@ -123,10 +123,16 @@ async def get_user_tomorrow(
         else:
             data = {"subclass_id", get_subclass_id(telegram_id)}
 
-    data = await get_request("/lesson/get/day", data={"data": data, "school_id": school_id, "day_of_week":day_of_week})
+    data = await get_request(
+        "/lesson/get/day",
+        data={"data": data, "school_id": school_id, "day_of_week": day_of_week},
+    )
     return data
 
-async def get_user_week(telegram_id, is_searching=False, teacher_id=None, subclass_id=None):
+
+async def get_user_week(
+    telegram_id, is_searching=False, teacher_id=None, subclass_id=None
+):
     """
     Returns timetable for user with `telegram_id` if `is_searching` == False
     Else return timetable for `teacher_id` or `subclass_id` (Only one must be set)
@@ -146,28 +152,30 @@ async def get_user_week(telegram_id, is_searching=False, teacher_id=None, subcla
             data = {"subclass_id", get_subclass_id(telegram_id)}
 
     data = await get_request(
-        '/lesson/get/range',
+        "/lesson/get/range",
         data={
             "data": data,
             "start_index": 1,
             "end_index": 1,
             "school_id": school_id,
-        }
+        },
     )
     return data
 
 
-async def get_user_day_of_week(telegram_id, day_of_week, is_searching=False, teacher_id=None, subclass_id=None):
+async def get_user_day_of_week(
+    telegram_id, day_of_week, is_searching=False, teacher_id=None, subclass_id=None
+):
     """
-        Returns timetable for user with `telegram_id` if `is_searching` == False
-        Else return timetable for `teacher_id` or `subclass_id` (Only one must be set)
+    Returns timetable for user with `telegram_id` if `is_searching` == False
+    Else return timetable for `teacher_id` or `subclass_id` (Only one must be set)
     """
     school_id = await get_school_id(telegram_id)
     if is_searching:
         if teacher_id is not None:
-            data = { "teaher_id": teacher_id }
+            data = {"teaher_id": teacher_id}
         else:
-            data = { "subclass_id": subclass_id }
+            data = {"subclass_id": subclass_id}
     else:
         main_role = get_main_role(telegram_id)
 
@@ -175,10 +183,15 @@ async def get_user_day_of_week(telegram_id, day_of_week, is_searching=False, tea
             data = {"teacher_id", get_teacher_id(telegram_id)}
         else:
             data = {"subclass_id", get_subclass_id(telegram_id)}
-    data = await get_request("/lesson/get/day", data={"data": data, "school_id": school_id, "day_of_week":day_of_week})
+    data = await get_request(
+        "/lesson/get/day",
+        data={"data": data, "school_id": school_id, "day_of_week": day_of_week},
+    )
     return data
 
+
 # ~=============================
+
 
 async def get_ring_timetable(telegram_id: int):
     school_id = await get_school_id(telegram_id)
@@ -202,43 +215,59 @@ async def get_canteen_timetable(telegram_id: int):
 
     return canteen_texts
 
+
 # ~=============================
+
 
 async def get_allowed_parallel(is_searching, telegram_id=None, school_id=None):
     """
-        If `is_searching` is True, returns for `school_id` for account `telegram_id`.
-        Else returns for school with `school_id`
-        Only one of `telegram_id` and `school_id` must be set
+    If `is_searching` is True, returns for `school_id` for account `telegram_id`.
+    Else returns for school with `school_id`
+    Only one of `telegram_id` and `school_id` must be set
     """
     if is_searching:
         school_id = await get_school_id(telegram_id)
     data = await get_request("/info/parallels/all", data={"school_id": school_id})
     return data
 
+
 async def get_allowed_letter(is_searching, parallel, telegram_id=None, school_id=None):
     """
-        If `is_searching` is True, returns for `school_id` for account `telegram_id`.
-        Else returns for school with `school_id`
-        Only one of `telegram_id` and `school_id` must be set
+    If `is_searching` is True, returns for `school_id` for account `telegram_id`.
+    Else returns for school with `school_id`
+    Only one of `telegram_id` and `school_id` must be set
     """
     if is_searching:
         school_id = await get_school_id(telegram_id)
 
-    data = await get_request("/info/letters/all", data={"school_id": school_id, "educational_level": parallel})
+    data = await get_request(
+        "/info/letters/all",
+        data={"school_id": school_id, "educational_level": parallel},
+    )
     return data
 
 
-async def get_allowed_group(is_searching, parallel, letter, telegram_id=None, school_id=None):
+async def get_allowed_group(
+    is_searching, parallel, letter, telegram_id=None, school_id=None
+):
     """
-        If `is_searching` is True, returns for `school_id` for account `telegram_id`.
-        Else returns for school with `school_id`
-        Only one of `telegram_id` and `school_id` must be set
+    If `is_searching` is True, returns for `school_id` for account `telegram_id`.
+    Else returns for school with `school_id`
+    Only one of `telegram_id` and `school_id` must be set
     """
     if is_searching:
         school_id = get_school_id(telegram_id)
 
-    data = await get_request("/info/groups/all", data={"school_id": school_id, "educational_level": parallel, "identificator": letter})
+    data = await get_request(
+        "/info/groups/all",
+        data={
+            "school_id": school_id,
+            "educational_level": parallel,
+            "identificator": letter,
+        },
+    )
     return data
+
 
 async def is_registered(telegram_id):
     data = await get_request("/info/check/telegramid", {"telegram_id": telegram_id})
@@ -256,18 +285,23 @@ async def get_similar_teachers(teacher_name, school_id):
     )
     return data
 
+
 # ~=============================
 async def register_student(telegram_id, subclass_id):
     data = await post_request(
-        "/registration/student", {"telegram_id": telegram_id, "subclass_id": subclass_id}
+        "/registration/student",
+        {"telegram_id": telegram_id, "subclass_id": subclass_id},
     )
     await save(data)
 
+
 async def register_child(telegram_id, subclass_id):
     data = await post_request(
-        "/rolemanagement/add/child", {"parent_id": telegram_id, "subclass_id": subclass_id}
+        "/rolemanagement/add/child",
+        {"parent_id": telegram_id, "subclass_id": subclass_id},
     )
     await save(data)
+
 
 async def register_teacher(telegram_id, teacher_id):
     data = await post_request(
@@ -278,9 +312,11 @@ async def register_teacher(telegram_id, teacher_id):
 
 async def register_administration(telegram_id, school_id):
     data = await post_request(
-        "/registration/administration", {"telegram_id": telegram_id, "school_id": school_id}
+        "/registration/administration",
+        {"telegram_id": telegram_id, "school_id": school_id},
     )
     await save(data)
+
 
 # ~=============================
 

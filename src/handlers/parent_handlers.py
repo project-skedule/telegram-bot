@@ -102,7 +102,10 @@ async def register_parent_handlers():
         message = call.message
         # FIX format
         text = await get_user_day_of_week(
-            telegram_id=(await state.get_data())["child"], day_of_week=callback_data["data"], is_searching=False)
+            telegram_id=(await state.get_data())["child"],
+            day_of_week=callback_data["data"],
+            is_searching=False,
+        )
         await send_message(
             message, text=text, keyboard=CHILD_MAIN_KEYBOARD, parse_mode="markdown"
         )
@@ -149,7 +152,9 @@ async def register_parent_handlers():
         await States.child_menu.set()
         message = call.message
         # FIX format
-        text = await get_user_next_lesson(telegram_id=(await state.get_data())["child"], is_searching=False)
+        text = await get_user_next_lesson(
+            telegram_id=(await state.get_data())["child"], is_searching=False
+        )
         await send_message(
             message, text=text, keyboard=CHILD_MAIN_KEYBOARD, parse_mode="markdown"
         )
@@ -164,7 +169,9 @@ async def register_parent_handlers():
         await States.child_menu.set()
         message = call.message
         # FIX: format
-        text = await get_user_today(telegram_id=(await state.get_data())["child"], is_searching=False)
+        text = await get_user_today(
+            telegram_id=(await state.get_data())["child"], is_searching=False
+        )
         await send_message(
             message, text=text, keyboard=CHILD_MAIN_KEYBOARD, parse_mode="markdown"
         )
@@ -179,7 +186,9 @@ async def register_parent_handlers():
         await States.child_menu.set()
         message = call.message
         # FIX format
-        text = await get_user_tomorrow(telegram_id=(await state.get_data())["child"], is_searching=False)
+        text = await get_user_tomorrow(
+            telegram_id=(await state.get_data())["child"], is_searching=False
+        )
         await send_message(
             message, text=text, keyboard=CHILD_MAIN_KEYBOARD, parse_mode="markdown"
         )
@@ -194,7 +203,9 @@ async def register_parent_handlers():
         await States.child_menu.set()
         message = call.message
         # FIX: format
-        text = await get_user_week(telegram_id=(await state.get_data())["child"], is_searching=False)
+        text = await get_user_week(
+            telegram_id=(await state.get_data())["child"], is_searching=False
+        )
         await send_message(
             message, text=text, keyboard=CHILD_MAIN_KEYBOARD, parse_mode="markdown"
         )

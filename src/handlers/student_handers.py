@@ -72,7 +72,9 @@ async def register_student_handlers():
         await States.student_menu.set()
         message = call.message
         text = await get_user_day_of_week(
-            telegram_id=message.chat.id, day_of_week=callback_data["data"], is_searching=False
+            telegram_id=message.chat.id,
+            day_of_week=callback_data["data"],
+            is_searching=False,
         )
         await send_message(
             message,
@@ -125,7 +127,9 @@ async def register_student_handlers():
         await States.student_menu.set()
         message = call.message
         # FIX format Texts.lesson_format
-        text = await get_user_next_lesson(telegram_id=message.chat.id, is_searching=False)
+        text = await get_user_next_lesson(
+            telegram_id=message.chat.id, is_searching=False
+        )
         await send_message(
             message,
             text=text,

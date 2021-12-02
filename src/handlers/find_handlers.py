@@ -7,7 +7,7 @@ from src.api import (
     get_user_next_lesson,
     get_user_today,
     get_user_tomorrow,
-    get_user_week
+    get_user_week,
 )
 
 from src.bot import bot, dp
@@ -173,12 +173,16 @@ async def register_find_handlers():
         if await is_find_for_student(state):
             text = await get_user_day_of_week(
                 telegram_id=message.chat.id,
-                subclass_id=(await state.get_data())["class"], day_of_week=day_of_week, is_searching=True
+                subclass_id=(await state.get_data())["class"],
+                day_of_week=day_of_week,
+                is_searching=True,
             )
         else:
             text = await get_user_day_of_week(
                 telegram_id=message.chat.id,
-                teacher_id=(await state.get_data())["teacher"], day_of_week=day_of_week, is_searching=True,
+                teacher_id=(await state.get_data())["teacher"],
+                day_of_week=day_of_week,
+                is_searching=True,
             )
 
         await dispatcher_menu(message, role, text)
@@ -260,7 +264,7 @@ async def register_find_handlers():
             text = await get_user_tomorrow(
                 telegram_id=message.chat.id,
                 is_searching=True,
-                teacher_id=(await state.get_data())["teacher"]
+                teacher_id=(await state.get_data())["teacher"],
             )
 
         await dispatcher_menu(message, role, text)
@@ -278,7 +282,11 @@ async def register_find_handlers():
         role = (await state.get_data())["role"]
         # FIX: format
         if await is_find_for_student(state):
-            text = await get_user_week(telegram_id=message.chat.id,subclass_id=(await state.get_data())["class"], is_searching=True)
+            text = await get_user_week(
+                telegram_id=message.chat.id,
+                subclass_id=(await state.get_data())["class"],
+                is_searching=True,
+            )
         else:
             text = await get_user_week(
                 telegram_id=message.chat.id,
