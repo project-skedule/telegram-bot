@@ -4,11 +4,11 @@ from src.texts import Texts
 from src.api import (
     get_canteen_timetable,
     get_ring_timetable,
-    get_teacher_day_of_week,
-    get_teacher_next_lesson,
-    get_teacher_today,
-    get_teacher_tomorrow,
-    get_teacher_week,
+    get_user_day_of_week,
+    get_user_next_lesson,
+    get_user_today,
+    get_user_tomorrow,
+    get_user_week,
 )
 from src.bot import bot, dp
 from src.keyboards import (
@@ -72,8 +72,9 @@ async def register_teacher_handlers():
         await States.teacher_menu.set()
         message = call.message
         # TODO: format
-        text = await get_teacher_day_of_week(
-            user_id=message.chat.id, day=callback_data["data"]
+        text = await get_user_day_of_week(
+            telegram_id=message.chat.id, day_of_week=callback_data["data"],
+            is_searching=False
         )
         await send_message(
             message,
@@ -100,6 +101,7 @@ async def register_teacher_handlers():
         await call.answer()
 
     # =============================
+
     @dp.callback_query_handler(
         cf.filter(action=["teacher_misc_menu_second"]),
         state=[States.teacher_menu, States.teacher_misc_menu_first],
@@ -125,7 +127,7 @@ async def register_teacher_handlers():
     async def teacher_next_lesson_handler(call: CallbackQuery):
         message = call.message
         # FIX: format
-        text = await get_teacher_next_lesson(user_id=message.chat.id)
+        text = await get_user_next_lesson(telegram_id=message.chat.id, is_searching=False)
         await send_message(
             message,
             text=text,
@@ -142,7 +144,7 @@ async def register_teacher_handlers():
     async def teacher_today_handler(call: CallbackQuery):
         message = call.message
         # FIX: format
-        text = await get_teacher_today(user_id=message.chat.id)
+        text = await get_user_today(telegram_id=message.chat.id, is_searching=False)
         await send_message(
             message,
             text=text,
@@ -159,7 +161,7 @@ async def register_teacher_handlers():
     async def teacher_tomorrow_handler(call: CallbackQuery):
         message = call.message
         # FIX: format
-        text = await get_teacher_tomorrow(user_id=message.chat.id)
+        text = await get_user_tomorrow(telegram_id=message.chat.id, is_searching=False)
         await send_message(
             message,
             text=text,
@@ -176,7 +178,7 @@ async def register_teacher_handlers():
     async def teacher_week_handler(call: CallbackQuery):
         message = call.message
         # FIX: format
-        text = await get_teacher_week(user_id=message.chat.id)
+        text = await get_user_week(telegram_id=message.chat.id, is_searching=False)
         await send_message(
             message,
             text=text,

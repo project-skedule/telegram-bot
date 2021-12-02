@@ -247,7 +247,7 @@ async def get_find_enter_parallel_keyboard(user_id):
 
 async def get_find_enter_letter_keyboard(user_id, current_chosen):
     allowed_letter = await get_allowed_letter(
-        user_id=user_id, current_chosen=current_chosen
+        telegram_id=user_id, current_chosen=current_chosen
     )
     return generate_markup(
         [[(f"{i}", cf.new(action="find_enter_group", data=i))] for i in allowed_letter]

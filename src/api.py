@@ -69,14 +69,14 @@ async def get_user_next_lesson(
 
 
 async def get_user_today(
-    user_id, is_searching=False, teacher_id=None, subclass_id=None
+    telegram_id, is_searching=False, teacher_id=None, subclass_id=None
 ):
     """
     Returns timetable for user with `telegram_id` if `is_searching` == False
     Else return timetable for `teacher_id` or `subclass_id` (Only one must be set)
     """
     day_of_week = get_current_day_of_week()
-    school_id = await get_school_id(user_id)
+    school_id = await get_school_id(telegram_id)
 
     if is_searching:
         if teacher_id is not None:
@@ -84,12 +84,12 @@ async def get_user_today(
         else:
             data = {"subclass_id": subclass_id}
     else:
-        main_role = await get_main_role(user_id)
+        main_role = await get_main_role(telegram_id)
 
         if main_role == "teacher":
-            data = {"teacher_id": get_teacher_id(user_id)}
+            data = {"teacher_id": get_teacher_id(telegram_id)}
         else:
-            data = {"subclass_id": get_subclass_id(user_id)}
+            data = {"subclass_id": get_subclass_id(telegram_id)}
 
     data = await get_request(
         "/lesson/get/day",
