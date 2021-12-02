@@ -71,7 +71,7 @@ async def register_teacher_handlers():
     ):
         await States.teacher_menu.set()
         message = call.message
-        # FIX: format
+        # TODO: format
         text = await get_teacher_day_of_week(
             user_id=message.chat.id, day=callback_data["data"]
         )

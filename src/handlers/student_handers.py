@@ -142,7 +142,7 @@ async def register_student_handlers():
     async def student_today_handler(call: CallbackQuery):
         await States.student_menu.set()
         message = call.message
-        # FIX format
+        # TODO format
         Texts.today_timetable
         text = await get_student_today(user_id=message.chat.id)
         await send_message(

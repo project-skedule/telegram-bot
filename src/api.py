@@ -1,7 +1,8 @@
 import asyncio
 from typing import Union
 from src.logger import logger
-
+from src.redis import *  # TODO remove star import
+from src.some_functions import get_current_day_of_week
 import aiohttp
 import ujson
 
@@ -32,48 +33,150 @@ async def put_request(request: str, data):  # TODO 200 status code handler
 # ~=============================
 
 
-async def get_school(user_id):  # TODO add redis
-    return "1580"
+async def get_user_next_lesson(
+    telegram_id, is_searching=False, teacher_id=None, subclass_id=None
+):
+    """
+    Returns timetable for user with `telegram_id` if `is_searching` == False
+    Else return timetable for `teacher_id` or `subclass_id` (Only one must be set)
+    """
+    school_id = get_school_id(telegram_id)
+    # TODO: undetstand next lesson number and day of week
+    lesson_number = 1
+    day_of_week = 1
+
+    if is_searching:
+        if teacher_id is not None:
+            data = {"teacher_id": teacher_id}
+        else:
+            data = {"subclass_id": subclass_id}
+    else:
+        main_role = get_main_role(telegram_id)
+        if main_role == "teacher":
+            data = {"teacher_id": get_teacher_id(telegram_id)}
+        else:
+            data = {"subclass_id": get_subclass_id(teacher_id)}
+    data = await get_request(
+        "/lesson/get/certain",
+        data={
+            "data": data,
+            "school_id": school_id,
+            "day_of_week": day_of_week,
+            "lesson_number": lesson_number,
+        },
+    )
+    return data
 
 
-async def get_teacher_name(user_id):  # TODO add redis
-    return "Иванов К. Ю."
+async def get_user_today(
+    user_id, is_searching=False, teacher_id=None, subclass_id=None
+):
+    """
+    Returns timetable for user with `telegram_id` if `is_searching` == False
+    Else return timetable for `teacher_id` or `subclass_id` (Only one must be set)
+    """
+    day_of_week = get_current_day_of_week()
+    school_id = get_school_id(user_id)
+
+    if is_searching:
+        if teacher_id is not None:
+            data = {"teacher_id": teacher_id}
+        else:
+            data = {"subclass_id": subclass_id}
+    else:
+        main_role = get_main_role(user_id)
+
+        if main_role == "teacher":
+            data = {"teacher_id": get_teacher_id(user_id)}
+        else:
+            data = {"subclass_id": get_subclass_id(user_id)}
+
+    data = await get_request(
+        "/lesson/get/day",
+        data={"data": data, "school_id": school_id, "day_of_week": day_of_week},
+    )
+
+    return data
 
 
-async def get_student_class(user_id):  # TODO add redis
-    return "11Е1"
+async def get_user_tomorrow(
+    telegram_id, is_searching=False, teacher_id=None, subclass_id=None
+):
+    """
+    Returns timetable for user with `telegram_id` if `is_searching` == False
+    Else return timetable for `teacher_id` or `subclass_id` (Only one must be set)
+    """
+    day_of_week = get_current_day_of_week()
+    day_of_week = day_of_week % 7 + 1
+    school_id = get_school_id(telegram_id)
+
+    if is_searching:
+        if teacher_id is not None:
+            data = {"teacher_id": teacher_id}
+        else:
+            data = {"subclass_id": subclass_id}
+    else:
+        main_role = get_main_role(telegram_id)
+
+        if main_role == "teacher":
+            data = {"teacher_id", get_teacher_id(telegram_id)}
+        else:
+            data = {"subclass_id", get_subclass_id(telegram_id)}
+
+    data = get_request("/lesson/get/day", data={"data": data, "school_id": school_id, "day_of_week":day_of_week})
+    return data
+
+async def get_user_week(telegram_id, is_searching=False, teacher_id=None, subclass_id=None):
+    """
+    Returns timetable for user with `telegram_id` if `is_searching` == False
+    Else return timetable for `teacher_id` or `subclass_id` (Only one must be set)
+    """
+    school_id = get_school_id(telegram_id)
+    if is_searching:
+        if teacher_id is not None:
+            data = {"teacher_id": teacher_id}
+        else:
+            data = {"subclass_id": subclass_id}
+    else:
+        main_role = get_main_role(telegram_id)
+
+        if main_role == "teacher":
+            data = {"teacher_id", get_teacher_id(telegram_id)}
+        else:
+            data = {"subclass_id", get_subclass_id(telegram_id)}
+
+    data = get_request(
+        '/lesson/get/range',
+        data={
+            "data": data,
+            "start_index": 1,
+            "end_index": 1,
+            "school_id": school_id,
+        }
+    )
+    return data
 
 
-# ~=============================
-async def get_teacher_next_lesson(user_id=None, teacher_name=None):
-    if user_id is not None:
-        teacher_name = await get_teacher_name(user_id)
-    return f"next lesson for {teacher_name}"
+async def get_user_day_of_week(telegram_id, day_of_week, is_searching=False, teacher_id=None, subclass_id=None):
+    """
+        Returns timetable for user with `telegram_id` if `is_searching` == False
+        Else return timetable for `teacher_id` or `subclass_id` (Only one must be set)
+    """
+    school_id = get_school_id(telegram_id)
+    if is_searching:
+        if teacher_id is not None:
+            data = { "teaher_id": teacher_id }
+        else:
+            data = { "subclass_id": subclass_id }
+    else:
+        main_role = get_main_role(telegram_id)
 
-
-async def get_teacher_today(user_id=None, teacher_name=None):
-    if user_id is not None:
-        teacher_name = await get_teacher_name(user_id)
-    return f"today for {teacher_name}"
-
-
-async def get_teacher_tomorrow(user_id=None, teacher_name=None):
-    if user_id is not None:
-        teacher_name = await get_teacher_name(user_id)
-    return f"tomorrow for {teacher_name}"
-
-
-async def get_teacher_week(user_id=None, teacher_name=None):
-    if user_id is not None:
-        teacher_name = await get_teacher_name(user_id)
-    return f"week for {teacher_name}"
-
-
-async def get_teacher_day_of_week(user_id=None, teacher_name=None, day=None):
-    if user_id is not None:
-        teacher_name = await get_teacher_name(user_id)
-    return f"day of week #{day} for {teacher_name}"
-
+        if main_role == "teacher":
+            data = {"teacher_id", get_teacher_id(telegram_id)}
+        else:
+            data = {"subclass_id", get_subclass_id(telegram_id)}
+    data = get_request("/lesson/get/day", data={"data": data, "school_id": school_id, "day_of_week":day_of_week})
+    return data
 
 # ~=============================
 
@@ -238,9 +341,12 @@ async def register_administration(user_id, school):
 # ~=============================
 
 
-async def get_user_roles(user_id):
+async def get_user_roles(telegram_id):
+    """
+    Returns all user roles by telegram_id
+    """
     # TODO: get from reddis
-    response = await post_request("/rolemanagement/get", {"telegram_id": user_id})
-    logger.debug(f"get user roles for {user_id}")
+    response = await post_request("/rolemanagement/get", {"telegram_id": telegram_id})
+    logger.debug(f"get user roles for {telegram_id}")
     return {}
     # TODO: update reddis

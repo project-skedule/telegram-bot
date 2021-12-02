@@ -2,7 +2,7 @@ import asyncio
 import re
 from asyncio.tasks import ensure_future
 from aiogram.dispatcher import FSMContext
-
+from datetime import datetime
 from src.bot import bot
 from aiogram.types import Message, ReplyKeyboardRemove
 from aiogram.types.inline_keyboard import InlineKeyboardMarkup
@@ -55,3 +55,7 @@ async def dispatcher_menu(message: Message, role: str, text: str):
 
 async def is_find_for_student(state: FSMContext):
     return (await state.get_data()).get("class") is not None
+
+
+def get_current_day_of_week():
+    return datetime.today().weekday() + 1
