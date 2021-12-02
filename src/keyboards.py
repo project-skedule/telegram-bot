@@ -235,8 +235,8 @@ async def get_child_keyboard(name: int):  # TODO add api
     return generate_markup(keyboard)
 
 
-async def get_find_enter_parallel_keyboard(user_id):
-    allowed_parallel = await get_allowed_parallel(user_id=user_id)
+async def get_find_enter_parallel_keyboard(telegram_id, is_searching):
+    allowed_parallel = await get_allowed_parallel(telegram_id=telegram_id, is_searching=is_searching)
     return generate_markup(
         [
             [(f"{i}", cf.new(action="find_enter_letter", data=i))]
@@ -245,18 +245,18 @@ async def get_find_enter_parallel_keyboard(user_id):
     )
 
 
-async def get_find_enter_letter_keyboard(user_id, current_chosen):
+async def get_find_enter_letter_keyboard(telegram_id, parallel, is_searching):
     allowed_letter = await get_allowed_letter(
-        telegram_id=user_id, current_chosen=current_chosen
+        telegram_id=telegram_id, parallel=parallel, is_searching=is_searching
     )
     return generate_markup(
         [[(f"{i}", cf.new(action="find_enter_group", data=i))] for i in allowed_letter]
     )
 
 
-async def get_find_enter_group_keyboard(user_id, current_chosen):
+async def get_find_enter_group_keyboard(telegram_id, parallel, letter, is_searching):
     allowed_group = await get_allowed_group(
-        user_id=user_id, current_chosen=current_chosen
+        telegram_id=telegram_id, parallel=parallel, letter=letter, is_searching=is_searching
     )
     return generate_markup(
         [
@@ -330,8 +330,8 @@ FIND_DAY_OF_WEEK_KEYBOARD = generate_markup(
 )
 
 
-async def find_get_teachers_keyboard(teacher):
-    teachers = await get_similar_teachers(teacher)
+async def find_get_teachers_keyboard(teacher, school_id):
+    teachers = await get_similar_teachers(teacher, school_id)
     return generate_markup(
         [
             [
@@ -345,8 +345,8 @@ async def find_get_teachers_keyboard(teacher):
     )
 
 
-async def get_teachers_keyboard(teacher):
-    teachers = await get_similar_teachers(teacher)
+async def get_teachers_keyboard(teacher, school_id):
+    teachers = await get_similar_teachers(teacher, school_id)
     return generate_markup(
         [[(name, cf.new(action="choose_teacher", data=name))] for name in teachers]
     )
