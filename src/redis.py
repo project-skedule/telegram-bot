@@ -52,3 +52,9 @@ async def get_main_role(telegram_id):
     """
     # TODO Implement
     return "teacher"
+
+async def get_children(name: int):
+    return {"child 1": "id1", "child 2": "id2"}
+
+async def save(full_user_info):
+    pass
