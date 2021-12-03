@@ -2,12 +2,14 @@ import asyncio
 from typing import Union
 from src.logger import logger
 from src.redis import *  # TODO remove star import
-from src.some_functions import get_current_day_of_week
+from datetime import datetime
 import aiohttp
 import ujson
 
 url = "http://0.0.0.1:8009"
 
+def get_current_day_of_week():
+    return datetime.today().weekday() + 1
 
 async def get_request(request: str, data):  # TODO 200 status code handler
     async with aiohttp.ClientSession() as session:
@@ -292,7 +294,7 @@ async def register_student(telegram_id, subclass_id):
         "/registration/student",
         {"telegram_id": telegram_id, "subclass_id": subclass_id},
     )
-    await save(data)
+    await save_to_redis(data)
 
 
 async def register_child(telegram_id, subclass_id):
@@ -300,14 +302,14 @@ async def register_child(telegram_id, subclass_id):
         "/rolemanagement/add/child",
         {"parent_id": telegram_id, "subclass_id": subclass_id},
     )
-    await save(data)
+    await save_to_redis(data)
 
 
 async def register_teacher(telegram_id, teacher_id):
     data = await post_request(
         "/registration/teacher", {"telegram_id": telegram_id, "teacher_id": teacher_id}
     )
-    await save(data)
+    await save_to_redis(data)
 
 
 async def register_administration(telegram_id, school_id):
@@ -315,7 +317,7 @@ async def register_administration(telegram_id, school_id):
         "/registration/administration",
         {"telegram_id": telegram_id, "school_id": school_id},
     )
-    await save(data)
+    await save_to_redis(data)
 
 
 # ~=============================
@@ -326,4 +328,4 @@ async def get_user_roles(telegram_id):
     Returns all user roles by telegram_id
     """
     data = await post_request("/rolemanagement/get", {"telegram_id": telegram_id})
-    await save(data)
+    await save_to_redis(data)
