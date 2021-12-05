@@ -8,15 +8,19 @@ import ujson
 
 url = "http://172.0.0.7:8009"
 
+
 def get_current_day_of_week():
     return datetime.today().weekday() + 1
+
 
 async def get_request(request: str, data):  # TODO 200 status code handler
     logger.debug(f"get_request to {url}/api{request} with data: {data}")
     async with aiohttp.ClientSession() as session:
         async with session.get(f"{url}/api{request}", json=data) as response:
             response = await response.read()
-            return ujson.loads(response)
+            answer = ujson.loads(response)
+            logger.debug(f"answer to request: {answer}")
+            return answer
 
 
 async def post_request(request: str, data):  # TODO 200 status code handler
@@ -281,9 +285,10 @@ async def is_registered(telegram_id):
 
 
 async def get_similar_schools(school):
-    data = await get_request("/info/schools/distance", {"name": school})
+    # data = await get_request("/info/schools/distance", {"name": school})
+    data = {"data": [{"id": 2147483647, "name": "1580"}]}
     logger.debug(f"get_similar_schools for {school}; answer: {data}")
-    return data
+    return data["data"]
 
 
 async def get_similar_teachers(teacher_name, school_id):

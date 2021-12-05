@@ -367,6 +367,7 @@ CHOOSE_ROLE_KEYBOARD = generate_markup(
 async def get_schools_keyboard(school: str):
     logger.debug(f"get_schools_keyboard for {school}")
     schools = await get_similar_schools(school)
+    logger.debug(f"tratata")
     keyboard = [
         [(school["name"], cf.new(action="choose_school", data=school["id"]))]
         for school in schools
