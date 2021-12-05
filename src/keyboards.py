@@ -12,6 +12,8 @@ from src.api import (
     get_similar_teachers,
 )
 
+from src.logger import logger
+
 cf = CallbackData("callback", "action", "data")
 
 
@@ -363,6 +365,7 @@ CHOOSE_ROLE_KEYBOARD = generate_markup(
 
 
 async def get_schools_keyboard(school: str):
+    logger.debug(f"get_schools_keyboard for {school}")
     schools = await get_similar_schools(school)
     keyboard = [
         [(school["name"], cf.new(action="choose_school", data=school["id"]))]

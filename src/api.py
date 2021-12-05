@@ -6,12 +6,13 @@ from datetime import datetime
 import aiohttp
 import ujson
 
-url = "http://0.0.0.1:8009"
+url = "http://172.0.0.7:8009"
 
 def get_current_day_of_week():
     return datetime.today().weekday() + 1
 
 async def get_request(request: str, data):  # TODO 200 status code handler
+    logger.debug(f"get_request to {url}/api{request} with data: {data}")
     async with aiohttp.ClientSession() as session:
         async with session.get(f"{url}/api{request}", json=data) as response:
             response = await response.read()
@@ -19,6 +20,7 @@ async def get_request(request: str, data):  # TODO 200 status code handler
 
 
 async def post_request(request: str, data):  # TODO 200 status code handler
+    logger.debug(f"get_request to {url}/api{request} with data: {data}")
     async with aiohttp.ClientSession() as session:
         async with session.post(f"{url}/api{request}", json=data) as response:
             response = await response.read()
@@ -26,6 +28,7 @@ async def post_request(request: str, data):  # TODO 200 status code handler
 
 
 async def put_request(request: str, data):  # TODO 200 status code handler
+    logger.debug(f"get_request to {url}/api{request} with data: {data}")
     async with aiohttp.ClientSession() as session:
         async with session.put(f"{url}/api{request}", json=data) as response:
             response = await response.read()
@@ -272,12 +275,14 @@ async def get_allowed_group(
 
 
 async def is_registered(telegram_id):
+    logger.debug(f"request is_registered for {telegram_id}")
     data = await get_request("/info/check/telegramid", {"telegram_id": telegram_id})
-    return data
+    return data["data"]
 
 
 async def get_similar_schools(school):
     data = await get_request("/info/schools/distance", {"name": school})
+    logger.debug(f"get_similar_schools for {school}; answer: {data}")
     return data
 
 

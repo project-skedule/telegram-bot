@@ -39,6 +39,7 @@ async def register_registration_handlers():
         commands=["start"],
     )
     async def registration_message(message: Message, state: FSMContext):
+        logger.debug("/start")
         if not await is_registered(message.chat.id):
             await state.set_data({})
             await States.choose_role.set()
@@ -95,6 +96,7 @@ async def register_registration_handlers():
     async def choose_role_handler(
         call: CallbackQuery, state: FSMContext, callback_data: dict
     ):
+        logger.debug("choose role")
         await States.choose_role.set()
         message = call.message
         await send_message(
@@ -116,6 +118,7 @@ async def register_registration_handlers():
     async def input_school_handler(
         call: CallbackQuery, state: FSMContext, callback_data: dict
     ):
+        logger.debug("input school")
         await States.input_school.set()
         if (await state.get_data()).get("role") is None:
             await state.update_data({"role": callback_data["data"]})
@@ -135,6 +138,7 @@ async def register_registration_handlers():
         state=[States.input_school],
     )
     async def input_school_message(message: Message):
+        logger.debug(f"input school message: {message.text}")
         await States.choose_school.set()
         await message.answer(
             text=f"school like {message.text}",  # FIX: add format for schools like entered
