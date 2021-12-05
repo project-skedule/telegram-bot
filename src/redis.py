@@ -1,3 +1,7 @@
+from .bot import storage
+from .logger import logger
+
+
 async def get_school_name(telegram_id):
     """
     Return school name where `main_role` of account with `telegram_id` is
@@ -10,8 +14,7 @@ async def get_school_id(telegram_id):
     """
     Return school id where `main_role` of account with `telegram_id` is
     """
-    # TODO Implement
-    return 1
+    return (await storage.get_data(user=telegram_id))["school"]
 
 
 async def get_teacher_name(telegram_id):
@@ -22,25 +25,25 @@ async def get_teacher_name(telegram_id):
     return "Иванов К. Ю."
 
 
-async def get_student_class(telegram_id):
-    """
-    Returns subclass string for account with `telegram_id` (`main_role`?)
-    """
-    # TODO Implement
-    return "11Е1"
+# async def get_student_class(telegram_id):
+#     """
+#     Returns subclass string for account with `telegram_id` (`main_role`?)
+#     """
+#     # TODO Implement
+#     return "11Е1"
 
 
 async def get_subclass_id(telegram_id):
     """
-    Returns subclass_id for account with `telegram_id` (`main_role`?)
+    Returns subclass_id for user
     """
-    # TODO Implement
-    return 1
+    logger.debug("get_subclass_id")
+    return (await storage.get_data(user=telegram_id))["subclass_id"]
 
 
 async def get_teacher_id(telegram_id):
     """
-    Return teacher id for account with `telegram_id` (`main_role`?)
+    Return teacher id for user
     """
     # TODO Implement
     return 1
@@ -48,10 +51,10 @@ async def get_teacher_id(telegram_id):
 
 async def get_main_role(telegram_id):
     """
-    Return main role for account with `telegram_id`
+    Return main role for user
     """
     # TODO Implement
-    return "teacher"
+    return "student"
 
 
 async def get_children(name: int):

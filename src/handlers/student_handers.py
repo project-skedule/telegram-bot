@@ -124,6 +124,7 @@ async def register_student_handlers():
         state=[States.student_menu],
     )
     async def student_next_lesson_handler(call: CallbackQuery):
+        logger.debug("next lesson for student")
         await States.student_menu.set()
         message = call.message
         # FIX format Texts.lesson_format
@@ -144,11 +145,11 @@ async def register_student_handlers():
         state=[States.student_menu],
     )
     async def student_today_handler(call: CallbackQuery):
+        logger.debug("today for student")
         await States.student_menu.set()
         message = call.message
         # TODO format
-        Texts.today_timetable
-        text = await get_user_today(telegram_id=message.chat.id, is_searching=True)
+        text = await get_user_today(telegram_id=message.chat.id, is_searching=False)
         await send_message(
             message,
             text=text,
@@ -163,6 +164,7 @@ async def register_student_handlers():
         state=[States.student_menu],
     )
     async def student_tomorrow_handler(call: CallbackQuery):
+        logger.debug("tomorrow for student")
         await States.student_menu.set()
         message = call.message
         # FIX format
@@ -181,6 +183,7 @@ async def register_student_handlers():
         state=[States.student_menu],
     )
     async def student_week_handler(call: CallbackQuery):
+        logger.debug("week for student")
         await States.student_menu.set()
         message = call.message
         # FIX format

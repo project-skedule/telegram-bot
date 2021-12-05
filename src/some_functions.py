@@ -54,5 +54,3 @@ async def dispatcher_menu(message: Message, role: str, text: str):
 
 async def is_find_for_student(state: FSMContext):
     return (await state.get_data()).get("class") is not None
-
-

@@ -24,19 +24,23 @@ async def get_request(request: str, data):  # TODO 200 status code handler
 
 
 async def post_request(request: str, data):  # TODO 200 status code handler
-    logger.debug(f"get_request to {url}/api{request} with data: {data}")
+    logger.debug(f"post_request to {url}/api{request} with data: {data}")
     async with aiohttp.ClientSession() as session:
         async with session.post(f"{url}/api{request}", json=data) as response:
             response = await response.read()
-            return ujson.loads(response)
+            answer = ujson.loads(response)
+            logger.debug(f"answer to request: {answer}")
+            return answer
 
 
 async def put_request(request: str, data):  # TODO 200 status code handler
-    logger.debug(f"get_request to {url}/api{request} with data: {data}")
+    logger.debug(f"put_request to {url}/api{request} with data: {data}")
     async with aiohttp.ClientSession() as session:
         async with session.put(f"{url}/api{request}", json=data) as response:
             response = await response.read()
-            return ujson.loads(response)
+            answer = ujson.loads(response)
+            logger.debug(f"answer to request: {answer}")
+            return answer
 
 
 # ~=============================
@@ -62,9 +66,9 @@ async def get_user_next_lesson(
     else:
         main_role = await get_main_role(telegram_id)
         if main_role == "teacher":
-            data = {"teacher_id": get_teacher_id(telegram_id)}
+            data = {"teacher_id": await get_teacher_id(telegram_id)}
         else:
-            data = {"subclass_id": get_subclass_id(teacher_id)}
+            data = {"subclass_id": await get_subclass_id(teacher_id)}
     data = await get_request(
         "/lesson/get/certain",
         data={
@@ -96,9 +100,9 @@ async def get_user_today(
         main_role = await get_main_role(telegram_id)
 
         if main_role == "teacher":
-            data = {"teacher_id": get_teacher_id(telegram_id)}
+            data = {"teacher_id": await get_teacher_id(telegram_id)}
         else:
-            data = {"subclass_id": get_subclass_id(telegram_id)}
+            data = {"subclass_id": await get_subclass_id(telegram_id)}
 
     data = await get_request(
         "/lesson/get/day",
@@ -128,9 +132,9 @@ async def get_user_tomorrow(
         main_role = await get_main_role(telegram_id)
 
         if main_role == "teacher":
-            data = {"teacher_id", get_teacher_id(telegram_id)}
+            data = {"teacher_id": await get_teacher_id(telegram_id)}
         else:
-            data = {"subclass_id", get_subclass_id(telegram_id)}
+            data = {"subclass_id": await get_subclass_id(telegram_id)}
 
     data = await get_request(
         "/lesson/get/day",
@@ -146,7 +150,7 @@ async def get_user_week(
     Returns timetable for user with `telegram_id` if `is_searching` == False
     Else return timetable for `teacher_id` or `subclass_id` (Only one must be set)
     """
-    school_id = get_school_id(telegram_id)
+    school_id = await get_school_id(telegram_id)
     if is_searching:
         if teacher_id is not None:
             data = {"teacher_id": teacher_id}
@@ -156,9 +160,9 @@ async def get_user_week(
         main_role = await get_main_role(telegram_id)
 
         if main_role == "teacher":
-            data = {"teacher_id", get_teacher_id(telegram_id)}
+            data = {"teacher_id": await get_teacher_id(telegram_id)}
         else:
-            data = {"subclass_id", get_subclass_id(telegram_id)}
+            data = {"subclass_id": await get_subclass_id(telegram_id)}
 
     data = await get_request(
         "/lesson/get/range",
@@ -186,12 +190,12 @@ async def get_user_day_of_week(
         else:
             data = {"subclass_id": subclass_id}
     else:
-        main_role = get_main_role(telegram_id)
+        main_role = await get_main_role(telegram_id)
 
         if main_role == "teacher":
-            data = {"teacher_id", get_teacher_id(telegram_id)}
+            data = {"teacher_id": await get_teacher_id(telegram_id)}
         else:
-            data = {"subclass_id", get_subclass_id(telegram_id)}
+            data = {"subclass_id": await get_subclass_id(telegram_id)}
     data = await get_request(
         "/lesson/get/day",
         data={"data": data, "school_id": school_id, "day_of_week": day_of_week},
@@ -265,7 +269,7 @@ async def get_allowed_group(
     Only one of `telegram_id` and `school_id` must be set
     """
     if is_searching:
-        school_id = get_school_id(telegram_id)
+        school_id = await get_school_id(telegram_id)
 
     data = await get_request(
         "/info/groups/all",
@@ -299,12 +303,25 @@ async def get_similar_teachers(teacher_name, school_id):
 
 
 # ~=============================
+async def get_subclass_by_params(school, parallel, letter, group):
+    data = await get_request(
+        "/info/subclass/params",
+        {
+            "school_id": school,
+            "educational_level": parallel,
+            "identificator": letter,
+            "additional_identificator": group,
+        },
+    )
+    return data["id"]
+
+
 async def register_student(telegram_id, subclass_id):
     data = await post_request(
         "/registration/student",
         {"telegram_id": telegram_id, "subclass_id": subclass_id},
     )
-    await save_to_redis(data)
+    # await save_to_redis(data)
 
 
 async def register_child(telegram_id, subclass_id):

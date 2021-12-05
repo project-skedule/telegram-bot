@@ -31,6 +31,7 @@ from src.keyboards import (
 from src.logger import logger
 from src.some_functions import send_message
 from src.states import States
+from src.api import get_subclass_by_params
 
 
 async def register_registration_handlers():
@@ -154,6 +155,7 @@ async def register_registration_handlers():
     async def choose_school_handler(
         call: CallbackQuery, state: FSMContext, callback_data: dict
     ):
+        logger.debug(f"choose school")
         role = (await state.get_data())["role"]
 
         message = call.message
@@ -196,6 +198,7 @@ async def register_registration_handlers():
         state=[States.input_teacher],
     )
     async def choose_teacher_handler(message: Message, state: FSMContext):
+        logger.debug(f"choose teacher")
         await States.choose_teacher.set()
         await message.answer(
             text="Choose teacher ",  # FIX: text for choosing teacher from list
@@ -211,6 +214,7 @@ async def register_registration_handlers():
     async def input_teacher_handler(
         call: CallbackQuery, state: FSMContext, callback_data: dict
     ):
+        logger.debug(f"input teacher")
         await States.teacher_submit.set()
         message = call.message
         text = Texts.confirm_teacher_from_list.format(
@@ -233,9 +237,9 @@ async def register_registration_handlers():
     async def enter_parallel_handler(
         call: CallbackQuery, state: FSMContext, callback_data: dict
     ):
+        logger.debug(f"enter parallel")
         message = call.message
         await States.enter_parallel.set()
-        await state.update_data({"class": ""})
         await send_message(
             message,
             text=Texts.enter_parallel,
@@ -252,8 +256,9 @@ async def register_registration_handlers():
     async def enter_letter_handler(
         call: CallbackQuery, state: FSMContext, callback_data: dict
     ):
+        logger.debug(f"enter letter")
         await States.enter_letter.set()
-        await state.update_data({"class": f"{callback_data['data']}"})
+        await state.update_data({"parallel": f"{callback_data['data']}"})
         message = call.message
         await send_message(
             message,
@@ -271,10 +276,9 @@ async def register_registration_handlers():
     async def enter_group_handler(
         call: CallbackQuery, state: FSMContext, callback_data: dict
     ):
+        logger.debug(f"enter group")
         await States.enter_group.set()
-        await state.update_data(
-            {"class": f"{(await state.get_data())['class']}{callback_data['data']}"}
-        )
+        await state.update_data({"letter": f"{callback_data['data']}"})
         message = call.message
         await send_message(
             message,
@@ -292,14 +296,16 @@ async def register_registration_handlers():
     async def student_submit_handler(
         call: CallbackQuery, state: FSMContext, callback_data: dict
     ):
+        logger.debug(f"submit student")
         await States.student_submit.set()
-        await state.update_data(
-            {"class": f"{(await state.get_data())['class']}{callback_data['data']}"}
-        )
+        await state.update_data({"group": f"{callback_data['data']}"})
         message = call.message
+        parallel = (await state.get_data())["parallel"]
+        letter = (await state.get_data())["letter"]
+        group = (await state.get_data())["group"]
         await send_message(
             message,
-            text=Texts.confirm_class.format(subclass=(await state.get_data())["class"]),
+            text=Texts.confirm_class.format(subclass=parallel + letter + group),
             keyboard=STUDENT_SUBMIT_KEYBOARD,
             parse_mode="markdown",
         )
@@ -316,12 +322,17 @@ async def register_registration_handlers():
     ):
         message = call.message
 
-        class_name = (await state.get_data())["class"]
+        parallel = (await state.get_data())["parallel"]
+        letter = (await state.get_data())["letter"]
+        group = (await state.get_data())["group"]
         school = (await state.get_data())["school"]
+
+        subclass_id = await get_subclass_by_params(school, parallel, letter, group)
+        await state.update_data({"subclass_id": subclass_id})
 
         role = (await state.get_data())["role"]
         if role == "Parent":
-            await register_child(telegram_id=message.chat.id, subclass_id=class_name)
+            await register_child(telegram_id=message.chat.id, subclass_id=subclass_id)
             await States.show_childs.set()
             children = await get_children(message.chat.id)
             await send_message(
@@ -332,7 +343,7 @@ async def register_registration_handlers():
                 parse_mode="markdown",
             )
         elif role == "Student":
-            await register_student(telegram_id=message.chat.id, subclass_id=class_name)
+            await register_student(telegram_id=message.chat.id, subclass_id=subclass_id)
             await States.student_menu.set()
             await send_message(
                 message,

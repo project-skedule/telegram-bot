@@ -238,7 +238,9 @@ async def get_child_keyboard(name: int):  # TODO add api
 
 
 async def get_find_enter_parallel_keyboard(telegram_id, is_searching):
-    allowed_parallel = await get_allowed_parallel(telegram_id=telegram_id, is_searching=is_searching)
+    allowed_parallel = await get_allowed_parallel(
+        telegram_id=telegram_id, is_searching=is_searching
+    )
     return generate_markup(
         [
             [(f"{i}", cf.new(action="find_enter_letter", data=i))]
@@ -258,7 +260,10 @@ async def get_find_enter_letter_keyboard(telegram_id, parallel, is_searching):
 
 async def get_find_enter_group_keyboard(telegram_id, parallel, letter, is_searching):
     allowed_group = await get_allowed_group(
-        telegram_id=telegram_id, parallel=parallel, letter=letter, is_searching=is_searching
+        telegram_id=telegram_id,
+        parallel=parallel,
+        letter=letter,
+        is_searching=is_searching,
     )
     return generate_markup(
         [
@@ -367,7 +372,6 @@ CHOOSE_ROLE_KEYBOARD = generate_markup(
 async def get_schools_keyboard(school: str):
     logger.debug(f"get_schools_keyboard for {school}")
     schools = await get_similar_schools(school)
-    logger.debug(f"tratata")
     keyboard = [
         [(school["name"], cf.new(action="choose_school", data=school["id"]))]
         for school in schools
