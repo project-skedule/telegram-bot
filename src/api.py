@@ -232,44 +232,41 @@ async def get_canteen_timetable(telegram_id: int):
 # ~=============================
 
 
-async def get_allowed_parallel(is_searching, telegram_id=None, school_id=None):
+async def get_allowed_parallel(telegram_id=None):
     """
     If `is_searching` is True, returns for `school_id` for account `telegram_id`.
     Else returns for school with `school_id`
     Only one of `telegram_id` and `school_id` must be set
     """
-    if is_searching:
-        school_id = await get_school_id(telegram_id)
+    school_id = await get_school_id(telegram_id)
     data = await get_request("/info/parallels/all", data={"school_id": school_id})
-    return data
+    return data["data"]
 
 
-async def get_allowed_letter(is_searching, parallel, telegram_id=None, school_id=None):
+async def get_allowed_letter(parallel, telegram_id=None):
     """
     If `is_searching` is True, returns for `school_id` for account `telegram_id`.
     Else returns for school with `school_id`
     Only one of `telegram_id` and `school_id` must be set
     """
-    if is_searching:
-        school_id = await get_school_id(telegram_id)
+
+    school_id = await get_school_id(telegram_id)
 
     data = await get_request(
         "/info/letters/all",
         data={"school_id": school_id, "educational_level": parallel},
     )
-    return data
+    return data["data"]
 
 
-async def get_allowed_group(
-    is_searching, parallel, letter, telegram_id=None, school_id=None
-):
+async def get_allowed_group(parallel, letter, telegram_id=None):
     """
     If `is_searching` is True, returns for `school_id` for account `telegram_id`.
     Else returns for school with `school_id`
     Only one of `telegram_id` and `school_id` must be set
     """
-    if is_searching:
-        school_id = await get_school_id(telegram_id)
+
+    school_id = await get_school_id(telegram_id)
 
     data = await get_request(
         "/info/groups/all",
@@ -279,7 +276,7 @@ async def get_allowed_group(
             "identificator": letter,
         },
     )
-    return data
+    return data["data"]
 
 
 async def is_registered(telegram_id):
@@ -289,8 +286,8 @@ async def is_registered(telegram_id):
 
 
 async def get_similar_schools(school):
-    # data = await get_request("/info/schools/distance", {"name": school})
-    data = {"data": [{"id": 2147483647, "name": "1580"}]}
+    data = await get_request("/info/schools/distance", {"name": school})
+    # data = {"data": [{"id": 2147483647, "name": "1580"}]}
     logger.debug(f"get_similar_schools for {school}; answer: {data}")
     return data["data"]
 

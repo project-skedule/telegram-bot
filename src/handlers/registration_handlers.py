@@ -27,6 +27,7 @@ from src.keyboards import (
     get_enter_parallel_keyboard,
     get_schools_keyboard,
     get_teachers_keyboard,
+    generate_markup,
 )
 from src.logger import logger
 from src.some_functions import send_message
@@ -127,11 +128,10 @@ async def register_registration_handlers():
         await send_message(
             message,
             text="input school",
-            keyboard=None,  # FIX: why `None` is here?
+            keyboard=None,
             parse_mode="markdown",
         )
         await call.answer()
-        #  add fsm magick
 
     # =============================
     @dp.message_handler(
@@ -166,7 +166,7 @@ async def register_registration_handlers():
             await send_message(
                 message,
                 text=Texts.enter_parallel,
-                keyboard=(await get_enter_parallel_keyboard()),
+                keyboard=(await get_enter_parallel_keyboard(message.chat.id)),
                 parse_mode="markdown",
             )
 
@@ -175,7 +175,7 @@ async def register_registration_handlers():
             await send_message(
                 message,
                 text=Texts.enter_name,
-                keyboard=None,  # FIX: why `None`
+                keyboard=None,
                 parse_mode="markdown",
             )
         elif role == "Administration":
@@ -243,7 +243,7 @@ async def register_registration_handlers():
         await send_message(
             message,
             text=Texts.enter_parallel,
-            keyboard=(await get_enter_parallel_keyboard()),
+            keyboard=(await get_enter_parallel_keyboard(message.chat.id)),
             parse_mode="markdown",
         )
         await call.answer()
@@ -258,12 +258,13 @@ async def register_registration_handlers():
     ):
         logger.debug(f"enter letter")
         await States.enter_letter.set()
-        await state.update_data({"parallel": f"{callback_data['data']}"})
+        parallel = callback_data["data"]
+        await state.update_data({"parallel": f"{parallel}"})
         message = call.message
         await send_message(
             message,
             text=Texts.enter_letter,
-            keyboard=(await get_enter_letter_keyboard()),
+            keyboard=(await get_enter_letter_keyboard(message.chat.id, parallel)),
             parse_mode="markdown",
         )
         await call.answer()
@@ -278,12 +279,16 @@ async def register_registration_handlers():
     ):
         logger.debug(f"enter group")
         await States.enter_group.set()
-        await state.update_data({"letter": f"{callback_data['data']}"})
+        parallel = (await state.get_data())["parallel"]
+        letter = callback_data["data"]
+        await state.update_data({"letter": f"{letter}"})
         message = call.message
         await send_message(
             message,
             text=Texts.enter_group,
-            keyboard=(await get_enter_group_keyboard()),
+            keyboard=(
+                await get_enter_group_keyboard(message.chat.id, parallel, letter)
+            ),
             parse_mode="markdown",
         )
         await call.answer()
