@@ -84,63 +84,25 @@ async def get_user_next_lesson(
 async def get_user_today(
     telegram_id, is_searching=False, teacher_id=None, subclass_id=None
 ):
-    """
-    Returns timetable for user with `telegram_id` if `is_searching` == False
-    Else return timetable for `teacher_id` or `subclass_id` (Only one must be set)
-    """
-    day_of_week = get_current_day_of_week()
-    school_id = await get_school_id(telegram_id)
-
-    if is_searching:
-        if teacher_id is not None:
-            data = {"teacher_id": teacher_id}
-        else:
-            data = {"subclass_id": subclass_id}
-    else:
-        main_role = await get_main_role(telegram_id)
-
-        if main_role == "teacher":
-            data = {"teacher_id": await get_teacher_id(telegram_id)}
-        else:
-            data = {"subclass_id": await get_subclass_id(telegram_id)}
-
-    data = await get_request(
-        "/lesson/get/day",
-        data={"data": data, "school_id": school_id, "day_of_week": day_of_week},
+    return await get_user_day_of_week(
+        telegram_id,
+        get_current_day_of_week(),
+        is_searching=is_searching,
+        teacher_id=teacher_id,
+        subclass_id=subclass_id,
     )
-
-    return data
 
 
 async def get_user_tomorrow(
     telegram_id, is_searching=False, teacher_id=None, subclass_id=None
 ):
-    """
-    Returns timetable for user with `telegram_id` if `is_searching` == False
-    Else return timetable for `teacher_id` or `subclass_id` (Only one must be set)
-    """
-    day_of_week = get_current_day_of_week()
-    day_of_week = day_of_week % 7 + 1
-    school_id = await get_school_id(telegram_id)
-
-    if is_searching:
-        if teacher_id is not None:
-            data = {"teacher_id": teacher_id}
-        else:
-            data = {"subclass_id": subclass_id}
-    else:
-        main_role = await get_main_role(telegram_id)
-
-        if main_role == "teacher":
-            data = {"teacher_id": await get_teacher_id(telegram_id)}
-        else:
-            data = {"subclass_id": await get_subclass_id(telegram_id)}
-
-    data = await get_request(
-        "/lesson/get/day",
-        data={"data": data, "school_id": school_id, "day_of_week": day_of_week},
+    return await get_user_day_of_week(
+        telegram_id,
+        get_current_day_of_week() % 7 + 1,
+        is_searching=is_searching,
+        teacher_id=teacher_id,
+        subclass_id=subclass_id,
     )
-    return data
 
 
 async def get_user_week(
@@ -200,7 +162,19 @@ async def get_user_day_of_week(
         "/lesson/get/day",
         data={"data": data, "school_id": school_id, "day_of_week": day_of_week},
     )
-    return data
+
+    lessons = data["lessons"]
+    
+    result = ""
+    for lesson in lessons:
+        number = lesson["lesson_number"]
+        result += f"Урок №{number['number']} {number['time_start']} - {number['time_end']}\n"
+        result += f"Предмет: *{lesson['subject']}*\n"
+        result += f"{lesson['teacher']['name']}\n"
+        result += f"{lesson['corpus']['name']}, {lesson['cabinet']['name']}\n"
+        result += f"\n"
+
+    return result
 
 
 # ~=============================

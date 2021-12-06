@@ -42,6 +42,8 @@ async def register_registration_handlers():
     )
     async def registration_message(message: Message, state: FSMContext):
         logger.debug("/start")
+        logger.debug(f"{await state.get_data()}")
+        await state.update_data({"searchable": False})
         if not await is_registered(message.chat.id):
             await state.set_data({})
             await States.choose_role.set()
@@ -51,30 +53,30 @@ async def register_registration_handlers():
                 parse_mode="markdown",
             )
         else:
-            await state.set_data({"role": "Administration"})  # ! DEBUG
             data = await state.get_data()
-            if data["role"] == "Parent":
+            role = data["role"]
+            if role == "Parent":
                 await States.choose_child.set()
                 await message.answer(
                     text=Texts.choose_children,
                     reply_markup=await get_child_keyboard(message.chat.id),
                     parse_mode="markdown",
                 )
-            elif data["role"] == "Student":
+            elif role == "Student":
                 await States.student_menu.set()
                 await message.answer(
                     text=Texts.student_main_menu,
                     reply_markup=STUDENT_MAIN_KEYBOARD,
                     parse_mode="markdown",
                 )
-            elif data["role"] == "Teacher":
+            elif role == "Teacher":
                 await States.teacher_menu.set()
                 await message.answer(
                     text=Texts.teacher_main_menu,
                     reply_markup=TEACHER_MAIN_KEYBOARD,
                     parse_mode="markdown",
                 )
-            elif data["role"] == "Administration":
+            elif role == "Administration":
                 await States.administration_menu_first.set()
                 await message.answer(
                     text=Texts.admin_main_menu,
@@ -122,8 +124,8 @@ async def register_registration_handlers():
     ):
         logger.debug("input school")
         await States.input_school.set()
-        if (await state.get_data()).get("role") is None:
-            await state.update_data({"role": callback_data["data"]})
+        #if (await state.get_data()).get("role") is None:
+        await state.update_data({"role": callback_data["data"]})
         message = call.message
         await send_message(
             message,
