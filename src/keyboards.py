@@ -191,36 +191,36 @@ ADMINISTRATION_MENU_SECOND_KEYBOARD = generate_markup(
 
 CHILD_DAY_OF_WEEK_KEYBOARD = generate_markup(
     [
-        [("Понедельник", cf.new(action="child_choose_day_of_week", data="1"))],
-        [("Вторник", cf.new(action="child_choose_day_of_week", data="2"))],
-        [("Среда", cf.new(action="child_choose_day_of_week", data="3"))],
-        [("Четверг", cf.new(action="child_choose_day_of_week", data="4"))],
-        [("Пятница", cf.new(action="child_choose_day_of_week", data="5"))],
-        [("Суббота", cf.new(action="child_choose_day_of_week", data="6"))],
+        [("Понедельник", cf.new(action="child_choose_day_of_week", data=1))],
+        [("Вторник", cf.new(action="child_choose_day_of_week", data=2))],
+        [("Среда", cf.new(action="child_choose_day_of_week", data=3))],
+        [("Четверг", cf.new(action="child_choose_day_of_week", data=4))],
+        [("Пятница", cf.new(action="child_choose_day_of_week", data=5))],
+        [("Суббота", cf.new(action="child_choose_day_of_week", data=6))],
         [("go back", cf.new(action="child_menu", data=0))],
     ]
 )
 
 STUDENT_DAY_OF_WEEK_KEYBOARD = generate_markup(
     [
-        [("Понедельник", cf.new(action="student_choose_day_of_week", data="1"))],
-        [("Вторник", cf.new(action="student_choose_day_of_week", data="2"))],
-        [("Среда", cf.new(action="student_choose_day_of_week", data="3"))],
-        [("Четверг", cf.new(action="student_choose_day_of_week", data="4"))],
-        [("Пятница", cf.new(action="student_choose_day_of_week", data="5"))],
-        [("Суббота", cf.new(action="student_choose_day_of_week", data="6"))],
+        [("Понедельник", cf.new(action="student_choose_day_of_week", data=1))],
+        [("Вторник", cf.new(action="student_choose_day_of_week", data=2))],
+        [("Среда", cf.new(action="student_choose_day_of_week", data=3))],
+        [("Четверг", cf.new(action="student_choose_day_of_week", data=4))],
+        [("Пятница", cf.new(action="student_choose_day_of_week", data=5))],
+        [("Суббота", cf.new(action="student_choose_day_of_week", data=6))],
         [("go back", cf.new(action="student_menu", data=0))],
     ]
 )
 
 TEACHER_DAY_OF_WEEK_KEYBOARD = generate_markup(
     [
-        [("Понедельник", cf.new(action="teacher_choose_day_of_week", data="1"))],
-        [("Вторник", cf.new(action="teacher_choose_day_of_week", data="2"))],
-        [("Среда", cf.new(action="teacher_choose_day_of_week", data="3"))],
-        [("Четверг", cf.new(action="teacher_choose_day_of_week", data="4"))],
-        [("Пятница", cf.new(action="teacher_choose_day_of_week", data="5"))],
-        [("Суббота", cf.new(action="teacher_choose_day_of_week", data="6"))],
+        [("Понедельник", cf.new(action="teacher_choose_day_of_week", data=1))],
+        [("Вторник", cf.new(action="teacher_choose_day_of_week", data=2))],
+        [("Среда", cf.new(action="teacher_choose_day_of_week", data=3))],
+        [("Четверг", cf.new(action="teacher_choose_day_of_week", data=4))],
+        [("Пятница", cf.new(action="teacher_choose_day_of_week", data=5))],
+        [("Суббота", cf.new(action="teacher_choose_day_of_week", data=6))],
         [("go back", cf.new(action="teacher_menu", data=0))],
     ]
 )
@@ -272,7 +272,7 @@ async def get_find_enter_group_keyboard(telegram_id, parallel, letter):
 
 async def get_enter_parallel_keyboard(telegram_id):
     allowed_parallel = await get_allowed_parallel(telegram_id=telegram_id)
-    allowed_parallel.sort() # TODO time
+    allowed_parallel.sort()  # TODO time
     return generate_markup(
         [[(f"{i}", cf.new(action="enter_letter", data=i))] for i in allowed_parallel]
     )
@@ -282,7 +282,7 @@ async def get_enter_letter_keyboard(telegram_id, parallel):
     allowed_letter = await get_allowed_letter(
         telegram_id=telegram_id, parallel=parallel
     )
-    allowed_letter.sort() # TODO time
+    allowed_letter.sort()  # TODO time
     n = len(allowed_letter)
     logger.debug(f"{allowed_letter}")
     keyboard = []
@@ -310,7 +310,7 @@ async def get_enter_group_keyboard(telegram_id, parallel, letter):
         parallel=parallel,
         letter=letter,
     )
-    allowed_group.sort() # TODO time
+    allowed_group.sort()  # TODO time
     return generate_markup(
         [[(f"{i}", cf.new(action="student_submit", data=i))] for i in allowed_group]
     )
@@ -351,12 +351,12 @@ FIND_MAIN_KEYBOARD = generate_markup(
 
 FIND_DAY_OF_WEEK_KEYBOARD = generate_markup(
     [
-        [("Понедельник", cf.new(action="find_choose_day_of_week", data="1"))],
-        [("Вторник", cf.new(action="find_choose_day_of_week", data="2"))],
-        [("Среда", cf.new(action="find_choose_day_of_week", data="3"))],
-        [("Четверг", cf.new(action="find_choose_day_of_week", data="4"))],
-        [("Пятница", cf.new(action="find_choose_day_of_week", data="5"))],
-        [("Суббота", cf.new(action="find_choose_day_of_week", data="6"))],
+        [("Понедельник", cf.new(action="find_choose_day_of_week", data=1))],
+        [("Вторник", cf.new(action="find_choose_day_of_week", data=2))],
+        [("Среда", cf.new(action="find_choose_day_of_week", data=3))],
+        [("Четверг", cf.new(action="find_choose_day_of_week", data=4))],
+        [("Пятница", cf.new(action="find_choose_day_of_week", data=5))],
+        [("Суббота", cf.new(action="find_choose_day_of_week", data=6))],
         [("go back", cf.new(action="find_menu", data=0))],
     ]
 )
@@ -380,7 +380,10 @@ async def find_get_teachers_keyboard(teacher, school_id):
 async def get_teachers_keyboard(teacher, school_id):
     teachers = await get_similar_teachers(teacher, school_id)
     return generate_markup(
-        [[(name, cf.new(action="choose_teacher", data=name))] for name in teachers]
+        [
+            [(teacher["name"], cf.new(action="choose_teacher", data=teacher["id"]))]
+            for teacher in teachers
+        ]
     )
 
 

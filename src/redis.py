@@ -45,16 +45,14 @@ async def get_teacher_id(telegram_id):
     """
     Return teacher id for user
     """
-    # TODO Implement
-    return 1
+    return (await storage.get_data(user=telegram_id))["teacher"]
 
 
 async def get_main_role(telegram_id):
     """
     Return main role for user
     """
-    # TODO Implement
-    return "student"
+    return (await storage.get_data(user=telegram_id))["role"]
 
 
 async def get_children(name: int):

@@ -73,7 +73,7 @@ async def register_student_handlers():
         message = call.message
         text = await get_user_day_of_week(
             telegram_id=message.chat.id,
-            day_of_week=callback_data["data"],
+            day_of_week=int(callback_data["data"]),
             is_searching=False,
         )
         await send_message(
