@@ -106,6 +106,8 @@ async def get_user_tomorrow(
         subclass_id=subclass_id,
     )
 
+async def get_student_day_of_week(telegram_id, day_of_week, is_searching=False, subclass_id=None):
+    pass
 
 async def get_user_day_of_week(
     telegram_id, day_of_week, is_searching=False, teacher_id=None, subclass_id=None
@@ -117,7 +119,7 @@ async def get_user_day_of_week(
     school_id = await get_school_id(telegram_id)
     if is_searching:
         if teacher_id is not None:
-            data = {"teaher_id": teacher_id}
+            data = {"teacher_id": teacher_id}
         else:
             data = {"subclass_id": subclass_id}
     else:
@@ -133,11 +135,13 @@ async def get_user_day_of_week(
     )
 
     lessons = data["lessons"]
-    
-    result = f"Ваше расписание **{DAYS_OF_WEEK[day_of_week]}**:"
+
+    result = f"Ваше расписание *{DAYS_OF_WEEK[day_of_week]}*:\n"
     for lesson in lessons:
         number = lesson["lesson_number"]
-        result += f"Урок №{number['number']} {number['time_start']} - {number['time_end']}\n"
+        result += (
+            f"Урок №{number['number']} {number['time_start']} - {number['time_end']}\n"
+        )
         result += f"Предмет: *{lesson['subject']}*\n"
         result += f"{lesson['teacher']['name']}\n"
         result += f"{lesson['corpus']['name']}, {lesson['cabinet']['name']}\n"
@@ -176,12 +180,13 @@ async def get_user_week(
             "school_id": school_id,
         },
     )
-    return data
-    days_of_week = data["day_of_week"]
+
+    result = ""
+    days_of_week = data["data"]
     for day in days_of_week:
         lessons = day["lessons"]
-
-        result = f"Ваше расписание в: **{DAYS_OF_WEEK[day]}**"
+        day_of_week = day["day_of_week"]
+        result += f"Ваше расписание *{DAYS_OF_WEEK[day_of_week]}*:\n"
         for lesson in lessons:
             number = lesson["lesson_number"]
             result += f"Урок №{number['number']} {number['time_start']} - {number['time_end']}\n"
@@ -189,8 +194,9 @@ async def get_user_week(
             result += f"{lesson['teacher']['name']}\n"
             result += f"{lesson['corpus']['name']}, {lesson['cabinet']['name']}\n"
             result += f"\n"
-
-        return result
+        result += "\n"
+    
+    return result
 
 
 # ~=============================
