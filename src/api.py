@@ -164,11 +164,13 @@ async def get_user_day_of_week(
     )
 
     lessons = data["lessons"]
-    
+
     result = ""
     for lesson in lessons:
         number = lesson["lesson_number"]
-        result += f"Урок №{number['number']} {number['time_start']} - {number['time_end']}\n"
+        result += (
+            f"Урок №{number['number']} {number['time_start']} - {number['time_end']}\n"
+        )
         result += f"Предмет: *{lesson['subject']}*\n"
         result += f"{lesson['teacher']['name']}\n"
         result += f"{lesson['corpus']['name']}, {lesson['cabinet']['name']}\n"

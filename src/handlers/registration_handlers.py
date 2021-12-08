@@ -124,7 +124,7 @@ async def register_registration_handlers():
     ):
         logger.debug("input school")
         await States.input_school.set()
-        #if (await state.get_data()).get("role") is None:
+        # if (await state.get_data()).get("role") is None:
         await state.update_data({"role": callback_data["data"]})
         message = call.message
         await send_message(
