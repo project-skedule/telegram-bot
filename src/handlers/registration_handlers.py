@@ -33,6 +33,7 @@ from src.logger import logger
 from src.some_functions import send_message
 from src.states import States
 from src.api import get_subclass_by_params
+from src.redis import get_school_id
 
 
 async def register_registration_handlers():
@@ -204,7 +205,9 @@ async def register_registration_handlers():
         await States.choose_teacher.set()
         await message.answer(
             text="Choose teacher ",  # FIX: text for choosing teacher from list
-            reply_markup=await get_teachers_keyboard(message.text),
+            reply_markup=await get_teachers_keyboard(
+                message.text, await get_school_id(message.chat.id)
+            ),
             parse_mode="markdown",
         )
 
@@ -220,7 +223,7 @@ async def register_registration_handlers():
         await States.teacher_submit.set()
         message = call.message
         text = Texts.confirm_teacher_from_list.format(
-            teachear_name=callback_data["data"]
+            teacher_name=callback_data["data"]
         )
         await state.update_data({"teacher": callback_data["data"]})
         await send_message(

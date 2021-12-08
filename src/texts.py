@@ -170,12 +170,13 @@ class Texts:
 """
     confirm_for_admin = """Confirm registration as admin for {school_name}
 """
-    confirm_teacher_from_list = """"""
+    confirm_teacher_from_list = """Are you teacher {teacher_name}
+"""
     children_information = """"""
     settings_menu = """Это меню настроек, здесь вы можете изменить информацию о себе 😉
 
 """
-    successful_reg_admin = """Вы успешно зарегистрированы как работник администрации 😌
+    successful_reg_admin = """Вы успешно зарегистрированы как работник администрации школы {school_name} 😌
 
 """
     successful_reg_teacher = """*{teacher_name}*, вы успешно зарегистрированы как учитель 😌
