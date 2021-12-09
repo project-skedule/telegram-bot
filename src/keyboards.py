@@ -251,9 +251,27 @@ async def get_find_enter_letter_keyboard(telegram_id, parallel):
     allowed_letter = await get_allowed_letter(
         telegram_id=telegram_id, parallel=parallel
     )
-    return generate_markup(
-        [[(f"{i}", cf.new(action="find_enter_group", data=i))] for i in allowed_letter]
-    )
+    allowed_letter.sort()  # TODO time
+    n = len(allowed_letter)
+    logger.debug(f"{allowed_letter}")
+    keyboard = []
+    for i in range((n - 1) // 5 + 1):
+        row = []
+        for j in range(5):
+            index = i * 5 + j
+            if index < n:
+                row.append(
+                    (
+                        f"{allowed_letter[index]}",
+                        cf.new(action="find_enter_group", data=allowed_letter[index]),
+                    )
+                )
+            else:
+                row.append((f" ", cf.new(action="none", data=0)))
+        keyboard.append(row)
+    logger.debug(f"{keyboard}")
+    return generate_markup(keyboard)
+
 
 
 async def get_find_enter_group_keyboard(telegram_id, parallel, letter):

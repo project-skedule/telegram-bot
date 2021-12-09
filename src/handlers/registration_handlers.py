@@ -197,7 +197,7 @@ async def register_registration_handlers():
 
     # ! =============================
     @dp.message_handler(
-        lambda message: True,  # TODO add re magick #
+        # lambda message: True,  # TODO add re magick #
         state=[States.input_teacher],
     )
     async def choose_teacher_handler(message: Message, state: FSMContext):
