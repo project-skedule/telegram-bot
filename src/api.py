@@ -297,14 +297,14 @@ async def get_ring_timetable(telegram_id: int):
 async def get_canteen_timetable(telegram_id: int):
     school_id = await get_school_id(telegram_id)
     corpuses = await get_request(
-        "/api/info/corpuses/all", data={"school_id": school_id}
+        "/info/corpuses/all", data={"school_id": school_id}
     )
     corpuses = list(map(lambda c: (c["name"], c["id"]), corpuses["data"]))
 
     canteen_texts = {}
     for corpus_name, corpus_id in corpuses:
         canteen_text = await get_request(
-            "/api/info/corpus/canteen", data={"corpus_id": corpus_id}
+            "/info/corpus/canteen", data={"corpus_id": corpus_id}
         )
         canteen_texts[corpus_name] = canteen_text["data"]
 

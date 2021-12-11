@@ -238,3 +238,39 @@ async def register_teacher_handlers():
             parse_mode="markdown",
         )
         await call.answer()
+
+    # =============================
+    @dp.callback_query_handler(
+        cf.filter(action=["contact_devs"]),
+        state=[States.teacher_misc_menu_first],
+    )
+    async def student_canteen_timetable_handler(call: CallbackQuery):
+        await States.teacher_menu.set()
+        message = call.message
+        text = Texts.help_message
+        await send_message(
+            message,
+            text=text,
+            keyboard=TEACHER_MAIN_KEYBOARD,
+            parse_mode="markdown",
+        )
+        await call.answer()
+
+    # =============================
+    @dp.callback_query_handler(
+        cf.filter(action=["support_devs"]),
+        state=[States.teacher_misc_menu_first],
+    )
+    async def student_canteen_timetable_handler(call: CallbackQuery):
+        await States.teacher_menu.set()
+        message = call.message
+        text = Texts.donate_message
+        await send_message(
+            message,
+            text=text,
+            keyboard=TEACHER_MAIN_KEYBOARD,
+            parse_mode="markdown",
+        )
+        await call.answer()
+
+    # =============================
