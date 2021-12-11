@@ -169,7 +169,6 @@ async def get_user_day_of_week(
     Returns timetable for user with `telegram_id` if `is_searching` == False
     Else return timetable for `teacher_id` or `subclass_id` (Only one must be set)
     """
-    school_id = await get_school_id(telegram_id)
     if is_searching:
         if teacher_id is not None:
             return await get_teacher_day_of_week(telegram_id, day_of_week, teacher_id)

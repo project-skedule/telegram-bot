@@ -175,19 +175,19 @@ async def register_find_handlers():
     ):
         message = call.message
         role = (await state.get_data())["role"]
-        day_of_week = callback_data["data"]
+        day_of_week = int(callback_data["data"])
         # FIX: format
         if await is_find_for_student(state):
             text = await get_user_day_of_week(
                 telegram_id=message.chat.id,
-                subclass_id=(await state.get_data())["class"],
+                subclass_id=(await state.get_data())["find_subclass_id"],
                 day_of_week=day_of_week,
                 is_searching=True,
             )
         else:
             text = await get_user_day_of_week(
                 telegram_id=message.chat.id,
-                teacher_id=(await state.get_data())["teacher"],
+                teacher_id=(await state.get_data())["find_teacher_id"],
                 day_of_week=day_of_week,
                 is_searching=True,
             )
@@ -210,13 +210,13 @@ async def register_find_handlers():
         if await is_find_for_student(state):
             text = await get_user_next_lesson(
                 telegram_id=message.chat.id,
-                subclass_id=(await state.get_data())["class"],
+                subclass_id=(await state.get_data())["find_subclass_id"],
                 is_searching=True,
             )
         else:
             text = await get_user_next_lesson(
                 telegram_id=message.chat.id,
-                teacher_id=(await state.get_data())["teacher"],
+                teacher_id=(await state.get_data())["find_teacher_id"],
                 is_searching=True,
             )
 
