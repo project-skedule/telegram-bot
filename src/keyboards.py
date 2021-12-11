@@ -273,7 +273,6 @@ async def get_find_enter_letter_keyboard(telegram_id, parallel):
     return generate_markup(keyboard)
 
 
-
 async def get_find_enter_group_keyboard(telegram_id, parallel, letter):
     allowed_group = await get_allowed_group(
         telegram_id=telegram_id,

@@ -203,6 +203,7 @@ async def register_student_handlers():
         state=[States.student_misc_menu_first],
     )
     async def student_ring_timetable_handler(call: CallbackQuery):
+        logger.debug("ring timetable")
         await States.student_menu.set()
         message = call.message
         data = await get_ring_timetable(message.chat.id)
@@ -229,6 +230,7 @@ async def register_student_handlers():
         state=[States.student_misc_menu_second],
     )
     async def student_canteen_timetable_handler(call: CallbackQuery):
+        logger.debug("canteen timetable")
         await States.student_menu.set()
         message = call.message
         canteens = await get_canteen_timetable(message.chat.id)
@@ -245,3 +247,39 @@ async def register_student_handlers():
             parse_mode="markdown",
         )
         await call.answer()
+
+    # =============================
+    @dp.callback_query_handler(
+        cf.filter(action=["contact_devs"]),
+        state=[States.student_misc_menu_first],
+    )
+    async def student_canteen_timetable_handler(call: CallbackQuery):
+        await States.student_menu.set()
+        message = call.message
+        text = Texts.help_message
+        await send_message(
+            message,
+            text=text,
+            keyboard=STUDENT_MAIN_KEYBOARD,
+            parse_mode="markdown",
+        )
+        await call.answer()
+
+    # =============================
+    @dp.callback_query_handler(
+        cf.filter(action=["support_devs"]),
+        state=[States.student_misc_menu_first],
+    )
+    async def student_canteen_timetable_handler(call: CallbackQuery):
+        await States.student_menu.set()
+        message = call.message
+        text = Texts.donate_message
+        await send_message(
+            message,
+            text=text,
+            keyboard=STUDENT_MAIN_KEYBOARD,
+            parse_mode="markdown",
+        )
+        await call.answer()
+
+    # =============================

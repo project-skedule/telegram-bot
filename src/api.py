@@ -187,10 +187,11 @@ async def get_user_day_of_week(
                 telegram_id, day_of_week, await get_subclass_id(telegram_id)
             )
 
+
 async def get_student_week(telegram_id, student_id):
     school_id = await get_school_id(telegram_id)
-    data = {"stujdent_id": student_id}
-    
+    data = {"subclass_id": student_id}
+
     data = await get_request(
         "/lesson/get/range",
         data={
@@ -218,6 +219,7 @@ async def get_student_week(telegram_id, student_id):
 
     return result
 
+
 async def get_teacher_week(telegram_id, teacher_id):
     school_id = await get_school_id(telegram_id)
 
@@ -241,9 +243,7 @@ async def get_teacher_week(telegram_id, teacher_id):
         result += f"Ваше расписание *{DAYS_OF_WEEK[day_of_week]}*:\n"
         for lesson in lessons:
             number = lesson["lesson_number"]
-            result += (
-                f"Урок №{number['number']} {number['time_start']} - {number['time_end']}\n"
-            )
+            result += f"Урок №{number['number']} {number['time_start']} - {number['time_end']}\n"
             result += f"Предмет: {lesson['subject']}\n"
             subclasses = lesson["subclasses"]
             for subclass in subclasses:
@@ -255,6 +255,7 @@ async def get_teacher_week(telegram_id, teacher_id):
         result += f"\n"
 
     return result
+
 
 async def get_user_week(
     telegram_id, is_searching=False, teacher_id=None, subclass_id=None
@@ -282,14 +283,15 @@ async def get_user_week(
             )
 
 
-
 # ~=============================
 
 
 async def get_ring_timetable(telegram_id: int):
     school_id = await get_school_id(telegram_id)
-    data = await get_request("/info/lessontimetable/all", data={"school_id": school_id})
-    return data
+    data = await get_request(
+        "/info/lessontimetables/all", data={"school_id": school_id}
+    )
+    return data["data"]
 
 
 async def get_canteen_timetable(telegram_id: int):

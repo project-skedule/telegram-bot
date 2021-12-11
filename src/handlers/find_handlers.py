@@ -206,7 +206,7 @@ async def register_find_handlers():
         message = call.message
         role = (await state.get_data())["role"]
         day_of_week = callback_data["data"]
-        # FIX: format
+
         if await is_find_for_student(state):
             text = await get_user_next_lesson(
                 telegram_id=message.chat.id,
@@ -231,9 +231,10 @@ async def register_find_handlers():
     async def find_today_handler(
         call: CallbackQuery, state: FSMContext, callback_data: dict
     ):
+        logger.debug(f"{await state.get_data()}")
         message = call.message
         role = (await state.get_data())["role"]
-        
+
         if await is_find_for_student(state):
             text = await get_user_today(
                 telegram_id=message.chat.id,
@@ -260,7 +261,7 @@ async def register_find_handlers():
     ):
         message = call.message
         role = (await state.get_data())["role"]
-        
+
         if await is_find_for_student(state):
             text = await get_user_tomorrow(
                 telegram_id=message.chat.id,
@@ -273,7 +274,6 @@ async def register_find_handlers():
                 teacher_id=(await state.get_data())["find_teacher_id"],
                 is_searching=True,
             )
-            
 
         await dispatcher_menu(message, role, text)
         await call.answer()
@@ -288,7 +288,7 @@ async def register_find_handlers():
     ):
         message = call.message
         role = (await state.get_data())["role"]
-        
+        logger.debug(f"{await state.get_data()}")
         if await is_find_for_student(state):
             text = await get_user_week(
                 telegram_id=message.chat.id,
@@ -320,6 +320,8 @@ async def register_find_handlers():
         call: CallbackQuery, state: FSMContext, callback_data: dict
     ):
         await States.find_input_teacher.set()
+        await state.update_data({"find_subclass_id": None})
+        await state.update_data({"find_teacher_id": None})
         message = call.message
         text = Texts.enter_name
         await send_message(message, text=text, keyboard=None, parse_mode="markdown")
