@@ -44,7 +44,6 @@ async def register_registration_handlers():
     async def registration_message(message: Message, state: FSMContext):
         logger.debug("/start")
         logger.debug(f"{await state.get_data()}")
-        await state.update_data({"searchable": False})
         if not await is_registered(message.chat.id):
             await state.set_data({})
             await States.choose_role.set()
@@ -86,19 +85,18 @@ async def register_registration_handlers():
                 )
 
     # =============================
-    """@dp.callback_query_handler(cf.filter(action=["choose_role"]), state="*")
-    async def registration_message(message: Message, state: FSMContext):
-        logger.debug("change role")
-        logger.debug(f"{await state.get_data()}")
-        await state.update_data({"searchable": False})
-        
-        await state.set_data({})
-        await States.choose_role.set()
-        await message.answer(
-            text=Texts.greeting,
-            reply_markup=CHOOSE_ROLE_KEYBOARD,
-            parse_mode="markdown",
-        )"""
+    # @dp.callback_query_handler(cf.filter(action=["choose_role"]), state="*")
+    # async def registration_message(message: Message, state: FSMContext):
+    #     logger.debug("change role")
+    #     logger.debug(f"{await state.get_data()}")
+
+    #     await state.set_data({})
+    #     await States.choose_role.set()
+    #     await message.answer(
+    #         text=Texts.greeting,
+    #         reply_markup=CHOOSE_ROLE_KEYBOARD,
+    #         parse_mode="markdown",
+    #     )
 
     # ============================
     @dp.callback_query_handler(

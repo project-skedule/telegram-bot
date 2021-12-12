@@ -54,7 +54,7 @@ def generate_markup(
 
 STUDENT_MAIN_KEYBOARD = generate_markup(
     [
-        [("Следующий урок", cf.new(action="next_lesson", data=0))],
+        # [("Следующий урок", cf.new(action="next_lesson", data=0))],
         [
             ("Сегодня", cf.new(action="today", data=0)),
             ("Завтра", cf.new(action="tomorrow", data=0)),
@@ -66,7 +66,7 @@ STUDENT_MAIN_KEYBOARD = generate_markup(
 )
 TEACHER_MAIN_KEYBOARD = generate_markup(
     [
-        [("Следующий урок", cf.new(action="next_lesson", data=0))],
+        # [("Следующий урок", cf.new(action="next_lesson", data=0))],
         [
             ("Сегодня", cf.new(action="today", data=0)),
             ("Завтра", cf.new(action="tomorrow", data=0)),
@@ -109,7 +109,7 @@ STUDENT_MISC_MENU_SECOND_KEYBOARD = generate_markup(
     [
         [("Объявления", cf.new(action="anouns", data=0))],
         [("Расписание столовой", cf.new(action="canteen_timetable", data=0))],
-        [("Изменить ФИО/класс", cf.new(action="registration", data=0))],
+        [("Изменить тип аккаунта", cf.new(action="registration", data=0))],
         [("Вернуться в главное меню", cf.new(action="student_menu", data=0))],
         [("<-", cf.new(action="student_misc_menu_first", data=0))],
     ]
@@ -133,7 +133,7 @@ TEACHER_MISC_MENU_SECOND_KEYBOARD = generate_markup(
     [
         [("Объявления", cf.new(action="anouns", data=0))],
         [("Расписание столовой", cf.new(action="canteen_timetable", data=0))],
-        [("Изменить ФИО/класс", cf.new(action="registration", data=0))],
+        [("Изменить тип аккаунта", cf.new(action="registration", data=0))],
         [("Вернуться в главное меню", cf.new(action="teacher_menu", data=0))],
         [("<-", cf.new(action="teacher_misc_menu_first", data=0))],
     ]
@@ -152,7 +152,7 @@ CHILD_MISC_MENU_FIRST_KEYBOARD = generate_markup(
 )
 PARENT_MISC_MENU_FIRST_KEYBOARD = generate_markup(
     [
-        [("Изменить ФИО/класс", cf.new(action="registration", data=0))],
+        [("Изменить тип аккаунта", cf.new(action="registration", data=0))],
         [("Вернуться в главное меню", cf.new(action="choose_child", data=0))],
     ]
 )
@@ -162,7 +162,7 @@ MISC_MENU_SECOND_KEYBOARD = generate_markup(
     [
         [("Объявления", cf.new(action="anouns", data=0))],
         [("Расписание столовой", cf.new(action="canteen_timetable", data=0))],
-        [("Изменить ФИО/класс", cf.new(action="registration", data=0))],
+        [("Изменить тип аккаунта", cf.new(action="registration", data=0))],
         [("Вернуться в главное меню", cf.new(action="main_menu", data=0))],
         [("<-", cf.new(action="misc_menu_first", data=0))],
     ]
@@ -184,7 +184,7 @@ ADMINISTRATION_MENU_SECOND_KEYBOARD = generate_markup(
     [
         [("Объявления", cf.new(action="anouns", data=0))],
         [("Расписание столовой", cf.new(action="canteen_timetable", data=0))],
-        [("Изменить ФИО/класс", cf.new(action="registration", data=0))],
+        [("Изменить тип аккаунта", cf.new(action="registration", data=0))],
         [("<-", cf.new(action="administration_menu_first", data=0))],
     ]
 )
@@ -197,7 +197,7 @@ CHILD_DAY_OF_WEEK_KEYBOARD = generate_markup(
         [("Четверг", cf.new(action="child_choose_day_of_week", data=4))],
         [("Пятница", cf.new(action="child_choose_day_of_week", data=5))],
         [("Суббота", cf.new(action="child_choose_day_of_week", data=6))],
-        [("go back", cf.new(action="child_menu", data=0))],
+        [("Вернуться назад", cf.new(action="child_menu", data=0))],
     ]
 )
 
@@ -209,7 +209,7 @@ STUDENT_DAY_OF_WEEK_KEYBOARD = generate_markup(
         [("Четверг", cf.new(action="student_choose_day_of_week", data=4))],
         [("Пятница", cf.new(action="student_choose_day_of_week", data=5))],
         [("Суббота", cf.new(action="student_choose_day_of_week", data=6))],
-        [("go back", cf.new(action="student_menu", data=0))],
+        [("Вернуться назад", cf.new(action="student_menu", data=0))],
     ]
 )
 
@@ -221,7 +221,7 @@ TEACHER_DAY_OF_WEEK_KEYBOARD = generate_markup(
         [("Четверг", cf.new(action="teacher_choose_day_of_week", data=4))],
         [("Пятница", cf.new(action="teacher_choose_day_of_week", data=5))],
         [("Суббота", cf.new(action="teacher_choose_day_of_week", data=6))],
-        [("go back", cf.new(action="teacher_menu", data=0))],
+        [("Вернуться назад", cf.new(action="teacher_menu", data=0))],
     ]
 )
 
@@ -335,22 +335,22 @@ async def get_enter_group_keyboard(telegram_id, parallel, letter):
 
 STUDENT_SUBMIT_KEYBOARD = generate_markup(
     [
-        [(f"YES", cf.new(action="student_submit_yes", data=0))],
-        [(f"NO", cf.new(action="enter_parallel", data=0))],
+        [(f"Да", cf.new(action="student_submit_yes", data=0))],
+        [(f"Нет", cf.new(action="enter_parallel", data=0))],
     ]
 )
 
 FIND_STUDENT_SUBMIT_KEYBOARD = generate_markup(
     [
-        [(f"YES", cf.new(action="find_menu", data=0))],
-        [(f"NO", cf.new(action="find_class", data=0))],
+        [(f"Да", cf.new(action="find_menu", data=0))],
+        [(f"Нет", cf.new(action="find_class", data=0))],
     ]
 )
 
 FIND_TEACHER_SUBMIT_KEYBOARD = generate_markup(
     [
-        [(f"YES", cf.new(action="find_menu", data=0))],
-        [(f"NO", cf.new(action="find_teacher", data=0))],
+        [(f"Да", cf.new(action="find_menu", data=0))],
+        [(f"Нет", cf.new(action="find_teacher", data=0))],
     ]
 )
 
@@ -374,7 +374,7 @@ FIND_DAY_OF_WEEK_KEYBOARD = generate_markup(
         [("Четверг", cf.new(action="find_choose_day_of_week", data=4))],
         [("Пятница", cf.new(action="find_choose_day_of_week", data=5))],
         [("Суббота", cf.new(action="find_choose_day_of_week", data=6))],
-        [("go back", cf.new(action="find_menu", data=0))],
+        [("Вернуться назад", cf.new(action="find_menu", data=0))],
     ]
 )
 
@@ -406,10 +406,15 @@ async def get_teachers_keyboard(teacher, school_id):
 
 CHOOSE_ROLE_KEYBOARD = generate_markup(
     [
-        [("Parent", cf.new(action="show_childs", data=0))],
-        [("Student", cf.new(action="input_school", data="Student"))],
-        [("Teacher", cf.new(action="input_school", data="Teacher"))],
-        [("Administration", cf.new(action="input_school", data="Administration"))],
+        # [("Parent", cf.new(action="show_childs", data=0))],
+        [("Ученик", cf.new(action="input_school", data="Student"))],
+        [("Учитель", cf.new(action="input_school", data="Teacher"))],
+        [
+            (
+                "Работник администрации",
+                cf.new(action="input_school", data="Administration"),
+            )
+        ],
     ]
 )
 
@@ -427,21 +432,21 @@ async def get_schools_keyboard(school: str):
 
 SUBMIT_ADMINISTRATION_KEYBOARD = generate_markup(
     [
-        [("Yes", cf.new(action="administration_menu_first", data=0))],
-        [("No", cf.new(action="choose_role", data=0))],
+        [("Да", cf.new(action="administration_menu_first", data=0))],
+        [("Нет", cf.new(action="choose_role", data=0))],
     ]
 )
 
 TEACHER_SUBMIT_KEYBOARD = generate_markup(
     [
-        [("Yes", cf.new(action="teacher_menu", data=0))],
-        [("No", cf.new(action="input_school", data=0))],
+        [("Да", cf.new(action="teacher_menu", data=0))],
+        [("Нет", cf.new(action="input_school", data=0))],
     ]
 )
 
 ADD_MORE_CHILDREN_KEYBOARD = generate_markup(
     [
-        [("Yes", cf.new(action="input_school", data=0))],
-        [("No", cf.new(action="choose_child", data=0))],
+        [("Да", cf.new(action="input_school", data=0))],
+        [("Нет", cf.new(action="choose_child", data=0))],
     ]
 )

@@ -9,6 +9,7 @@ from src.api import (
     get_user_today,
     get_user_tomorrow,
     get_user_week,
+    get_teacher_name_by_id,
 )
 
 from src.bot import bot, dp
@@ -110,6 +111,7 @@ async def register_find_handlers():
             await get_school_id(message.chat.id), parallel, letter, group
         )
         await state.update_data({"find_subclass_id": subclass_id})
+        await state.update_data({"find_subclass_name": parallel + letter + group})
         message = call.message
         await send_message(
             message,
@@ -135,9 +137,11 @@ async def register_find_handlers():
         message = call.message
 
         if await is_find_for_student(state):
-            text = f"Расписание ученика `{(await state.get_data())['find_subclass_id']}` класса"
+            text = f"Расписание ученика `{(await state.get_data())['find_subclass_name']}` класса"
         else:
-            text = f"Расписание учителя `{(await state.get_data())['find_teacher_id']}`"
+            text = (
+                f"Расписание учителя `{(await state.get_data())['find_teacher_name']}`"
+            )
         await send_message(
             message,
             text=text,
@@ -351,10 +355,12 @@ async def register_find_handlers():
     ):
         await States.find_teacher_submit.set()
         message = call.message
-        text = Texts.confirm_teacher_from_list.format(
-            teacher_name=callback_data["data"]
-        )
-        await state.update_data({"find_teacher_id": callback_data["data"]})
+
+        teacher_id = callback_data["data"]
+        teacher_name = await get_teacher_name_by_id(teacher_id)
+        await state.update_data({"find_teacher_id": teacher_id})
+        await state.update_data({"find_teacher_name": teacher_name})
+        text = Texts.confirm_teacher_from_list.format(teacher_name=teacher_name)
         await send_message(
             message,
             text=text,
