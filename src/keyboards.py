@@ -3,7 +3,7 @@ from typing import List, Tuple
 from aiogram.types.inline_keyboard import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.callback_data import CallbackData
 
-from .api import (
+from src.api import (
     get_allowed_group,
     get_allowed_letter,
     get_allowed_parallel,
@@ -11,6 +11,8 @@ from .api import (
     get_similar_schools,
     get_similar_teachers,
 )
+
+from src.logger import logger
 
 cf = CallbackData("callback", "action", "data")
 
@@ -21,7 +23,7 @@ def generate_markup(
     """Generate markup from variants.
     Variants must have certain structure. Firsly, variants is a `List` each element of which is a `List` too.
     Variants itself contains `ROW`s for buttons, which are `List`s.
-    Every `ROW` contains elements - `Tuple`, identifing button. Number of buttons in row is a number of columns.
+    Every `ROW` contains elements - `Tuple`, identifying button. Number of buttons in row is a number of columns.
     Button is a tuple of `str` - text for button and `CallbackData` for callbacks.
     Valid variants:
     [
@@ -52,7 +54,7 @@ def generate_markup(
 
 STUDENT_MAIN_KEYBOARD = generate_markup(
     [
-        [("Следующий урок", cf.new(action="next_lesson", data=0))],
+        # [("Следующий урок", cf.new(action="next_lesson", data=0))],
         [
             ("Сегодня", cf.new(action="today", data=0)),
             ("Завтра", cf.new(action="tomorrow", data=0)),
@@ -64,7 +66,7 @@ STUDENT_MAIN_KEYBOARD = generate_markup(
 )
 TEACHER_MAIN_KEYBOARD = generate_markup(
     [
-        [("Следующий урок", cf.new(action="next_lesson", data=0))],
+        # [("Следующий урок", cf.new(action="next_lesson", data=0))],
         [
             ("Сегодня", cf.new(action="today", data=0)),
             ("Завтра", cf.new(action="tomorrow", data=0)),
@@ -107,7 +109,7 @@ STUDENT_MISC_MENU_SECOND_KEYBOARD = generate_markup(
     [
         [("Объявления", cf.new(action="anouns", data=0))],
         [("Расписание столовой", cf.new(action="canteen_timetable", data=0))],
-        [("Изменить ФИО/класс", cf.new(action="registration", data=0))],
+        [("Изменить тип аккаунта", cf.new(action="registration", data=0))],
         [("Вернуться в главное меню", cf.new(action="student_menu", data=0))],
         [("<-", cf.new(action="student_misc_menu_first", data=0))],
     ]
@@ -131,7 +133,7 @@ TEACHER_MISC_MENU_SECOND_KEYBOARD = generate_markup(
     [
         [("Объявления", cf.new(action="anouns", data=0))],
         [("Расписание столовой", cf.new(action="canteen_timetable", data=0))],
-        [("Изменить ФИО/класс", cf.new(action="registration", data=0))],
+        [("Изменить тип аккаунта", cf.new(action="registration", data=0))],
         [("Вернуться в главное меню", cf.new(action="teacher_menu", data=0))],
         [("<-", cf.new(action="teacher_misc_menu_first", data=0))],
     ]
@@ -150,7 +152,7 @@ CHILD_MISC_MENU_FIRST_KEYBOARD = generate_markup(
 )
 PARENT_MISC_MENU_FIRST_KEYBOARD = generate_markup(
     [
-        [("Изменить ФИО/класс", cf.new(action="registration", data=0))],
+        [("Изменить тип аккаунта", cf.new(action="registration", data=0))],
         [("Вернуться в главное меню", cf.new(action="choose_child", data=0))],
     ]
 )
@@ -160,7 +162,7 @@ MISC_MENU_SECOND_KEYBOARD = generate_markup(
     [
         [("Объявления", cf.new(action="anouns", data=0))],
         [("Расписание столовой", cf.new(action="canteen_timetable", data=0))],
-        [("Изменить ФИО/класс", cf.new(action="registration", data=0))],
+        [("Изменить тип аккаунта", cf.new(action="registration", data=0))],
         [("Вернуться в главное меню", cf.new(action="main_menu", data=0))],
         [("<-", cf.new(action="misc_menu_first", data=0))],
     ]
@@ -182,44 +184,44 @@ ADMINISTRATION_MENU_SECOND_KEYBOARD = generate_markup(
     [
         [("Объявления", cf.new(action="anouns", data=0))],
         [("Расписание столовой", cf.new(action="canteen_timetable", data=0))],
-        [("Изменить ФИО/класс", cf.new(action="registration", data=0))],
+        [("Изменить тип аккаунта", cf.new(action="registration", data=0))],
         [("<-", cf.new(action="administration_menu_first", data=0))],
     ]
 )
 
 CHILD_DAY_OF_WEEK_KEYBOARD = generate_markup(
     [
-        [("Понедельник", cf.new(action="child_choose_day_of_week", data="1"))],
-        [("Вторник", cf.new(action="child_choose_day_of_week", data="2"))],
-        [("Среда", cf.new(action="child_choose_day_of_week", data="3"))],
-        [("Четверг", cf.new(action="child_choose_day_of_week", data="4"))],
-        [("Пятница", cf.new(action="child_choose_day_of_week", data="5"))],
-        [("Суббота", cf.new(action="child_choose_day_of_week", data="6"))],
-        [("go back", cf.new(action="child_menu", data=0))],
+        [("Понедельник", cf.new(action="child_choose_day_of_week", data=1))],
+        [("Вторник", cf.new(action="child_choose_day_of_week", data=2))],
+        [("Среда", cf.new(action="child_choose_day_of_week", data=3))],
+        [("Четверг", cf.new(action="child_choose_day_of_week", data=4))],
+        [("Пятница", cf.new(action="child_choose_day_of_week", data=5))],
+        [("Суббота", cf.new(action="child_choose_day_of_week", data=6))],
+        [("Вернуться назад", cf.new(action="child_menu", data=0))],
     ]
 )
 
 STUDENT_DAY_OF_WEEK_KEYBOARD = generate_markup(
     [
-        [("Понедельник", cf.new(action="student_choose_day_of_week", data="1"))],
-        [("Вторник", cf.new(action="student_choose_day_of_week", data="2"))],
-        [("Среда", cf.new(action="student_choose_day_of_week", data="3"))],
-        [("Четверг", cf.new(action="student_choose_day_of_week", data="4"))],
-        [("Пятница", cf.new(action="student_choose_day_of_week", data="5"))],
-        [("Суббота", cf.new(action="student_choose_day_of_week", data="6"))],
-        [("go back", cf.new(action="student_menu", data=0))],
+        [("Понедельник", cf.new(action="student_choose_day_of_week", data=1))],
+        [("Вторник", cf.new(action="student_choose_day_of_week", data=2))],
+        [("Среда", cf.new(action="student_choose_day_of_week", data=3))],
+        [("Четверг", cf.new(action="student_choose_day_of_week", data=4))],
+        [("Пятница", cf.new(action="student_choose_day_of_week", data=5))],
+        [("Суббота", cf.new(action="student_choose_day_of_week", data=6))],
+        [("Вернуться назад", cf.new(action="student_menu", data=0))],
     ]
 )
 
 TEACHER_DAY_OF_WEEK_KEYBOARD = generate_markup(
     [
-        [("Понедельник", cf.new(action="teacher_choose_day_of_week", data="1"))],
-        [("Вторник", cf.new(action="teacher_choose_day_of_week", data="2"))],
-        [("Среда", cf.new(action="teacher_choose_day_of_week", data="3"))],
-        [("Четверг", cf.new(action="teacher_choose_day_of_week", data="4"))],
-        [("Пятница", cf.new(action="teacher_choose_day_of_week", data="5"))],
-        [("Суббота", cf.new(action="teacher_choose_day_of_week", data="6"))],
-        [("go back", cf.new(action="teacher_menu", data=0))],
+        [("Понедельник", cf.new(action="teacher_choose_day_of_week", data=1))],
+        [("Вторник", cf.new(action="teacher_choose_day_of_week", data=2))],
+        [("Среда", cf.new(action="teacher_choose_day_of_week", data=3))],
+        [("Четверг", cf.new(action="teacher_choose_day_of_week", data=4))],
+        [("Пятница", cf.new(action="teacher_choose_day_of_week", data=5))],
+        [("Суббота", cf.new(action="teacher_choose_day_of_week", data=6))],
+        [("Вернуться назад", cf.new(action="teacher_menu", data=0))],
     ]
 )
 
@@ -231,12 +233,12 @@ async def get_child_keyboard(name: int):  # TODO add api
         for child_name, child_id in children.items()
     ]
 
-    keyboard += [("parent menu #1", cf.new(action="parent_misc_menu_first", data=0))]
+    keyboard += [[("parent menu #1", cf.new(action="parent_misc_menu_first", data=0))]]
     return generate_markup(keyboard)
 
 
-async def get_find_enter_parallel_keyboard(user_id):
-    allowed_parallel = await get_allowed_parallel(user_id=user_id)
+async def get_find_enter_parallel_keyboard(telegram_id):
+    allowed_parallel = await get_allowed_parallel(telegram_id=telegram_id)
     return generate_markup(
         [
             [(f"{i}", cf.new(action="find_enter_letter", data=i))]
@@ -245,18 +247,37 @@ async def get_find_enter_parallel_keyboard(user_id):
     )
 
 
-async def get_find_enter_letter_keyboard(user_id, current_chosen):
+async def get_find_enter_letter_keyboard(telegram_id, parallel):
     allowed_letter = await get_allowed_letter(
-        user_id=user_id, current_chosen=current_chosen
+        telegram_id=telegram_id, parallel=parallel
     )
-    return generate_markup(
-        [[(f"{i}", cf.new(action="find_enter_group", data=i))] for i in allowed_letter]
-    )
+    allowed_letter.sort()  # TODO time
+    n = len(allowed_letter)
+    logger.debug(f"{allowed_letter}")
+    keyboard = []
+    for i in range((n - 1) // 5 + 1):
+        row = []
+        for j in range(5):
+            index = i * 5 + j
+            if index < n:
+                row.append(
+                    (
+                        f"{allowed_letter[index]}",
+                        cf.new(action="find_enter_group", data=allowed_letter[index]),
+                    )
+                )
+            else:
+                row.append((f" ", cf.new(action="none", data=0)))
+        keyboard.append(row)
+    logger.debug(f"{keyboard}")
+    return generate_markup(keyboard)
 
 
-async def get_find_enter_group_keyboard(user_id, current_chosen):
+async def get_find_enter_group_keyboard(telegram_id, parallel, letter):
     allowed_group = await get_allowed_group(
-        user_id=user_id, current_chosen=current_chosen
+        telegram_id=telegram_id,
+        parallel=parallel,
+        letter=letter,
     )
     return generate_markup(
         [
@@ -266,42 +287,70 @@ async def get_find_enter_group_keyboard(user_id, current_chosen):
     )
 
 
-async def get_enter_parallel_keyboard():
+async def get_enter_parallel_keyboard(telegram_id):
+    allowed_parallel = await get_allowed_parallel(telegram_id=telegram_id)
+    allowed_parallel.sort()  # TODO time
     return generate_markup(
-        [[(f"{i}", cf.new(action="enter_letter", data=i))] for i in range(8, 11 + 1)]
+        [[(f"{i}", cf.new(action="enter_letter", data=i))] for i in allowed_parallel]
     )
 
 
-async def get_enter_letter_keyboard():
-    return generate_markup(
-        [[(f"{i}", cf.new(action="enter_group", data=i))] for i in "ABCDEF"]
+async def get_enter_letter_keyboard(telegram_id, parallel):
+    allowed_letter = await get_allowed_letter(
+        telegram_id=telegram_id, parallel=parallel
     )
+    allowed_letter.sort()  # TODO time
+    n = len(allowed_letter)
+    logger.debug(f"{allowed_letter}")
+    keyboard = []
+    for i in range((n - 1) // 5 + 1):
+        row = []
+        for j in range(5):
+            index = i * 5 + j
+            if index < n:
+                row.append(
+                    (
+                        f"{allowed_letter[index]}",
+                        cf.new(action="enter_group", data=allowed_letter[index]),
+                    )
+                )
+            else:
+                row.append((f" ", cf.new(action="none", data=0)))
+        keyboard.append(row)
+    logger.debug(f"{keyboard}")
+    return generate_markup(keyboard)
 
 
-async def get_enter_group_keyboard():
+async def get_enter_group_keyboard(telegram_id, parallel, letter):
+    allowed_group = await get_allowed_group(
+        telegram_id=telegram_id,
+        parallel=parallel,
+        letter=letter,
+    )
+    allowed_group.sort()  # TODO time
     return generate_markup(
-        [[(f"{i}", cf.new(action="student_submit", data=i))] for i in range(1, 2 + 1)]
+        [[(f"{i}", cf.new(action="student_submit", data=i))] for i in allowed_group]
     )
 
 
 STUDENT_SUBMIT_KEYBOARD = generate_markup(
     [
-        [(f"YES", cf.new(action="student_submit_yes", data=0))],
-        [(f"NO", cf.new(action="enter_parallel", data=0))],
+        [(f"Да", cf.new(action="student_submit_yes", data=0))],
+        [(f"Нет", cf.new(action="enter_parallel", data=0))],
     ]
 )
 
 FIND_STUDENT_SUBMIT_KEYBOARD = generate_markup(
     [
-        [(f"YES", cf.new(action="find_menu", data=0))],
-        [(f"NO", cf.new(action="find_class", data=0))],
+        [(f"Да", cf.new(action="find_menu", data=0))],
+        [(f"Нет", cf.new(action="find_class", data=0))],
     ]
 )
 
 FIND_TEACHER_SUBMIT_KEYBOARD = generate_markup(
     [
-        [(f"YES", cf.new(action="find_menu", data=0))],
-        [(f"NO", cf.new(action="find_teacher", data=0))],
+        [(f"Да", cf.new(action="find_menu", data=0))],
+        [(f"Нет", cf.new(action="find_teacher", data=0))],
     ]
 )
 
@@ -319,42 +368,59 @@ FIND_MAIN_KEYBOARD = generate_markup(
 
 FIND_DAY_OF_WEEK_KEYBOARD = generate_markup(
     [
-        [("Понедельник", cf.new(action="find_choose_day_of_week", data="1"))],
-        [("Вторник", cf.new(action="find_choose_day_of_week", data="2"))],
-        [("Среда", cf.new(action="find_choose_day_of_week", data="3"))],
-        [("Четверг", cf.new(action="find_choose_day_of_week", data="4"))],
-        [("Пятница", cf.new(action="find_choose_day_of_week", data="5"))],
-        [("Суббота", cf.new(action="find_choose_day_of_week", data="6"))],
-        [("go back", cf.new(action="find_menu", data=0))],
+        [("Понедельник", cf.new(action="find_choose_day_of_week", data=1))],
+        [("Вторник", cf.new(action="find_choose_day_of_week", data=2))],
+        [("Среда", cf.new(action="find_choose_day_of_week", data=3))],
+        [("Четверг", cf.new(action="find_choose_day_of_week", data=4))],
+        [("Пятница", cf.new(action="find_choose_day_of_week", data=5))],
+        [("Суббота", cf.new(action="find_choose_day_of_week", data=6))],
+        [("Вернуться назад", cf.new(action="find_menu", data=0))],
     ]
 )
 
 
-async def find_get_teachers_keyboard(teacher):
-    teachers = await get_similar_teachers(teacher)
+async def find_get_teachers_keyboard(teacher, school_id):
+    teachers = await get_similar_teachers(teacher, school_id)
     return generate_markup(
-        [[(teacher["name"], cf.new(action="find_choose_teacher", data=teacher["id"]))] for teacher in teachers]
+        [
+            [
+                (
+                    teacher["name"],
+                    cf.new(action="find_choose_teacher", data=teacher["id"]),
+                )
+            ]
+            for teacher in teachers
+        ]
     )
 
 
-async def get_teachers_keyboard(teacher):
-    teachers = await get_similar_teachers(teacher)
+async def get_teachers_keyboard(teacher, school_id):
+    teachers = await get_similar_teachers(teacher, school_id)
     return generate_markup(
-        [[(name, cf.new(action="choose_teacher", data=name))] for name in teachers]
+        [
+            [(teacher["name"], cf.new(action="choose_teacher", data=teacher["id"]))]
+            for teacher in teachers
+        ]
     )
 
 
 CHOOSE_ROLE_KEYBOARD = generate_markup(
     [
-        [("Parent", cf.new(action="show_childs", data=0))],
-        [("Student", cf.new(action="input_school", data="Student"))],
-        [("Teacher", cf.new(action="input_school", data="Teacher"))],
-        [("Administration", cf.new(action="input_school", data="Administration"))],
+        # [("Parent", cf.new(action="show_childs", data=0))],
+        [("Ученик", cf.new(action="input_school", data="Student"))],
+        [("Учитель", cf.new(action="input_school", data="Teacher"))],
+        [
+            (
+                "Работник администрации",
+                cf.new(action="input_school", data="Administration"),
+            )
+        ],
     ]
 )
 
 
 async def get_schools_keyboard(school: str):
+    logger.debug(f"get_schools_keyboard for {school}")
     schools = await get_similar_schools(school)
     keyboard = [
         [(school["name"], cf.new(action="choose_school", data=school["id"]))]
@@ -366,21 +432,21 @@ async def get_schools_keyboard(school: str):
 
 SUBMIT_ADMINISTRATION_KEYBOARD = generate_markup(
     [
-        [("Yes", cf.new(action="administration_menu_first", data=0))],
-        [("No", cf.new(action="choose_role", data=0))],
+        [("Да", cf.new(action="administration_menu_first", data=0))],
+        [("Нет", cf.new(action="choose_role", data=0))],
     ]
 )
 
 TEACHER_SUBMIT_KEYBOARD = generate_markup(
     [
-        [("Yes", cf.new(action="teacher_menu", data=0))],
-        [("No", cf.new(action="input_school", data=0))],
+        [("Да", cf.new(action="teacher_menu", data=0))],
+        [("Нет", cf.new(action="input_school", data=0))],
     ]
 )
 
 ADD_MORE_CHILDREN_KEYBOARD = generate_markup(
     [
-        [("Yes", cf.new(action="input_school", data=0))],
-        [("No", cf.new(action="choose_child", data=0))],
+        [("Да", cf.new(action="input_school", data=0))],
+        [("Нет", cf.new(action="choose_child", data=0))],
     ]
 )

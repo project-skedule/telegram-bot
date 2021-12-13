@@ -1,7 +1,7 @@
 from aiogram.types import Update
-from ..text_loader import Texts
-from ..bot import dp
-from ..logger import logger
+from src.texts import Texts
+from src.bot import dp
+from src.logger import logger
 
 
 async def register_error_handlers():
@@ -12,7 +12,7 @@ async def register_error_handlers():
             chat_id = update.message.chat.id
             username = update.message.chat.username
         except:
-            chat_id = ""
+            chat_id = -1
             username = ""
         finally:
             logger.error(

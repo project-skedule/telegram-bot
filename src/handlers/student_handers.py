@@ -1,26 +1,26 @@
 from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery, Message
-from ..text_loader import Texts
-from ..api import (
+from src.texts import Texts
+from src.api import (
     get_canteen_timetable,
     get_ring_timetable,
-    get_student_day_of_week,
-    get_student_next_lesson,
-    get_student_today,
-    get_student_tomorrow,
-    get_student_week,
+    get_user_day_of_week,
+    get_user_next_lesson,
+    get_user_today,
+    get_user_tomorrow,
+    get_user_week,
 )
-from ..bot import bot, dp
-from ..keyboards import (
+from src.bot import bot, dp
+from src.keyboards import (
     STUDENT_DAY_OF_WEEK_KEYBOARD,
     STUDENT_MAIN_KEYBOARD,
     STUDENT_MISC_MENU_FIRST_KEYBOARD,
     STUDENT_MISC_MENU_SECOND_KEYBOARD,
     cf,
 )
-from ..logger import logger
-from ..some_functions import send_message
-from ..states import States
+from src.logger import logger
+from src.some_functions import send_message
+from src.states import States
 
 
 async def register_student_handlers():
@@ -39,7 +39,7 @@ async def register_student_handlers():
         message = call.message
         await send_message(
             message,
-            text="student menu",
+            text=Texts.student_main_menu,
             keyboard=STUDENT_MAIN_KEYBOARD,
             parse_mode="markdown",
         )
@@ -71,8 +71,10 @@ async def register_student_handlers():
     ):
         await States.student_menu.set()
         message = call.message
-        text = await get_student_day_of_week(
-            user_id=message.chat.id, day=callback_data["data"]
+        text = await get_user_day_of_week(
+            telegram_id=message.chat.id,
+            day_of_week=int(callback_data["data"]),
+            is_searching=False,
         )
         await send_message(
             message,
@@ -92,7 +94,7 @@ async def register_student_handlers():
         message = call.message
         await send_message(
             message,
-            text="student misc menu #1",
+            text=Texts.student_misc_menu,
             keyboard=STUDENT_MISC_MENU_FIRST_KEYBOARD,
             parse_mode="markdown",
         )
@@ -110,7 +112,7 @@ async def register_student_handlers():
         message = call.message
         await send_message(
             message,
-            text="student misc menu #2",
+            text=Texts.student_misc_menu,
             keyboard=STUDENT_MISC_MENU_SECOND_KEYBOARD,
             parse_mode="markdown",
         )
@@ -122,9 +124,13 @@ async def register_student_handlers():
         state=[States.student_menu],
     )
     async def student_next_lesson_handler(call: CallbackQuery):
+        logger.debug("next lesson for student")
         await States.student_menu.set()
         message = call.message
-        text = await get_student_next_lesson(user_id=message.chat.id)
+        # FIX format Texts.lesson_format
+        text = await get_user_next_lesson(
+            telegram_id=message.chat.id, is_searching=False
+        )
         await send_message(
             message,
             text=text,
@@ -139,9 +145,11 @@ async def register_student_handlers():
         state=[States.student_menu],
     )
     async def student_today_handler(call: CallbackQuery):
+        logger.debug("today for student")
         await States.student_menu.set()
         message = call.message
-        text = await get_student_today(user_id=message.chat.id)
+        # TODO format
+        text = await get_user_today(telegram_id=message.chat.id, is_searching=False)
         await send_message(
             message,
             text=text,
@@ -156,9 +164,11 @@ async def register_student_handlers():
         state=[States.student_menu],
     )
     async def student_tomorrow_handler(call: CallbackQuery):
+        logger.debug("tomorrow for student")
         await States.student_menu.set()
         message = call.message
-        text = await get_student_tomorrow(user_id=message.chat.id)
+        # FIX format
+        text = await get_user_tomorrow(telegram_id=message.chat.id, is_searching=False)
         await send_message(
             message,
             text=text,
@@ -173,9 +183,12 @@ async def register_student_handlers():
         state=[States.student_menu],
     )
     async def student_week_handler(call: CallbackQuery):
+        logger.debug("week for student")
         await States.student_menu.set()
         message = call.message
-        text = await get_student_week(user_id=message.chat.id)
+        # FIX format
+        text = await get_user_week(telegram_id=message.chat.id, is_searching=False)
+
         await send_message(
             message,
             text=text,
@@ -190,9 +203,19 @@ async def register_student_handlers():
         state=[States.student_misc_menu_first],
     )
     async def student_ring_timetable_handler(call: CallbackQuery):
+        logger.debug("ring timetable")
         await States.student_menu.set()
         message = call.message
-        text = await get_ring_timetable(message.chat.id)
+        data = await get_ring_timetable(message.chat.id)
+        # FIX: add break
+        text = Texts.rings_timetable_header + "".join(
+            Texts.rings_timetable_format.format(
+                lesson_number=lsn["number"],
+                time=lsn["time_start"] + " - " + lsn["time_end"],
+                _break="",
+            )
+            for lsn in data
+        )
         await send_message(
             message,
             text=text,
@@ -207,9 +230,16 @@ async def register_student_handlers():
         state=[States.student_misc_menu_second],
     )
     async def student_canteen_timetable_handler(call: CallbackQuery):
+        logger.debug("canteen timetable")
         await States.student_menu.set()
         message = call.message
-        text = await get_canteen_timetable(message.chat.id)
+        canteens = await get_canteen_timetable(message.chat.id)
+        text = Texts.canteen_timetable_header + "".join(
+            Texts.canteen_timetable_format.format(
+                corpus_name=corpus_name, canteen_text=canteen_text
+            )
+            for corpus_name, canteen_text in canteens.items()
+        )
         await send_message(
             message,
             text=text,
@@ -217,3 +247,39 @@ async def register_student_handlers():
             parse_mode="markdown",
         )
         await call.answer()
+
+    # =============================
+    @dp.callback_query_handler(
+        cf.filter(action=["contact_devs"]),
+        state=[States.student_misc_menu_first],
+    )
+    async def student_canteen_timetable_handler(call: CallbackQuery):
+        await States.student_menu.set()
+        message = call.message
+        text = Texts.help_message
+        await send_message(
+            message,
+            text=text,
+            keyboard=STUDENT_MAIN_KEYBOARD,
+            parse_mode="markdown",
+        )
+        await call.answer()
+
+    # =============================
+    @dp.callback_query_handler(
+        cf.filter(action=["support_devs"]),
+        state=[States.student_misc_menu_first],
+    )
+    async def student_canteen_timetable_handler(call: CallbackQuery):
+        await States.student_menu.set()
+        message = call.message
+        text = Texts.donate_message
+        await send_message(
+            message,
+            text=text,
+            keyboard=STUDENT_MAIN_KEYBOARD,
+            parse_mode="markdown",
+        )
+        await call.answer()
+
+    # =============================

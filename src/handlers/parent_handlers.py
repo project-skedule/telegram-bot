@@ -1,17 +1,17 @@
 from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery, Message
 
-from ..api import (
+from src.api import (
     get_canteen_timetable,
     get_ring_timetable,
-    get_student_day_of_week,
-    get_student_next_lesson,
-    get_student_today,
-    get_student_tomorrow,
-    get_student_week,
+    get_user_day_of_week,
+    get_user_next_lesson,
+    get_user_today,
+    get_user_tomorrow,
+    get_user_week,
 )
-from ..bot import bot, dp
-from ..keyboards import (
+from src.bot import bot, dp
+from src.keyboards import (
     CHILD_DAY_OF_WEEK_KEYBOARD,
     CHILD_MAIN_KEYBOARD,
     CHILD_MISC_MENU_FIRST_KEYBOARD,
@@ -19,10 +19,10 @@ from ..keyboards import (
     cf,
     get_child_keyboard,
 )
-from ..logger import logger
-from ..some_functions import send_message
-from ..states import States
-from ..text_loader import Texts
+from src.logger import logger
+from src.some_functions import send_message
+from src.states import States
+from src.texts import Texts
 
 
 async def register_parent_handlers():
@@ -41,7 +41,10 @@ async def register_parent_handlers():
         await States.choose_child.set()
         message = call.message
         await send_message(
-            message, "choose child", await get_child_keyboard(message.chat.id)
+            message,
+            Texts.choose_children,
+            await get_child_keyboard(message.chat.id),
+            parse_mode="markdown",
         )
         await call.answer()
 
@@ -61,6 +64,8 @@ async def register_parent_handlers():
         message = call.message
         if callback_data["data"] != "0":
             await state.update_data({"child": callback_data["data"]})
+
+        # FIX: what is going on here?
         await send_message(
             message,
             f"child menu {(await state.get_data())['child']}",
@@ -90,13 +95,16 @@ async def register_parent_handlers():
         cf.filter(action=["child_choose_day_of_week"]),
         state=[States.child_day_of_week],
     )
-    async def child_day_of_week_handler(
+    async def child_choose_day_of_week_handler(
         call: CallbackQuery, callback_data: dict, state: FSMContext
     ):
         await States.child_menu.set()
         message = call.message
-        text = await get_student_day_of_week(
-            (await state.get_data())["child"], callback_data["data"]
+        # FIX format
+        text = await get_user_day_of_week(
+            telegram_id=(await state.get_data())["child"],
+            day_of_week=callback_data["data"],
+            is_searching=False,
         )
         await send_message(
             message, text=text, keyboard=CHILD_MAIN_KEYBOARD, parse_mode="markdown"
@@ -113,7 +121,7 @@ async def register_parent_handlers():
         message = call.message
         await send_message(
             message,
-            text="child misc menu #1",
+            text=Texts.student_main_menu,  # NOTE: should we use student menu or create child menu?
             keyboard=CHILD_MISC_MENU_FIRST_KEYBOARD,
             parse_mode="markdown",
         )
@@ -129,7 +137,7 @@ async def register_parent_handlers():
         message = call.message
         await send_message(
             message,
-            text="parent misc menu #1",
+            text=Texts.parent_main_menu,
             keyboard=PARENT_MISC_MENU_FIRST_KEYBOARD,
             parse_mode="markdown",
         )
@@ -143,7 +151,10 @@ async def register_parent_handlers():
     async def student_next_lesson_handler(call: CallbackQuery, state: FSMContext):
         await States.child_menu.set()
         message = call.message
-        text = await get_student_next_lesson((await state.get_data())["child"])
+        # FIX format
+        text = await get_user_next_lesson(
+            telegram_id=(await state.get_data())["child"], is_searching=False
+        )
         await send_message(
             message, text=text, keyboard=CHILD_MAIN_KEYBOARD, parse_mode="markdown"
         )
@@ -157,7 +168,10 @@ async def register_parent_handlers():
     async def student_today_handler(call: CallbackQuery, state: FSMContext):
         await States.child_menu.set()
         message = call.message
-        text = await get_student_today((await state.get_data())["child"])
+        # FIX: format
+        text = await get_user_today(
+            telegram_id=(await state.get_data())["child"], is_searching=False
+        )
         await send_message(
             message, text=text, keyboard=CHILD_MAIN_KEYBOARD, parse_mode="markdown"
         )
@@ -171,7 +185,10 @@ async def register_parent_handlers():
     async def student_tomorrow_handler(call: CallbackQuery, state: FSMContext):
         await States.child_menu.set()
         message = call.message
-        text = await get_student_tomorrow((await state.get_data())["child"])
+        # FIX format
+        text = await get_user_tomorrow(
+            telegram_id=(await state.get_data())["child"], is_searching=False
+        )
         await send_message(
             message, text=text, keyboard=CHILD_MAIN_KEYBOARD, parse_mode="markdown"
         )
@@ -185,7 +202,10 @@ async def register_parent_handlers():
     async def student_week_handler(call: CallbackQuery, state: FSMContext):
         await States.child_menu.set()
         message = call.message
-        text = await get_student_week((await state.get_data())["child"])
+        # FIX: format
+        text = await get_user_week(
+            telegram_id=(await state.get_data())["child"], is_searching=False
+        )
         await send_message(
             message, text=text, keyboard=CHILD_MAIN_KEYBOARD, parse_mode="markdown"
         )
@@ -199,7 +219,16 @@ async def register_parent_handlers():
     async def student_ring_timetable_handler(call: CallbackQuery, state: FSMContext):
         await States.child_menu.set()
         message = call.message
-        text = await get_ring_timetable((await state.get_data())["child"])
+        data = await get_ring_timetable(message.chat.id)
+        # FIX: add break
+        text = Texts.rings_timetable_header + "".join(
+            Texts.rings_timetable_format.format(
+                lesson_number=lsn["number"],
+                time=lsn["time_start"] + " - " + lsn["time_end"],
+                _break="",
+            )
+            for lsn in data
+        )
         await send_message(
             message, text=text, keyboard=CHILD_MAIN_KEYBOARD, parse_mode="markdown"
         )
@@ -213,7 +242,13 @@ async def register_parent_handlers():
     async def student_canteen_timetable_handler(call: CallbackQuery, state: FSMContext):
         await States.child_menu.set()
         message = call.message
-        text = await get_canteen_timetable((await state.get_data())["child"])
+        canteens = await get_canteen_timetable(message.chat.id)
+        text = Texts.canteen_timetable_header + "".join(
+            Texts.canteen_timetable_format.format(
+                corpus_name=corpus_name, canteen_text=canteen_text
+            )
+            for corpus_name, canteen_text in canteens.items()
+        )
         await send_message(
             message, text=text, keyboard=CHILD_MAIN_KEYBOARD, parse_mode="markdown"
         )

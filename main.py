@@ -10,16 +10,21 @@ from src.handlers.administration_handlers import register_administration_handler
 from src.handlers.find_handlers import register_find_handlers
 from src.handlers.registration_handlers import register_registration_handlers
 from os import getenv
-from aiohttp import web
+import aiohttp
 
-routes = web.RouteTableDef()
 
-@routes.get('/')
-async def healthcheck(request):
-    return web.Response(text="Healthy")
-app = web.Application()
-app.add_routes(routes)
-web.run_app(app)    
+async def web():
+
+    app = aiohttp.web.Application()
+    app.add_routes([
+        aiohttp.web.get("/", lambda req: aiohttp.web.Response(text="Healthy")),
+    ])
+
+    runner = aiohttp.web.AppRunner(app)
+    await runner.setup()
+
+    await aiohttp.web.TCPSite(runner).start()
+    await asyncio.Event().wait()
 
 
 async def run():
@@ -35,21 +40,22 @@ async def run():
 
     # await aiogram.executor.start_polling(dp, skip_updates=True)
     await dp.start_polling()
-    
 
 
-async def zmq():
-    context = azmq.Context();
-    socket = context.socket(zmq.SUB)
+context = azmq.Context()
+socket = context.socket(zmq.SUB)
+
+
+async def zmq(socket):
     port = getenv("ZMQ_PORT")
     host = getenv("ZMQ_HOST")
-    await socket.connect(f"tcp://{port}:{host}")
-    await socket.subscribe("")
+    socket.connect(f"tcp://{host}:{port}")
+    socket.subscribe("")
 
     while True:
         json = await socket.recv_json()
+        logger.debug(f"ZMQ receive json {json}")
         text = json.get("text")
-
         if text is None or not isinstance(text, str) or text.strip() == "":
             continue
 
@@ -57,13 +63,18 @@ async def zmq():
         args = json.get("args", {})
 
         for id in ids:
-            await bot.send_message(chat_id=id, text=text, parse_mode="markdown", **args)
+            logger.debug(f"Send message to {id}")
+            await bot.send_message(chat_id=id,
+                                   text=text,
+                                   parse_mode="markdown",
+                                   **args)
+
 
 async def main():
     bot_service = main_loop.create_task(run())
-    zmq_service = main_loop.create_task(zmq())
-    await asyncio.wait([bot_service, zmq_service])
-
+    zmq_service = main_loop.create_task(zmq(socket))
+    web_service = main_loop.create_task(web())
+    await asyncio.wait([web_service, bot_service, zmq_service])
 
 
 if __name__ == "__main__":

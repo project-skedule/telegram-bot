@@ -2,19 +2,18 @@ import asyncio
 import re
 from asyncio.tasks import ensure_future
 from aiogram.dispatcher import FSMContext
-
-from .bot import bot
+from src.bot import bot
 from aiogram.types import Message, ReplyKeyboardRemove
 from aiogram.types.inline_keyboard import InlineKeyboardMarkup
 
-from .bot import bot, dp
-from .keyboards import (
+from src.bot import bot, dp
+from src.keyboards import (
     ADMINISTRATION_MENU_FIRST_KEYBOARD,
     CHILD_MAIN_KEYBOARD,
     STUDENT_MAIN_KEYBOARD,
     TEACHER_MAIN_KEYBOARD,
 )
-from .states import States
+from src.states import States
 
 
 async def send_message(
@@ -54,4 +53,4 @@ async def dispatcher_menu(message: Message, role: str, text: str):
 
 
 async def is_find_for_student(state: FSMContext):
-    return (await state.get_data()).get("class") is not None
+    return (await state.get_data()).get("find_subclass_id") is not None

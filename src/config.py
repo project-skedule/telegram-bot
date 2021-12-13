@@ -3,7 +3,7 @@ from pathlib import Path
 
 from jproperties import Properties
 
-from .logger import logger
+from src.logger import logger
 
 logger.debug("#" * 50)
 logger.debug("BOT STARTED")

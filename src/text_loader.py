@@ -8,4 +8,4 @@ class TextFactory:
         return type("Texts", (object,), data)
 
 
-Texts = TextFactory.create(toml.load(TEXTS_PATH.open("r"))["russian"])
+Texts = TextFactory.create(toml.load(TEXTS_PATH.open("r", encoding="utf-8"))["russian"])

@@ -41,6 +41,12 @@ Babel = "==2.9.1"
 DateTimeRange = "==1.2.0"
 
 [dev-packages]
+black = "*"
+pyright = "*"
+bandit = "*"
 
 [requires]
 python_version = "3.9"
+
+[pipenv]
+allow_prereleases = true
