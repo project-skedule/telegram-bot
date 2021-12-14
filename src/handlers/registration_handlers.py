@@ -52,7 +52,7 @@ async def register_registration_handlers():
                 reply_markup=CHOOSE_ROLE_KEYBOARD,
                 parse_mode="markdown",
             )
-        else:
+        else:  # TODO add dump to redis from api here (because of role changes)
             data = await state.get_data()
             role = data["role"]
             if role == "Parent":
@@ -84,19 +84,23 @@ async def register_registration_handlers():
                     parse_mode="markdown",
                 )
 
-    # =============================
-    # @dp.callback_query_handler(cf.filter(action=["choose_role"]), state="*")
-    # async def registration_message(message: Message, state: FSMContext):
-    #     logger.debug("change role")
-    #     logger.debug(f"{await state.get_data()}")
-
-    #     await state.set_data({})
-    #     await States.choose_role.set()
-    #     await message.answer(
-    #         text=Texts.greeting,
-    #         reply_markup=CHOOSE_ROLE_KEYBOARD,
-    #         parse_mode="markdown",
-    #     )
+    @dp.callback_query_handler(
+        cf.filter(action=["registration"]),
+        state=[
+            States.student_misc_menu_second,
+            States.teacher_misc_menu_second,
+            States.administration_menu_second,
+        ],
+    )
+    async def registration_message(message: Message, state: FSMContext):
+        logger.debug("role change")
+        await state.set_data({"changed": True})
+        await States.choose_role.set()
+        await message.answer(
+            text=Texts.greeting + "TODO",
+            reply_markup=CHOOSE_ROLE_KEYBOARD,
+            parse_mode="markdown",
+        )
 
     # ============================
     @dp.callback_query_handler(
