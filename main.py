@@ -16,9 +16,11 @@ import aiohttp
 async def web():
 
     app = aiohttp.web.Application()
-    app.add_routes([
-        aiohttp.web.get("/", lambda req: aiohttp.web.Response(text="Healthy")),
-    ])
+    app.add_routes(
+        [
+            aiohttp.web.get("/", lambda req: aiohttp.web.Response(text="Healthy")),
+        ]
+    )
 
     runner = aiohttp.web.AppRunner(app)
     await runner.setup()
@@ -64,10 +66,7 @@ async def zmq(socket):
 
         for id in ids:
             logger.debug(f"Send message to {id}")
-            await bot.send_message(chat_id=id,
-                                   text=text,
-                                   parse_mode="markdown",
-                                   **args)
+            await bot.send_message(chat_id=id, text=text, parse_mode="markdown", **args)
 
 
 async def main():
