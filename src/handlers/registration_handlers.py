@@ -44,7 +44,6 @@ async def register_registration_handlers():
     async def registration_message(message: Message, state: FSMContext):
         logger.debug("/start")
         logger.debug(f"{await state.get_data()}")
-        await state.update_data({"searchable": False})
         if not await is_registered(message.chat.id):
             await state.set_data({})
             await States.choose_role.set()
@@ -53,7 +52,7 @@ async def register_registration_handlers():
                 reply_markup=CHOOSE_ROLE_KEYBOARD,
                 parse_mode="markdown",
             )
-        else:
+        else:  # TODO add dump to redis from api here (because of role changes)
             data = await state.get_data()
             role = data["role"]
             if role == "Parent":
@@ -84,6 +83,24 @@ async def register_registration_handlers():
                     reply_markup=ADMINISTRATION_MENU_FIRST_KEYBOARD,
                     parse_mode="markdown",
                 )
+
+    @dp.callback_query_handler(
+        cf.filter(action=["registration"]),
+        state=[
+            States.student_misc_menu_second,
+            States.teacher_misc_menu_second,
+            States.administration_menu_second,
+        ],
+    )
+    async def registration_message(message: Message, state: FSMContext):
+        logger.debug("role change")
+        await state.set_data({"changed": True})
+        await States.choose_role.set()
+        await message.answer(
+            text=Texts.greeting + "TODO",
+            reply_markup=CHOOSE_ROLE_KEYBOARD,
+            parse_mode="markdown",
+        )
 
     # ============================
     @dp.callback_query_handler(
@@ -197,7 +214,7 @@ async def register_registration_handlers():
 
     # ! =============================
     @dp.message_handler(
-        lambda message: True,  # TODO add re magick #
+        # lambda message: True,  # TODO add re magick #
         state=[States.input_teacher],
     )
     async def choose_teacher_handler(message: Message, state: FSMContext):

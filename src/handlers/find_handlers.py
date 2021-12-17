@@ -3,11 +3,13 @@ from aiogram.types import CallbackQuery, Message
 from src.texts import Texts
 
 from src.api import (
+    get_subclass_by_params,
     get_user_day_of_week,
     get_user_next_lesson,
     get_user_today,
     get_user_tomorrow,
     get_user_week,
+    get_teacher_name_by_id,
 )
 
 from src.bot import bot, dp
@@ -25,6 +27,7 @@ from src.keyboards import (
 from src.logger import logger
 from src.some_functions import dispatcher_menu, is_find_for_student, send_message
 from src.states import States
+from src.redis import get_school_id
 
 
 async def register_find_handlers():
@@ -40,8 +43,9 @@ async def register_find_handlers():
     )
     async def find_class_handler(call: CallbackQuery, state: FSMContext):
         await States.find_enter_parallel.set()
-        await state.update_data({"class": ""})
-        await state.update_data({"teacher": None})
+        await state.update_data({"find_subclass_id": None})
+        await state.update_data({"find_teacher_id": None})
+
         message = call.message
         await send_message(
             message,
@@ -59,14 +63,13 @@ async def register_find_handlers():
         call: CallbackQuery, state: FSMContext, callback_data: dict
     ):
         await States.find_enter_letter.set()
-        await state.update_data({"class": f"{callback_data['data']}"})
+        parallel = callback_data["data"]
+        await state.update_data({"find_parallel": f"{parallel}"})
         message = call.message
         await send_message(
             message,
             Texts.enter_letter,
-            await get_find_enter_letter_keyboard(
-                message.chat.id, (await state.get_data())["class"]
-            ),
+            await get_find_enter_letter_keyboard(message.chat.id, parallel),
         )
         await call.answer()
 
@@ -79,16 +82,14 @@ async def register_find_handlers():
         call: CallbackQuery, state: FSMContext, callback_data: dict
     ):
         await States.find_enter_group.set()
-        await state.update_data(
-            {"class": f"{(await state.get_data())['class']}{callback_data['data']}"}
-        )
+        parallel = (await state.get_data())["find_parallel"]
+        letter = callback_data["data"]
+        await state.update_data({"find_letter": letter})
         message = call.message
         await send_message(
             message,
             Texts.enter_group,
-            await get_find_enter_group_keyboard(
-                message.chat.id, (await state.get_data())["class"]
-            ),
+            await get_find_enter_group_keyboard(message.chat.id, parallel, letter),
         )
         await call.answer()
 
@@ -100,14 +101,21 @@ async def register_find_handlers():
     async def find_student_submit_handler(
         call: CallbackQuery, state: FSMContext, callback_data: dict
     ):
+        message = call.message
         await States.find_student_submit.set()
-        await state.update_data(
-            {"class": f"{(await state.get_data())['class']}{callback_data['data']}"}
+        await state.update_data({"find_group": callback_data["data"]})
+        parallel = (await state.get_data())["find_parallel"]
+        letter = (await state.get_data())["find_letter"]
+        group = (await state.get_data())["find_group"]
+        subclass_id = await get_subclass_by_params(
+            await get_school_id(message.chat.id), parallel, letter, group
         )
+        await state.update_data({"find_subclass_id": subclass_id})
+        await state.update_data({"find_subclass_name": parallel + letter + group})
         message = call.message
         await send_message(
             message,
-            Texts.confirm_class.format(subclass=(await state.get_data())["class"]),
+            Texts.confirm_class.format(subclass=f"{parallel}{letter}{group}"),
             FIND_STUDENT_SUBMIT_KEYBOARD,
         )
 
@@ -129,13 +137,16 @@ async def register_find_handlers():
         message = call.message
 
         if await is_find_for_student(state):
-            text = f"Расписание ученика `{(await state.get_data())['class']}` класса"
+            text = f"Расписание ученика `{(await state.get_data())['find_subclass_name']}` класса"
         else:
-            text = f"Расписание учителя `{(await state.get_data())['teacher']}`"
+            text = (
+                f"Расписание учителя `{(await state.get_data())['find_teacher_name']}`"
+            )
         await send_message(
             message,
-            text,
-            FIND_MAIN_KEYBOARD,
+            text=text,
+            keyboard=FIND_MAIN_KEYBOARD,
+            parse_mode="markdown",
         )
         await call.answer()
 
@@ -168,19 +179,19 @@ async def register_find_handlers():
     ):
         message = call.message
         role = (await state.get_data())["role"]
-        day_of_week = callback_data["data"]
+        day_of_week = int(callback_data["data"])
         # FIX: format
         if await is_find_for_student(state):
             text = await get_user_day_of_week(
                 telegram_id=message.chat.id,
-                subclass_id=(await state.get_data())["class"],
+                subclass_id=(await state.get_data())["find_subclass_id"],
                 day_of_week=day_of_week,
                 is_searching=True,
             )
         else:
             text = await get_user_day_of_week(
                 telegram_id=message.chat.id,
-                teacher_id=(await state.get_data())["teacher"],
+                teacher_id=(await state.get_data())["find_teacher_id"],
                 day_of_week=day_of_week,
                 is_searching=True,
             )
@@ -199,17 +210,17 @@ async def register_find_handlers():
         message = call.message
         role = (await state.get_data())["role"]
         day_of_week = callback_data["data"]
-        # FIX: format
+
         if await is_find_for_student(state):
             text = await get_user_next_lesson(
                 telegram_id=message.chat.id,
-                subclass_id=(await state.get_data())["class"],
+                subclass_id=(await state.get_data())["find_subclass_id"],
                 is_searching=True,
             )
         else:
             text = await get_user_next_lesson(
                 telegram_id=message.chat.id,
-                teacher_id=(await state.get_data())["teacher"],
+                teacher_id=(await state.get_data())["find_teacher_id"],
                 is_searching=True,
             )
 
@@ -224,19 +235,20 @@ async def register_find_handlers():
     async def find_today_handler(
         call: CallbackQuery, state: FSMContext, callback_data: dict
     ):
+        logger.debug(f"{await state.get_data()}")
         message = call.message
         role = (await state.get_data())["role"]
-        # FIX: format
+
         if await is_find_for_student(state):
             text = await get_user_today(
                 telegram_id=message.chat.id,
-                subclass_id=(await state.get_data())["class"],
+                subclass_id=(await state.get_data())["find_subclass_id"],
                 is_searching=True,
             )
         else:
             text = await get_user_today(
                 telegram_id=message.chat.id,
-                teacher_id=(await state.get_data())["teacher"],
+                teacher_id=(await state.get_data())["find_teacher_id"],
                 is_searching=True,
             )
 
@@ -253,18 +265,18 @@ async def register_find_handlers():
     ):
         message = call.message
         role = (await state.get_data())["role"]
-        # FIX: format
+
         if await is_find_for_student(state):
             text = await get_user_tomorrow(
                 telegram_id=message.chat.id,
-                subclass_id=(await state.get_data())["class"],
+                subclass_id=(await state.get_data())["find_subclass_id"],
                 is_searching=True,
             )
         else:
             text = await get_user_tomorrow(
                 telegram_id=message.chat.id,
+                teacher_id=(await state.get_data())["find_teacher_id"],
                 is_searching=True,
-                teacher_id=(await state.get_data())["teacher"],
             )
 
         await dispatcher_menu(message, role, text)
@@ -280,17 +292,17 @@ async def register_find_handlers():
     ):
         message = call.message
         role = (await state.get_data())["role"]
-        # FIX: format
+        logger.debug(f"{await state.get_data()}")
         if await is_find_for_student(state):
             text = await get_user_week(
                 telegram_id=message.chat.id,
-                subclass_id=(await state.get_data())["class"],
+                subclass_id=(await state.get_data())["find_subclass_id"],
                 is_searching=True,
             )
         else:
             text = await get_user_week(
                 telegram_id=message.chat.id,
-                teacher_id=(await state.get_data())["teacher"],
+                teacher_id=(await state.get_data())["find_teacher_id"],
                 is_searching=True,
             )
 
@@ -312,6 +324,8 @@ async def register_find_handlers():
         call: CallbackQuery, state: FSMContext, callback_data: dict
     ):
         await States.find_input_teacher.set()
+        await state.update_data({"find_subclass_id": None})
+        await state.update_data({"find_teacher_id": None})
         message = call.message
         text = Texts.enter_name
         await send_message(message, text=text, keyboard=None, parse_mode="markdown")
@@ -327,7 +341,7 @@ async def register_find_handlers():
         await message.answer(
             "choose from:",
             reply_markup=await find_get_teachers_keyboard(
-                (await state.get_data())["teacher"]
+                message.text, await get_school_id(message.chat.id)
             ),
         )
 
@@ -341,10 +355,12 @@ async def register_find_handlers():
     ):
         await States.find_teacher_submit.set()
         message = call.message
-        text = Texts.confirm_teacher_from_list.format(
-            teacher_name=callback_data["data"]
-        )
-        await state.update_data({"teacher": callback_data["data"]})
+
+        teacher_id = callback_data["data"]
+        teacher_name = await get_teacher_name_by_id(teacher_id)
+        await state.update_data({"find_teacher_id": teacher_id})
+        await state.update_data({"find_teacher_name": teacher_name})
+        text = Texts.confirm_teacher_from_list.format(teacher_name=teacher_name)
         await send_message(
             message,
             text=text,

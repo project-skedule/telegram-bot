@@ -97,3 +97,39 @@ async def register_administration_handlers():
             parse_mode="markdown",
         )
         await call.answer()
+
+    # =============================
+    @dp.callback_query_handler(
+        cf.filter(action=["contact_devs"]),
+        state=[States.administration_menu_first],
+    )
+    async def student_canteen_timetable_handler(call: CallbackQuery):
+        await States.administration_menu_first.set()
+        message = call.message
+        text = Texts.help_message
+        await send_message(
+            message,
+            text=text,
+            keyboard=ADMINISTRATION_MENU_FIRST_KEYBOARD,
+            parse_mode="markdown",
+        )
+        await call.answer()
+
+    # =============================
+    @dp.callback_query_handler(
+        cf.filter(action=["support_devs"]),
+        state=[States.administration_menu_first],
+    )
+    async def student_canteen_timetable_handler(call: CallbackQuery):
+        await States.administration_menu_first.set()
+        message = call.message
+        text = Texts.donate_message
+        await send_message(
+            message,
+            text=text,
+            keyboard=ADMINISTRATION_MENU_FIRST_KEYBOARD,
+            parse_mode="markdown",
+        )
+        await call.answer()
+
+    # =============================

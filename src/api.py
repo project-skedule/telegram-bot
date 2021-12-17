@@ -15,7 +15,7 @@ def get_current_day_of_week():
     return datetime.today().weekday() + 1
 
 
-async def get_request(request: str, data):  # TODO 200 status code handler
+async def get_request(request: str, data=None):  # TODO 200 status code handler
     logger.debug(f"get_request to {url}/api{request} with data: {data}")
     async with aiohttp.ClientSession() as session:
         async with session.get(f"{url}/api{request}", json=data) as response:
@@ -25,7 +25,7 @@ async def get_request(request: str, data):  # TODO 200 status code handler
             return answer
 
 
-async def post_request(request: str, data):  # TODO 200 status code handler
+async def post_request(request: str, data=None):  # TODO 200 status code handler
     logger.debug(f"post_request to {url}/api{request} with data: {data}")
     async with aiohttp.ClientSession() as session:
         async with session.post(f"{url}/api{request}", json=data) as response:
@@ -35,7 +35,7 @@ async def post_request(request: str, data):  # TODO 200 status code handler
             return answer
 
 
-async def put_request(request: str, data):  # TODO 200 status code handler
+async def put_request(request: str, data=None):  # TODO 200 status code handler
     logger.debug(f"put_request to {url}/api{request} with data: {data}")
     async with aiohttp.ClientSession() as session:
         async with session.put(f"{url}/api{request}", json=data) as response:
@@ -169,7 +169,6 @@ async def get_user_day_of_week(
     Returns timetable for user with `telegram_id` if `is_searching` == False
     Else return timetable for `teacher_id` or `subclass_id` (Only one must be set)
     """
-    school_id = await get_school_id(telegram_id)
     if is_searching:
         if teacher_id is not None:
             return await get_teacher_day_of_week(telegram_id, day_of_week, teacher_id)
@@ -190,7 +189,9 @@ async def get_user_day_of_week(
 
 async def get_student_week(telegram_id, student_id):
     school_id = await get_school_id(telegram_id)
-    data = {"stujdent_id": student_id}
+
+    data = {"subclass_id": student_id}
+
 
     data = await get_request(
         "/lesson/get/range",
@@ -282,6 +283,7 @@ async def get_user_week(
                 telegram_id, await get_subclass_id(telegram_id)
             )
 
+
     lessons = data["lessons"]
 
     result = ""
@@ -303,21 +305,21 @@ async def get_user_week(
 
 async def get_ring_timetable(telegram_id: int):
     school_id = await get_school_id(telegram_id)
-    data = await get_request("/info/lessontimetable/all", data={"school_id": school_id})
-    return data
+    data = await get_request(
+        "/info/lessontimetables/all", data={"school_id": school_id}
+    )
+    return data["data"]
 
 
 async def get_canteen_timetable(telegram_id: int):
     school_id = await get_school_id(telegram_id)
-    corpuses = await get_request(
-        "/api/info/corpuses/all", data={"school_id": school_id}
-    )
+    corpuses = await get_request("/info/corpuses/all", data={"school_id": school_id})
     corpuses = list(map(lambda c: (c["name"], c["id"]), corpuses["data"]))
 
     canteen_texts = {}
     for corpus_name, corpus_id in corpuses:
         canteen_text = await get_request(
-            "/api/info/corpus/canteen", data={"corpus_id": corpus_id}
+            "/info/corpus/canteen", data={"corpus_id": corpus_id}
         )
         canteen_texts[corpus_name] = canteen_text["data"]
 
@@ -448,3 +450,25 @@ async def get_user_roles(telegram_id):
     """
     data = await post_request("/rolemanagement/get", {"telegram_id": telegram_id})
     await save_to_redis(data)
+
+
+# ~=============================
+async def get_teacher_name_by_id(teacher_id):
+    data = await get_request(f"/idgetter/teacher/{teacher_id}")
+    return data["name"]
+
+
+# ~=============================
+async def change_role(telegram_id, subclass_id=None, teacher_id=None, school_id=None):
+    if subclass_id is not None:
+        data = {"telegram_id": telegram_id, "subclass_id": subclass_id}
+        data = await put_request("/rolemanagement/change/student", data=data)
+    elif teacher_id is not None:
+        data = {"telegram_id": telegram_id, "teacher_id": teacher_id}
+        data = await put_request("/rolemanagement/change/teacher", data=data)
+    elif school_id is not None:
+        data = {"telegram_id": telegram_id, "school_id": school_id}
+        data = await put_request("/rolemanagement/change/administration", data=data)
+    else:
+        data = {"telegram_id": telegram_id}
+        data = await put_request("/rolemanagement/change/parent", data=data)
