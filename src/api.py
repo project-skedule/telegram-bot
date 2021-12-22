@@ -192,7 +192,6 @@ async def get_student_week(telegram_id, student_id):
 
     data = {"subclass_id": student_id}
 
-
     data = await get_request(
         "/lesson/get/range",
         data={
@@ -282,7 +281,6 @@ async def get_user_week(
             return await get_student_week(
                 telegram_id, await get_subclass_id(telegram_id)
             )
-
 
     lessons = data["lessons"]
 
@@ -472,3 +470,45 @@ async def change_role(telegram_id, subclass_id=None, teacher_id=None, school_id=
     else:
         data = {"telegram_id": telegram_id}
         data = await put_request("/rolemanagement/change/parent", data=data)
+
+
+# ~=============================
+async def save_to_redis(telegram_id):
+    data = await get_request("/rolemanagement/get", data={"telegram_id": telegram_id})
+    for role in data["roles"]:
+        if role["is_main_role"]:
+            break
+    if role["role_type"] == 0:  # TODO check roles
+        await storage.update_data(data={"role": "Student"}, user=telegram_id)
+        await storage.update_data(
+            data={"subclass_id": role["data"]["subclass"]["id"]}, user=telegram_id
+        )
+        await storage.update_data(
+            data={"parallel": role["data"]["subclass"]["educational_level"]},
+            user=telegram_id,
+        )
+        await storage.update_data(
+            data={"letter": role["data"]["subclass"]["identificator"]}, user=telegram_id
+        )
+        await storage.update_data(
+            data={"group": role["data"]["subclass"]["additional_identificator"]},
+            user=telegram_id,
+        )
+        await storage.update_data(
+            data={"school": role["data"]["school"]["id"]}, user=telegram_id
+        )
+    elif role["role_type"] == 1:
+        await storage.update_data(data={"role": "Teacher"}, user=telegram_id)
+        await storage.update_data(
+            data={"teacher": role["data"]["teacher_id"]}, user=telegram_id
+        )
+        await storage.update_data(
+            data={"school": role["data"]["school"]["id"]}, user=telegram_id
+        )
+    elif role["role_type"] == 2:  # TODO parent
+        await storage.update_data(data={"role": "Parent"}, user=telegram_id)
+    elif role["role_type"] == 3:
+        await storage.update_data(data={"role": "Administration"}, user=telegram_id)
+        await storage.update_data(
+            data={"school": role["data"]["school"]["id"]}, user=telegram_id
+        )

@@ -57,7 +57,3 @@ async def get_main_role(telegram_id):
 
 async def get_children(name: int):
     return {"child 1": "id1", "child 2": "id2"}
-
-
-async def save_to_redis(full_user_info):
-    pass

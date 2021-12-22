@@ -54,3 +54,7 @@ async def dispatcher_menu(message: Message, role: str, text: str):
 
 async def is_find_for_student(state: FSMContext):
     return (await state.get_data()).get("find_subclass_id") is not None
+
+
+async def is_changing_role(state: FSMContext):
+    return (await state.get_data()).get("changed")

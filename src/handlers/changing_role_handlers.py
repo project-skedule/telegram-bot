@@ -36,73 +36,25 @@ from src.states import States
 from src.texts import Texts
 
 
-async def register_registration_handlers():
-    @dp.message_handler(
-        state="*",
-        commands=["start"],
+async def register_changing_role_handlers():
+    @dp.callback_query_handler(
+        cf.filter(action=["registration"]),
+        state=[
+            States.student_misc_menu_second,
+            States.teacher_misc_menu_second,
+            States.administration_menu_second,
+        ],
     )
-    async def registration_message(message: Message, state: FSMContext):
-        logger.debug("/start")
-        logger.debug(f"{await state.get_data()}")
-        if not await is_registered(message.chat.id):
-            await state.set_data({})
-            await States.choose_role.set()
-            await message.answer(
-                text=Texts.greeting,
-                reply_markup=CHOOSE_ROLE_KEYBOARD,
-                parse_mode="markdown",
-            )
-        else:  # TODO add dump to redis from api here (because of role changes (or redis breaks))
-            await save_to_redis(message.chat.id)
-            data = await state.get_data()
-            role = data["role"]
-            if role == "Parent":
-                await States.choose_child.set()
-                await message.answer(
-                    text=Texts.choose_children,
-                    reply_markup=await get_child_keyboard(message.chat.id),
-                    parse_mode="markdown",
-                )
-            elif role == "Student":
-                await States.student_menu.set()
-                await message.answer(
-                    text=Texts.student_main_menu,
-                    reply_markup=STUDENT_MAIN_KEYBOARD,
-                    parse_mode="markdown",
-                )
-            elif role == "Teacher":
-                await States.teacher_menu.set()
-                await message.answer(
-                    text=Texts.teacher_main_menu,
-                    reply_markup=TEACHER_MAIN_KEYBOARD,
-                    parse_mode="markdown",
-                )
-            elif role == "Administration":
-                await States.administration_menu_first.set()
-                await message.answer(
-                    text=Texts.admin_main_menu,
-                    reply_markup=ADMINISTRATION_MENU_FIRST_KEYBOARD,
-                    parse_mode="markdown",
-                )
-
-    # @dp.callback_query_handler(
-    #     cf.filter(action=["registration"]),
-    #     state=[
-    #         States.student_misc_menu_second,
-    #         States.teacher_misc_menu_second,
-    #         States.administration_menu_second,
-    #     ],
-    # )
-    # async def changing_role(call: CallbackQuery, state: FSMContext):
-    #     message = call.message
-    #     logger.debug("role change")
-    #     await state.set_data({"changed": True})
-    #     await States.choose_role.set()
-    #     await message.answer(
-    #         text=Texts.greeting + "TODO",
-    #         reply_markup=CHOOSE_ROLE_KEYBOARD,
-    #         parse_mode="markdown",
-    #     )
+    async def changing_role(call: CallbackQuery, state: FSMContext):
+        message = call.message
+        logger.debug("role change")
+        await state.set_data({"changed": True})
+        await States.choose_role.set()
+        await message.answer(
+            text=Texts.greeting + "TODO",
+            reply_markup=CHOOSE_ROLE_KEYBOARD,
+            parse_mode="markdown",
+        )
 
     # ============================
     @dp.callback_query_handler(
