@@ -192,6 +192,7 @@ async def get_student_week(telegram_id, student_id):
 
     data = {"subclass_id": student_id}
 
+
     data = await get_request(
         "/lesson/get/range",
         data={
@@ -281,6 +282,22 @@ async def get_user_week(
             return await get_student_week(
                 telegram_id, await get_subclass_id(telegram_id)
             )
+
+    lessons = data["lessons"]
+
+    result = ""
+    for lesson in lessons:
+        number = lesson["lesson_number"]
+        result += (
+            f"Урок №{number['number']} {number['time_start']} - {number['time_end']}\n"
+        )
+        result += f"Предмет: *{lesson['subject']}*\n"
+        result += f"{lesson['teacher']['name']}\n"
+        result += f"{lesson['corpus']['name']}, {lesson['cabinet']['name']}\n"
+        result += f"\n"
+
+    return result
+
 
     lessons = data["lessons"]
 
