@@ -1,8 +1,11 @@
 from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery, Message
 from src.api import (
+    change_role,
     get_children,
+    get_school_name_by_id,
     get_subclass_by_params,
+    get_teacher_name_by_id,
     is_registered,
     register_administration,
     register_child,
@@ -31,7 +34,7 @@ from src.keyboards import (
 )
 from src.logger import logger
 from src.redis import get_school_id
-from src.some_functions import send_message, is_changing_role
+from src.some_functions import is_changing_role, send_message
 from src.states import States
 from src.texts import Texts
 
@@ -45,7 +48,7 @@ async def register_registration_handlers():
         logger.debug("/start")
         logger.debug(f"{await state.get_data()}")
         if not await is_registered(message.chat.id):
-            await state.set_data({})
+            # await state.set_data({})
             await States.choose_role.set()
             await message.answer(
                 text=Texts.greeting,
@@ -85,24 +88,27 @@ async def register_registration_handlers():
                     parse_mode="markdown",
                 )
 
-    # @dp.callback_query_handler(
-    #     cf.filter(action=["registration"]),
-    #     state=[
-    #         States.student_misc_menu_second,
-    #         States.teacher_misc_menu_second,
-    #         States.administration_menu_second,
-    #     ],
-    # )
-    # async def changing_role(call: CallbackQuery, state: FSMContext):
-    #     message = call.message
-    #     logger.debug("role change")
-    #     await state.set_data({"changed": True})
-    #     await States.choose_role.set()
-    #     await message.answer(
-    #         text=Texts.greeting + "TODO",
-    #         reply_markup=CHOOSE_ROLE_KEYBOARD,
-    #         parse_mode="markdown",
-    #     )
+    # =============================
+    @dp.callback_query_handler(
+        cf.filter(action=["registration"]),
+        state=[
+            States.student_misc_menu_second,
+            States.teacher_misc_menu_second,
+            States.administration_menu_second,
+        ],
+    )
+    async def changing_role(call: CallbackQuery, state: FSMContext):
+        message = call.message
+        logger.debug("role change")
+        await state.set_data({"changed": True})
+        await States.choose_role.set()
+        await send_message(
+            message=message,
+            text=Texts.greeting + "TODO change role text",
+            keyboard=CHOOSE_ROLE_KEYBOARD,
+            parse_mode="markdown",
+        )
+        await call.answer()
 
     # ============================
     @dp.callback_query_handler(
@@ -145,8 +151,7 @@ async def register_registration_handlers():
         logger.debug("input school")
         await States.input_school.set()
         # if (await state.get_data()).get("role") is None:
-        if await is_changing_role(state):
-            await state.update_data({"role": callback_data["data"]})
+        await state.update_data({"role": callback_data["data"]})
         message = call.message
         await send_message(
             message,
@@ -181,8 +186,16 @@ async def register_registration_handlers():
         logger.debug(f"choose school")
         role = (await state.get_data())["role"]
 
+        school = callback_data["data"]
+        school_name = await get_school_name_by_id(school)
+
         message = call.message
-        await state.update_data({"school": callback_data["data"]})
+        await state.update_data(
+            {
+                "school": school,
+                "school_name": school_name,
+            }
+        )
 
         if role in ["Parent", "Student"]:
             await States.enter_parallel.set()
@@ -204,7 +217,7 @@ async def register_registration_handlers():
         elif role == "Administration":
             await States.administration_submit.set()
             text = Texts.confirm_for_admin.format(
-                school_name=(await state.get_data())["school"]
+                school_name=(await state.get_data())["school_name"]
             )
             await send_message(
                 message,
@@ -242,10 +255,16 @@ async def register_registration_handlers():
         logger.debug(f"input teacher")
         await States.teacher_submit.set()
         message = call.message
-        text = Texts.confirm_teacher_from_list.format(
-            teacher_name=callback_data["data"]
+        teacher = callback_data["data"]
+        teacher_name = await get_teacher_name_by_id(teacher)
+
+        text = Texts.confirm_teacher_from_list.format(teacher_name=teacher_name)
+        await state.update_data(
+            {
+                "teacher": teacher,
+                "teacher_name": teacher_name,
+            }
         )
-        await state.update_data({"teacher": callback_data["data"]})
         await send_message(
             message,
             text=text,
@@ -374,7 +393,14 @@ async def register_registration_handlers():
             )
         elif role == "Student":
             (await state.get_data())["school"]
-            await register_student(telegram_id=message.chat.id, subclass_id=subclass_id)
+            if (await state.get_data()).get("changed") is None:
+                await register_student(
+                    telegram_id=message.chat.id, subclass_id=subclass_id
+                )
+            else:
+                await change_role(telegram_id=message.chat.id, subclass_id=subclass_id)
+                await save_to_redis(message.chat.id)
+                await state.update_data({"changed": None})
             await States.student_menu.set()
             await send_message(
                 message,
@@ -418,7 +444,15 @@ async def register_registration_handlers():
         await States.teacher_menu.set()
         school = (await state.get_data())["school"]
         teacher = (await state.get_data())["teacher"]
-        await register_teacher(telegram_id=message.chat.id, teacher_id=teacher)
+
+        if (await state.get_data()).get("changed") is None:
+            await register_teacher(telegram_id=message.chat.id, teacher_id=teacher)
+
+        else:
+            await change_role(telegram_id=message.chat.id, teacher_id=teacher)
+            await save_to_redis(message.chat.id)
+            await state.update_data({"changed": None})
+
         await send_message(
             message,
             text=Texts.successful_reg_teacher.format(teacher_name=teacher),
@@ -438,7 +472,13 @@ async def register_registration_handlers():
         message = call.message
         await States.administration_menu_first.set()
         school = (await state.get_data())["school"]
-        await register_administration(telegram_id=message.chat.id, school_id=school)
+
+        if (await state.get_data()).get("changed") is None:
+            await register_administration(telegram_id=message.chat.id, school_id=school)
+        else:
+            await change_role(telegram_id=message.chat.id, school_id=school)
+            await save_to_redis(message.chat.id)
+            await state.update_data({"changed": None})
         await send_message(
             message,
             text=Texts.successful_reg_admin.format(school_name=school),

@@ -192,7 +192,6 @@ async def get_student_week(telegram_id, student_id):
 
     data = {"subclass_id": student_id}
 
-
     data = await get_request(
         "/lesson/get/range",
         data={
@@ -297,7 +296,6 @@ async def get_user_week(
         result += f"\n"
 
     return result
-
 
     lessons = data["lessons"]
 
@@ -470,6 +468,10 @@ async def get_user_roles(telegram_id):
 # ~=============================
 async def get_teacher_name_by_id(teacher_id):
     data = await get_request(f"/idgetter/teacher/{teacher_id}")
+    return data["name"]
+
+async def get_school_name_by_id(school_id):
+    data = await get_request(f"/idgetter/school/{school_id}")
     return data["name"]
 
 
