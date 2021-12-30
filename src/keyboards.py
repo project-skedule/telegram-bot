@@ -11,7 +11,6 @@ from src.api import (
     get_similar_schools,
     get_similar_teachers,
 )
-
 from src.logger import logger
 
 cf = CallbackData("callback", "action", "data")
@@ -79,7 +78,7 @@ TEACHER_MAIN_KEYBOARD = generate_markup(
 
 CHILD_MAIN_KEYBOARD = generate_markup(
     [
-        [("Следующий урок", cf.new(action="next_lesson", data=0))],
+        # [("Следующий урок", cf.new(action="next_lesson", data=0))],
         [
             ("Сегодня", cf.new(action="today", data=0)),
             ("Завтра", cf.new(action="tomorrow", data=0)),
@@ -356,7 +355,7 @@ FIND_TEACHER_SUBMIT_KEYBOARD = generate_markup(
 
 FIND_MAIN_KEYBOARD = generate_markup(
     [
-        [("Следующий урок", cf.new(action="next_lesson", data=0))],
+        # [("Следующий урок", cf.new(action="next_lesson", data=0))],
         [
             ("Сегодня", cf.new(action="today", data=0)),
             ("Завтра", cf.new(action="tomorrow", data=0)),

@@ -298,6 +298,21 @@ async def get_user_week(
 
     return result
 
+    lessons = data["lessons"]
+
+    result = ""
+    for lesson in lessons:
+        number = lesson["lesson_number"]
+        result += (
+            f"Урок №{number['number']} {number['time_start']} - {number['time_end']}\n"
+        )
+        result += f"Предмет: *{lesson['subject']}*\n"
+        result += f"{lesson['teacher']['name']}\n"
+        result += f"{lesson['corpus']['name']}, {lesson['cabinet']['name']}\n"
+        result += f"\n"
+
+    return result
+
 
     lessons = data["lessons"]
 
@@ -470,6 +485,11 @@ async def get_user_roles(telegram_id):
 # ~=============================
 async def get_teacher_name_by_id(teacher_id):
     data = await get_request(f"/idgetter/teacher/{teacher_id}")
+    return data["name"]
+
+
+async def get_school_name_by_id(school_id):
+    data = await get_request(f"/idgetter/school/{school_id}")
     return data["name"]
 
 

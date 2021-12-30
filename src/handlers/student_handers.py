@@ -144,11 +144,11 @@ async def register_student_handlers():
         cf.filter(action=["today"]),
         state=[States.student_menu],
     )
-    async def student_today_handler(call: CallbackQuery):
+    async def student_today_handler(call: CallbackQuery, callback_data: dict):
         logger.debug("today for student")
         await States.student_menu.set()
         message = call.message
-        # TODO format
+        logger.debug(f"{callback_data}")
         text = await get_user_today(telegram_id=message.chat.id, is_searching=False)
         await send_message(
             message,
