@@ -127,7 +127,9 @@ async def get_student_day_of_week(telegram_id, day_of_week, subclass_id):
         )
         result += f"Предмет: *{lesson['subject']}*\n"
         result += f"{lesson['teacher']['name']}\n"
-        result += f"{lesson['corpus']['name']}, {lesson['cabinet']['name']}\n"
+        result += (
+            f"{lesson['cabinet']['corpus']['name']}, {lesson['cabinet']['name']}\n"
+        )
         result += f"\n"
 
     return result
@@ -156,7 +158,9 @@ async def get_teacher_day_of_week(telegram_id, day_of_week, teacher_id):
             name = f"*{subclass['educational_level']}{subclass['identificator']}{subclass['additional_identificator']}* "
             result += name
         result += f"\n"
-        result += f"{lesson['corpus']['name']}, {lesson['cabinet']['name']}\n"
+        result += (
+            f"{lesson['cabinet']['corpus']['name']}, {lesson['cabinet']['name']}\n"
+        )
         result += f"\n"
 
     return result
@@ -213,7 +217,9 @@ async def get_student_week(telegram_id, student_id):
             result += f"Урок №{number['number']} {number['time_start']} - {number['time_end']}\n"
             result += f"Предмет: *{lesson['subject']}*\n"
             result += f"{lesson['teacher']['name']}\n"
-            result += f"{lesson['corpus']['name']}, {lesson['cabinet']['name']}\n"
+            result += (
+                f"{lesson['cabinet']['corpus']['name']}, {lesson['cabinet']['name']}\n"
+            )
             result += f"\n"
         result += "\n"
 
@@ -250,7 +256,9 @@ async def get_teacher_week(telegram_id, teacher_id):
                 name = f"*{subclass['educational_level']}{subclass['identificator']}{subclass['additional_identificator']}* "
                 result += name
             result += f"\n"
-            result += f"{lesson['corpus']['name']}, {lesson['cabinet']['name']}\n"
+            result += (
+                f"{lesson['cabinet']['corpus']['name']}, {lesson['cabinet']['name']}\n"
+            )
             result += f"\n"
         result += f"\n"
 
@@ -292,7 +300,9 @@ async def get_user_week(
         )
         result += f"Предмет: *{lesson['subject']}*\n"
         result += f"{lesson['teacher']['name']}\n"
-        result += f"{lesson['corpus']['name']}, {lesson['cabinet']['name']}\n"
+        result += (
+            f"{lesson['cabinet']['corpus']['name']}, {lesson['cabinet']['name']}\n"
+        )
         result += f"\n"
 
     return result
@@ -307,7 +317,9 @@ async def get_user_week(
         )
         result += f"Предмет: *{lesson['subject']}*\n"
         result += f"{lesson['teacher']['name']}\n"
-        result += f"{lesson['corpus']['name']}, {lesson['cabinet']['name']}\n"
+        result += (
+            f"{lesson['cabinet']['corpus']['name']}, {lesson['cabinet']['name']}\n"
+        )
         result += f"\n"
 
     return result
@@ -322,7 +334,9 @@ async def get_user_week(
         )
         result += f"Предмет: *{lesson['subject']}*\n"
         result += f"{lesson['teacher']['name']}\n"
-        result += f"{lesson['corpus']['name']}, {lesson['cabinet']['name']}\n"
+        result += (
+            f"{lesson['cabinet']['corpus']['name']}, {lesson['cabinet']['name']}\n"
+        )
         result += f"\n"
 
     return result
