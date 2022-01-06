@@ -20,9 +20,8 @@ async def get_request(request: str, data=None):  # TODO 200 status code handler
     async with aiohttp.ClientSession() as session:
         async with session.get(f"{url}/api{request}", json=data) as response:
             response = await response.read()
-            answer = ujson.loads(response)
-            logger.debug(f"answer to request: {answer}")
-            return answer
+            logger.debug(f"answer to request: {response}")
+            return ujson.loads(response)
 
 
 async def post_request(request: str, data=None):  # TODO 200 status code handler
@@ -30,9 +29,8 @@ async def post_request(request: str, data=None):  # TODO 200 status code handler
     async with aiohttp.ClientSession() as session:
         async with session.post(f"{url}/api{request}", json=data) as response:
             response = await response.read()
-            answer = ujson.loads(response)
-            logger.debug(f"answer to request: {answer}")
-            return answer
+            logger.debug(f"answer to request: {response}")
+            return ujson.loads(response)
 
 
 async def put_request(request: str, data=None):  # TODO 200 status code handler
@@ -40,9 +38,8 @@ async def put_request(request: str, data=None):  # TODO 200 status code handler
     async with aiohttp.ClientSession() as session:
         async with session.put(f"{url}/api{request}", json=data) as response:
             response = await response.read()
-            answer = ujson.loads(response)
-            logger.debug(f"answer to request: {answer}")
-            return answer
+            logger.debug(f"answer to request: {response}")
+            return ujson.loads(response)
 
 
 # ~=============================
