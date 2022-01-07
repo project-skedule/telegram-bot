@@ -117,7 +117,9 @@ async def register_find_handlers():
         message = call.message
         await send_message(
             message,
-            text=Texts.confirm_class.format(subclass=f"{parallel}{letter}{group}"),
+            text=Texts.confirm_another_class.format(
+                subclass=f"{parallel}{letter}{group}"
+            ),
             keyboard=FIND_STUDENT_SUBMIT_KEYBOARD,
         )
 
