@@ -165,6 +165,10 @@ MISC_MENU_SECOND_KEYBOARD = generate_markup(
 
 ADMINISTRATION_MENU_FIRST_KEYBOARD = generate_markup(
     [
+        [
+            ("Найти класс", cf.new(action="find_class", data=0)),
+            ("Найти учителя", cf.new(action="find_teacher", data=0)),
+        ],
         [("Расписание звонков", cf.new(action="ring_timetable", data=0))],
         [("Написать разработчикам", cf.new(action="contact_devs", data=0))],
         [("Поддержать разработчиков", cf.new(action="support_devs", data=0))],
