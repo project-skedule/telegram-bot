@@ -21,9 +21,8 @@ async def get_request(request: str, data=None):  # TODO 200 status code handler
     async with aiohttp.ClientSession() as session:
         async with session.get(f"{url}/api{request}", json=data) as response:
             response = await response.read()
-            answer = ujson.loads(response)
-            logger.debug(f"answer to request: {answer}")
-            return answer
+            logger.debug(f"answer to request: {response}")
+            return ujson.loads(response)
 
 
 async def post_request(request: str, data=None):  # TODO 200 status code handler
@@ -31,9 +30,8 @@ async def post_request(request: str, data=None):  # TODO 200 status code handler
     async with aiohttp.ClientSession() as session:
         async with session.post(f"{url}/api{request}", json=data) as response:
             response = await response.read()
-            answer = ujson.loads(response)
-            logger.debug(f"answer to request: {answer}")
-            return answer
+            logger.debug(f"answer to request: {response}")
+            return ujson.loads(response)
 
 
 async def put_request(request: str, data=None):  # TODO 200 status code handler
@@ -41,9 +39,8 @@ async def put_request(request: str, data=None):  # TODO 200 status code handler
     async with aiohttp.ClientSession() as session:
         async with session.put(f"{url}/api{request}", json=data) as response:
             response = await response.read()
-            answer = ujson.loads(response)
-            logger.debug(f"answer to request: {answer}")
-            return answer
+            logger.debug(f"answer to request: {response}")
+            return ujson.loads(response)
 
 
 # ~=============================
@@ -126,7 +123,6 @@ async def get_student_day_of_week(telegram_id, day_of_week, subclass_id):
         result += markdown.underline(
             f"Урок №{number['number']} {number['time_start']} - {number['time_end']}\n"
         )
-
         subject = markdown.escape_md(lesson["subject"])
         teacher = markdown.escape_md(lesson["teacher"]["name"])
         corpus = markdown.escape_md(lesson["corpus"]["name"])
@@ -286,7 +282,6 @@ async def get_teacher_week(telegram_id, teacher_id):
 
             result += f"{corpus}, {cabinet}\n"
             result += "\n"
-
         result += f"\n"
 
     return result
@@ -327,7 +322,9 @@ async def get_user_week(
         )
         result += f"Предмет: *{lesson['subject']}*\n"
         result += f"{lesson['teacher']['name']}\n"
-        result += f"{lesson['corpus']['name']}, {lesson['cabinet']['name']}\n"
+        result += (
+            f"{lesson['cabinet']['corpus']['name']}, {lesson['cabinet']['name']}\n"
+        )
         result += f"\n"
 
     return result
@@ -342,7 +339,26 @@ async def get_user_week(
         )
         result += f"Предмет: *{lesson['subject']}*\n"
         result += f"{lesson['teacher']['name']}\n"
-        result += f"{lesson['corpus']['name']}, {lesson['cabinet']['name']}\n"
+        result += (
+            f"{lesson['cabinet']['corpus']['name']}, {lesson['cabinet']['name']}\n"
+        )
+        result += f"\n"
+
+    return result
+
+    lessons = data["lessons"]
+
+    result = ""
+    for lesson in lessons:
+        number = lesson["lesson_number"]
+        result += (
+            f"Урок №{number['number']} {number['time_start']} - {number['time_end']}\n"
+        )
+        result += f"Предмет: *{lesson['subject']}*\n"
+        result += f"{lesson['teacher']['name']}\n"
+        result += (
+            f"{lesson['cabinet']['corpus']['name']}, {lesson['cabinet']['name']}\n"
+        )
         result += f"\n"
 
     return result
