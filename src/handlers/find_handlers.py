@@ -313,7 +313,7 @@ async def register_find_handlers():
     async def find_choose_teacher_handler(message: Message, state: FSMContext):
         await States.find_choose_teacher.set()
         await message.answer(
-            "choose from:",
+            text=Texts.select_teacher_from_list,
             reply_markup=await find_get_teachers_keyboard(
                 message.text, await get_school_id(message.chat.id)
             ),
