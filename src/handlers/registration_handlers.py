@@ -104,7 +104,7 @@ async def register_registration_handlers():
         await States.choose_role.set()
         await send_message(
             message=message,
-            text=Texts.greeting + "TODO change role text",
+            text=Texts.choose_role,
             keyboard=CHOOSE_ROLE_KEYBOARD,
             parse_mode="markdown",
         )
@@ -474,7 +474,9 @@ async def register_registration_handlers():
         school_id = (await state.get_data())["school"]
         school_name = (await state.get_data())["school_name"]
         if (await state.get_data()).get("changed") is None:
-            await register_administration(telegram_id=message.chat.id, school_id=school_id)
+            await register_administration(
+                telegram_id=message.chat.id, school_id=school_id
+            )
         else:
             await change_role(telegram_id=message.chat.id, school_id=school_id)
             await save_to_redis(message.chat.id)
