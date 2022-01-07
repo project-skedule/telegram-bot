@@ -131,7 +131,7 @@ async def register_registration_handlers():
         message = call.message
         await send_message(
             message,
-            text="choose role",
+            text=Texts.choose_role,
             keyboard=CHOOSE_ROLE_KEYBOARD,
             parse_mode="markdown",
         )
@@ -155,7 +155,7 @@ async def register_registration_handlers():
         message = call.message
         await send_message(
             message,
-            text="input school",
+            text=Texts.enter_school_name,
             keyboard=None,
             parse_mode="markdown",
         )
@@ -170,7 +170,7 @@ async def register_registration_handlers():
         logger.debug(f"input school message: {message.text}")
         await States.choose_school.set()
         await message.answer(
-            text=f"school like {message.text}",  # FIX: add format for schools like entered
+            text=Texts.select_school_name,
             reply_markup=(await get_schools_keyboard(message.text)),
             parse_mode="markdown",
         )
@@ -234,10 +234,10 @@ async def register_registration_handlers():
         state=[States.input_teacher],
     )
     async def choose_teacher_handler(message: Message, state: FSMContext):
-        logger.debug(f"choose teacher")
+        logger.debug("choose teacher")
         await States.choose_teacher.set()
         await message.answer(
-            text="Choose teacher ",  # FIX: text for choosing teacher from list
+            text=Texts.select_teacher_from_list,
             reply_markup=await get_teachers_keyboard(
                 message.text, await get_school_id(message.chat.id)
             ),
@@ -252,13 +252,13 @@ async def register_registration_handlers():
     async def input_teacher_handler(
         call: CallbackQuery, state: FSMContext, callback_data: dict
     ):
-        logger.debug(f"input teacher")
+        logger.debug("input teacher")
         await States.teacher_submit.set()
         message = call.message
         teacher = callback_data["data"]
         teacher_name = await get_teacher_name_by_id(teacher)
 
-        text = Texts.confirm_teacher_from_list.format(teacher_name=teacher_name)
+        text = Texts.confirm_name.format(teacher_name=teacher_name)
         await state.update_data(
             {
                 "teacher": teacher,
@@ -402,9 +402,12 @@ async def register_registration_handlers():
                 await save_to_redis(message.chat.id)
                 await state.update_data({"changed": None})
             await States.student_menu.set()
+
             await send_message(
                 message,
-                text="student menu",
+                text=Texts.successful_reg_student.format(
+                    subclass=f"{parallel}{letter}{group}"
+                ),
                 keyboard=STUDENT_MAIN_KEYBOARD,
                 parse_mode="markdown",
             )
@@ -455,7 +458,7 @@ async def register_registration_handlers():
 
         await send_message(
             message,
-            text=Texts.successful_reg_teacher.format(teacher_name=teacher_id),
+            text=Texts.successful_reg_teacher.format(teacher_name=teacher_name),
             keyboard=TEACHER_MAIN_KEYBOARD,
             parse_mode="markdown",
         )
