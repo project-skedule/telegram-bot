@@ -125,7 +125,7 @@ async def get_student_day_of_week(telegram_id, day_of_week, subclass_id):
         )
         subject = markdown.escape_md(lesson["subject"])
         teacher = markdown.escape_md(lesson["teacher"]["name"])
-        corpus = markdown.escape_md(lesson["corpus"]["name"])
+        corpus = markdown.escape_md(lesson["cabinet"]["corpus"]["name"])
         cabinet = markdown.escape_md(lesson["cabinet"]["name"])
 
         result += f"Предмет: *{subject}*\n"
@@ -162,7 +162,7 @@ async def get_teacher_day_of_week(telegram_id, day_of_week, teacher_id):
             result += markdown.escape_md(name)
         result += "\n"
 
-        corpus = markdown.escape_md(lesson["corpus"]["name"])
+        corpus = markdown.escape_md(lesson["cabinet"]["corpus"]["name"])
         cabinet = markdown.escape_md(lesson["cabinet"]["name"])
 
         result += f"{corpus}, {cabinet}\n"
@@ -228,7 +228,7 @@ async def get_student_week(telegram_id, student_id):
 
             subject = markdown.escape_md(lesson["subject"])
             teacher = markdown.escape_md(lesson["teacher"]["name"])
-            corpus = markdown.escape_md(lesson["corpus"]["name"])
+            corpus = markdown.escape_md(lesson["cabinet"]["corpus"]["name"])
             cabinet = markdown.escape_md(lesson["cabinet"]["name"])
 
             result += f"Предмет: *{subject}*\n"
@@ -277,7 +277,7 @@ async def get_teacher_week(telegram_id, teacher_id):
                 result += markdown.escape_md(name)
             result += "\n"
 
-            corpus = markdown.escape_md(lesson["corpus"]["name"])
+            corpus = markdown.escape_md(lesson["cabinet"]["corpus"]["name"])
             cabinet = markdown.escape_md(lesson["cabinet"]["name"])
 
             result += f"{corpus}, {cabinet}\n"
