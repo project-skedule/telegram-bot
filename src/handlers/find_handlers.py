@@ -334,7 +334,7 @@ async def register_find_handlers():
         teacher_name = await get_teacher_name_by_id(teacher_id)
         await state.update_data({"find_teacher_id": teacher_id})
         await state.update_data({"find_teacher_name": teacher_name})
-        text = Texts.confirm_teacher_from_list.format(teacher_name=teacher_name)
+        text = Texts.confirm_another_teacher.format(teacher_name=teacher_name)
         await send_message(
             message,
             text=text,
