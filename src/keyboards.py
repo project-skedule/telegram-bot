@@ -53,6 +53,10 @@ def generate_markup(
 
 STUDENT_MAIN_KEYBOARD = generate_markup(
     [
+        [
+            ("Найти класс", cf.new(action="find_class", data=0)),
+            ("Найти учителя", cf.new(action="find_teacher", data=0)),
+        ],
         # [("Следующий урок", cf.new(action="next_lesson", data=0))],
         [
             ("Сегодня", cf.new(action="today", data=0)),
@@ -65,6 +69,10 @@ STUDENT_MAIN_KEYBOARD = generate_markup(
 )
 TEACHER_MAIN_KEYBOARD = generate_markup(
     [
+        [
+            ("Найти класс", cf.new(action="find_class", data=0)),
+            ("Найти учителя", cf.new(action="find_teacher", data=0)),
+        ],
         # [("Следующий урок", cf.new(action="next_lesson", data=0))],
         [
             ("Сегодня", cf.new(action="today", data=0)),
@@ -92,10 +100,6 @@ CHILD_MAIN_KEYBOARD = generate_markup(
 
 STUDENT_MISC_MENU_FIRST_KEYBOARD = generate_markup(
     [
-        [
-            ("Найти класс", cf.new(action="find_class", data=0)),
-            ("Найти учителя", cf.new(action="find_teacher", data=0)),
-        ],
         [("Расписание звонков", cf.new(action="ring_timetable", data=0))],
         [("Написать разработчикам", cf.new(action="contact_devs", data=0))],
         [("Поддержать разработчиков", cf.new(action="support_devs", data=0))],
@@ -116,10 +120,6 @@ STUDENT_MISC_MENU_SECOND_KEYBOARD = generate_markup(
 
 TEACHER_MISC_MENU_FIRST_KEYBOARD = generate_markup(
     [
-        [
-            ("Найти класс", cf.new(action="find_class", data=0)),
-            ("Найти учителя", cf.new(action="find_teacher", data=0)),
-        ],
         [("Расписание звонков", cf.new(action="ring_timetable", data=0))],
         [("Написать разработчикам", cf.new(action="contact_devs", data=0))],
         [("Поддержать разработчиков", cf.new(action="support_devs", data=0))],
@@ -140,10 +140,6 @@ TEACHER_MISC_MENU_SECOND_KEYBOARD = generate_markup(
 
 CHILD_MISC_MENU_FIRST_KEYBOARD = generate_markup(
     [
-        [
-            ("Найти класс", cf.new(action="find_class", data=0)),
-            ("Найти учителя", cf.new(action="find_teacher", data=0)),
-        ],
         [("Расписание звонков", cf.new(action="ring_timetable", data=0))],
         [("Расписание Столовой", cf.new(action="canteen_timetable", data=0))],
         [("Вернуться в главное меню", cf.new(action="child_menu", data=0))],
@@ -169,10 +165,6 @@ MISC_MENU_SECOND_KEYBOARD = generate_markup(
 
 ADMINISTRATION_MENU_FIRST_KEYBOARD = generate_markup(
     [
-        [
-            ("Найти класс", cf.new(action="find_class", data=0)),
-            ("Найти учителя", cf.new(action="find_teacher", data=0)),
-        ],
         [("Расписание звонков", cf.new(action="ring_timetable", data=0))],
         [("Написать разработчикам", cf.new(action="contact_devs", data=0))],
         [("Поддержать разработчиков", cf.new(action="support_devs", data=0))],

@@ -26,21 +26,23 @@ async def send_message(
     await message.edit_reply_markup(reply_markup=None)
 
 
-async def dispatcher_menu(message: Message, role: str, text: str):
+async def dispatcher_menu(
+    message: Message, role: str, text: str, parse_mode="markdown"
+):
     if role == "Parent":
         await States.child_menu.set()
         await send_message(
-            message, text=text, keyboard=CHILD_MAIN_KEYBOARD, parse_mode="markdown"
+            message, text=text, keyboard=CHILD_MAIN_KEYBOARD, parse_mode=parse_mode
         )
     elif role == "Student":
         await States.student_menu.set()
         await send_message(
-            message, text=text, keyboard=STUDENT_MAIN_KEYBOARD, parse_mode="markdown"
+            message, text=text, keyboard=STUDENT_MAIN_KEYBOARD, parse_mode=parse_mode
         )
     elif role == "Teacher":
         await States.teacher_menu.set()
         await send_message(
-            message, text=text, keyboard=TEACHER_MAIN_KEYBOARD, parse_mode="markdown"
+            message, text=text, keyboard=TEACHER_MAIN_KEYBOARD, parse_mode=parse_mode
         )
     elif role == "Administration":
         await States.administration_menu_first.set()
@@ -48,7 +50,7 @@ async def dispatcher_menu(message: Message, role: str, text: str):
             message,
             text=text,
             keyboard=ADMINISTRATION_MENU_FIRST_KEYBOARD,
-            parse_mode="markdown",
+            parse_mode=parse_mode,
         )
 
 

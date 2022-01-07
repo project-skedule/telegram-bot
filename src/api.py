@@ -5,6 +5,7 @@ from src.redis import *  # TODO remove star import
 from datetime import datetime
 import aiohttp
 import ujson
+from aiogram.utils import markdown
 
 from src.constants import DAYS_OF_WEEK
 
@@ -122,13 +123,19 @@ async def get_student_day_of_week(telegram_id, day_of_week, subclass_id):
     result = f"Ваше расписание *{DAYS_OF_WEEK[day_of_week]}*:\n"
     for lesson in lessons:
         number = lesson["lesson_number"]
-        result += (
+        result += markdown.underline(
             f"Урок №{number['number']} {number['time_start']} - {number['time_end']}\n"
         )
-        result += f"Предмет: *{lesson['subject']}*\n"
-        result += f"{lesson['teacher']['name']}\n"
-        result += f"{lesson['corpus']['name']}, {lesson['cabinet']['name']}\n"
-        result += f"\n"
+
+        subject = markdown.escape_md(lesson["subject"])
+        teacher = markdown.escape_md(lesson["teacher"]["name"])
+        corpus = markdown.escape_md(lesson["corpus"]["name"])
+        cabinet = markdown.escape_md(lesson["cabinet"]["name"])
+
+        result += f"Предмет: *{subject}*\n"
+        result += f"{teacher}\n"
+        result += f"{corpus}, {cabinet}\n"
+        result += "\n"
 
     return result
 
@@ -147,17 +154,23 @@ async def get_teacher_day_of_week(telegram_id, day_of_week, teacher_id):
     result = f"Ваше расписание *{DAYS_OF_WEEK[day_of_week]}*:\n"
     for lesson in lessons:
         number = lesson["lesson_number"]
-        result += (
+        result += markdown.underline(
             f"Урок №{number['number']} {number['time_start']} - {number['time_end']}\n"
         )
-        result += f"Предмет: {lesson['subject']}\n"
+
+        subject = markdown.escape_md(lesson["subject"])
+        result += f"Предмет: {subject}\n"
         subclasses = lesson["subclasses"]
         for subclass in subclasses:
             name = f"*{subclass['educational_level']}{subclass['identificator']}{subclass['additional_identificator']}* "
-            result += name
-        result += f"\n"
-        result += f"{lesson['corpus']['name']}, {lesson['cabinet']['name']}\n"
-        result += f"\n"
+            result += markdown.escape_md(name)
+        result += "\n"
+
+        corpus = markdown.escape_md(lesson["corpus"]["name"])
+        cabinet = markdown.escape_md(lesson["cabinet"]["name"])
+
+        result += f"{corpus}, {cabinet}\n"
+        result += "\n"
 
     return result
 
@@ -207,14 +220,25 @@ async def get_student_week(telegram_id, student_id):
     for day in days_of_week:
         lessons = day["lessons"]
         day_of_week = day["day_of_week"]
-        result += f"Ваше расписание *{DAYS_OF_WEEK[day_of_week]}*:\n"
+
+        name_day = DAYS_OF_WEEK[day_of_week]
+        result += markdown.underline(f"Ваше расписание {name_day}:\n")
+
         for lesson in lessons:
             number = lesson["lesson_number"]
-            result += f"Урок №{number['number']} {number['time_start']} - {number['time_end']}\n"
-            result += f"Предмет: *{lesson['subject']}*\n"
-            result += f"{lesson['teacher']['name']}\n"
-            result += f"{lesson['corpus']['name']}, {lesson['cabinet']['name']}\n"
-            result += f"\n"
+            result += markdown.italic(
+                f"Урок №{number['number']} {number['time_start']} - {number['time_end']}\n"
+            )
+
+            subject = markdown.escape_md(lesson["subject"])
+            teacher = markdown.escape_md(lesson["teacher"]["name"])
+            corpus = markdown.escape_md(lesson["corpus"]["name"])
+            cabinet = markdown.escape_md(lesson["cabinet"]["name"])
+
+            result += f"Предмет: *{subject}*\n"
+            result += f"{teacher}\n"
+            result += f"{corpus}, {cabinet}\n"
+            result += "\n"
         result += "\n"
 
     return result
@@ -240,18 +264,29 @@ async def get_teacher_week(telegram_id, teacher_id):
     for day in days_of_week:
         lessons = day["lessons"]
         day_of_week = day["day_of_week"]
-        result += f"Ваше расписание *{DAYS_OF_WEEK[day_of_week]}*:\n"
+        name_day = DAYS_OF_WEEK[day_of_week]
+        result += markdown.underline(f"Ваше расписание {name_day}:\n")
+
         for lesson in lessons:
             number = lesson["lesson_number"]
-            result += f"Урок №{number['number']} {number['time_start']} - {number['time_end']}\n"
-            result += f"Предмет: {lesson['subject']}\n"
+            result += markdown.underline(
+                f"Урок №{number['number']} {number['time_start']} - {number['time_end']}\n"
+            )
+
+            subject = markdown.escape_md(lesson["subject"])
+            result += f"Предмет: {subject}\n"
             subclasses = lesson["subclasses"]
             for subclass in subclasses:
                 name = f"*{subclass['educational_level']}{subclass['identificator']}{subclass['additional_identificator']}* "
-                result += name
-            result += f"\n"
-            result += f"{lesson['corpus']['name']}, {lesson['cabinet']['name']}\n"
-            result += f"\n"
+                result += markdown.escape_md(name)
+            result += "\n"
+
+            corpus = markdown.escape_md(lesson["corpus"]["name"])
+            cabinet = markdown.escape_md(lesson["cabinet"]["name"])
+
+            result += f"{corpus}, {cabinet}\n"
+            result += "\n"
+
         result += f"\n"
 
     return result

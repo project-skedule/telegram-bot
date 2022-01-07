@@ -443,19 +443,19 @@ async def register_registration_handlers():
         message = call.message
         await States.teacher_menu.set()
         school = (await state.get_data())["school"]
-        teacher = (await state.get_data())["teacher"]
-
+        teacher_id = (await state.get_data())["teacher"]
+        teacher_name = (await state.get_data())["teacher_name"]
         if (await state.get_data()).get("changed") is None:
-            await register_teacher(telegram_id=message.chat.id, teacher_id=teacher)
+            await register_teacher(telegram_id=message.chat.id, teacher_id=teacher_id)
 
         else:
-            await change_role(telegram_id=message.chat.id, teacher_id=teacher)
+            await change_role(telegram_id=message.chat.id, teacher_id=teacher_id)
             await save_to_redis(message.chat.id)
             await state.update_data({"changed": None})
 
         await send_message(
             message,
-            text=Texts.successful_reg_teacher.format(teacher_name=teacher),
+            text=Texts.successful_reg_teacher.format(teacher_name=teacher_id),
             keyboard=TEACHER_MAIN_KEYBOARD,
             parse_mode="markdown",
         )
@@ -471,17 +471,17 @@ async def register_registration_handlers():
     ):
         message = call.message
         await States.administration_menu_first.set()
-        school = (await state.get_data())["school"]
-
+        school_id = (await state.get_data())["school"]
+        school_name = (await state.get_data())["school_name"]
         if (await state.get_data()).get("changed") is None:
-            await register_administration(telegram_id=message.chat.id, school_id=school)
+            await register_administration(telegram_id=message.chat.id, school_id=school_id)
         else:
-            await change_role(telegram_id=message.chat.id, school_id=school)
+            await change_role(telegram_id=message.chat.id, school_id=school_id)
             await save_to_redis(message.chat.id)
             await state.update_data({"changed": None})
         await send_message(
             message,
-            text=Texts.successful_reg_admin.format(school_name=school),
+            text=Texts.successful_reg_admin.format(school_name=school_name),
             keyboard=ADMINISTRATION_MENU_FIRST_KEYBOARD,
             parse_mode="markdown",
         )
