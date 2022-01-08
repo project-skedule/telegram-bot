@@ -57,7 +57,7 @@ async def register_student_handlers():
             message,
             text=Texts.select_day_of_week,
             keyboard=STUDENT_DAY_OF_WEEK_KEYBOARD,
-            parse_mode="markdown",
+            parse_mode="Markdown",
         )
         await call.answer()
 
@@ -80,7 +80,7 @@ async def register_student_handlers():
             message,
             text=text,
             keyboard=STUDENT_MAIN_KEYBOARD,
-            parse_mode="markdown",
+            parse_mode="MarkdownV2",
         )
         await call.answer()
 
@@ -120,27 +120,6 @@ async def register_student_handlers():
 
     # =============================
     @dp.callback_query_handler(
-        cf.filter(action=["next_lesson"]),
-        state=[States.student_menu],
-    )
-    async def student_next_lesson_handler(call: CallbackQuery):
-        logger.debug("next lesson for student")
-        await States.student_menu.set()
-        message = call.message
-        # FIX format Texts.lesson_format
-        text = await get_user_next_lesson(
-            telegram_id=message.chat.id, is_searching=False
-        )
-        await send_message(
-            message,
-            text=text,
-            keyboard=STUDENT_MAIN_KEYBOARD,
-            parse_mode="markdown",
-        )
-        await call.answer()
-
-    # =============================
-    @dp.callback_query_handler(
         cf.filter(action=["today"]),
         state=[States.student_menu],
     )
@@ -154,7 +133,7 @@ async def register_student_handlers():
             message,
             text=text,
             keyboard=STUDENT_MAIN_KEYBOARD,
-            parse_mode="markdown",
+            parse_mode="MarkdownV2",
         )
         await call.answer()
 
@@ -173,7 +152,7 @@ async def register_student_handlers():
             message,
             text=text,
             keyboard=STUDENT_MAIN_KEYBOARD,
-            parse_mode="markdown",
+            parse_mode="MarkdownV2",
         )
         await call.answer()
 
@@ -186,14 +165,13 @@ async def register_student_handlers():
         logger.debug("week for student")
         await States.student_menu.set()
         message = call.message
-        # FIX format
         text = await get_user_week(telegram_id=message.chat.id, is_searching=False)
 
         await send_message(
             message,
             text=text,
             keyboard=STUDENT_MAIN_KEYBOARD,
-            parse_mode="markdown",
+            parse_mode="MarkdownV2",
         )
         await call.answer()
 

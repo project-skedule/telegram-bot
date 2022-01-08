@@ -35,8 +35,8 @@ async def register_find_handlers():
         cf.filter(action=["find_class"]),
         state=[
             States.child_misc_menu_first,
-            States.student_misc_menu_first,
-            States.teacher_misc_menu_first,
+            States.student_menu,
+            States.teacher_menu,
             States.administration_menu_first,
             States.find_student_submit,
         ],
@@ -49,8 +49,8 @@ async def register_find_handlers():
         message = call.message
         await send_message(
             message,
-            Texts.enter_parallel,
-            await get_find_enter_parallel_keyboard(message.chat.id),
+            text=Texts.enter_parallel,
+            keyboard=await get_find_enter_parallel_keyboard(message.chat.id),
         )
         await call.answer()
 
@@ -68,8 +68,8 @@ async def register_find_handlers():
         message = call.message
         await send_message(
             message,
-            Texts.enter_letter,
-            await get_find_enter_letter_keyboard(message.chat.id, parallel),
+            text=Texts.enter_letter,
+            keyboard=await get_find_enter_letter_keyboard(message.chat.id, parallel),
         )
         await call.answer()
 
@@ -88,8 +88,10 @@ async def register_find_handlers():
         message = call.message
         await send_message(
             message,
-            Texts.enter_group,
-            await get_find_enter_group_keyboard(message.chat.id, parallel, letter),
+            text=Texts.enter_group,
+            keyboard=await get_find_enter_group_keyboard(
+                message.chat.id, parallel, letter
+            ),
         )
         await call.answer()
 
@@ -115,8 +117,10 @@ async def register_find_handlers():
         message = call.message
         await send_message(
             message,
-            Texts.confirm_class.format(subclass=f"{parallel}{letter}{group}"),
-            FIND_STUDENT_SUBMIT_KEYBOARD,
+            text=Texts.confirm_another_class.format(
+                subclass=f"{parallel}{letter}{group}"
+            ),
+            keyboard=FIND_STUDENT_SUBMIT_KEYBOARD,
         )
 
         await call.answer()
@@ -196,35 +200,7 @@ async def register_find_handlers():
                 is_searching=True,
             )
 
-        await dispatcher_menu(message, role, text)
-        await call.answer()
-
-    # =============================
-    @dp.callback_query_handler(
-        cf.filter(action=["next_lesson"]),
-        state=[States.find_menu],
-    )
-    async def find_next_lesson_handler(
-        call: CallbackQuery, state: FSMContext, callback_data: dict
-    ):
-        message = call.message
-        role = (await state.get_data())["role"]
-        day_of_week = callback_data["data"]
-
-        if await is_find_for_student(state):
-            text = await get_user_next_lesson(
-                telegram_id=message.chat.id,
-                subclass_id=(await state.get_data())["find_subclass_id"],
-                is_searching=True,
-            )
-        else:
-            text = await get_user_next_lesson(
-                telegram_id=message.chat.id,
-                teacher_id=(await state.get_data())["find_teacher_id"],
-                is_searching=True,
-            )
-
-        await dispatcher_menu(message, role, text)
+        await dispatcher_menu(message, role, text, "MarkdownV2")
         await call.answer()
 
     # =============================
@@ -252,7 +228,7 @@ async def register_find_handlers():
                 is_searching=True,
             )
 
-        await dispatcher_menu(message, role, text)
+        await dispatcher_menu(message, role, text, "MarkdownV2")
         await call.answer()
 
     # =============================
@@ -279,7 +255,7 @@ async def register_find_handlers():
                 is_searching=True,
             )
 
-        await dispatcher_menu(message, role, text)
+        await dispatcher_menu(message, role, text, "MarkdownV2")
         await call.answer()
 
     # =============================
@@ -306,7 +282,7 @@ async def register_find_handlers():
                 is_searching=True,
             )
 
-        await dispatcher_menu(message, role, text)
+        await dispatcher_menu(message, role, text, "MarkdownV2")
         await call.answer()
 
     # =============================
@@ -314,8 +290,8 @@ async def register_find_handlers():
         cf.filter(action=["find_teacher"]),
         state=[
             States.child_misc_menu_first,
-            States.student_misc_menu_first,
-            States.teacher_misc_menu_first,
+            States.student_menu,
+            States.teacher_menu,
             States.administration_menu_first,
             States.find_teacher_submit,
         ],
@@ -339,7 +315,7 @@ async def register_find_handlers():
     async def find_choose_teacher_handler(message: Message, state: FSMContext):
         await States.find_choose_teacher.set()
         await message.answer(
-            "choose from:",
+            text=Texts.select_teacher_from_list,
             reply_markup=await find_get_teachers_keyboard(
                 message.text, await get_school_id(message.chat.id)
             ),
@@ -360,7 +336,7 @@ async def register_find_handlers():
         teacher_name = await get_teacher_name_by_id(teacher_id)
         await state.update_data({"find_teacher_id": teacher_id})
         await state.update_data({"find_teacher_name": teacher_name})
-        text = Texts.confirm_teacher_from_list.format(teacher_name=teacher_name)
+        text = Texts.confirm_another_teacher.format(teacher_name=teacher_name)
         await send_message(
             message,
             text=text,

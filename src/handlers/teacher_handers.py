@@ -57,7 +57,7 @@ async def register_teacher_handlers():
             message,
             text=Texts.select_day_of_week,
             keyboard=TEACHER_DAY_OF_WEEK_KEYBOARD,
-            parse_mode="markdown",
+            parse_mode="Markdown",
         )
         await call.answer()
 
@@ -81,7 +81,7 @@ async def register_teacher_handlers():
             message,
             text=text,
             keyboard=TEACHER_MAIN_KEYBOARD,
-            parse_mode="markdown",
+            parse_mode="MarkdownV2",
         )
         await call.answer()
 
@@ -122,37 +122,17 @@ async def register_teacher_handlers():
 
     # =============================
     @dp.callback_query_handler(
-        cf.filter(action=["next_lesson"]),
-        state=[States.teacher_menu],
-    )
-    async def teacher_next_lesson_handler(call: CallbackQuery):
-        message = call.message
-        # FIX: format
-        text = await get_user_next_lesson(
-            telegram_id=message.chat.id, is_searching=False
-        )
-        await send_message(
-            message,
-            text=text,
-            keyboard=TEACHER_MAIN_KEYBOARD,
-            parse_mode="markdown",
-        )
-        await call.answer()
-
-    # =============================
-    @dp.callback_query_handler(
         cf.filter(action=["today"]),
         state=[States.teacher_menu],
     )
     async def teacher_today_handler(call: CallbackQuery):
         message = call.message
-        # FIX: format
         text = await get_user_today(telegram_id=message.chat.id, is_searching=False)
         await send_message(
             message,
             text=text,
             keyboard=TEACHER_MAIN_KEYBOARD,
-            parse_mode="markdown",
+            parse_mode="MarkdownV2",
         )
         await call.answer()
 
@@ -163,13 +143,12 @@ async def register_teacher_handlers():
     )
     async def teacher_tomorrow_handler(call: CallbackQuery):
         message = call.message
-        # FIX: format
         text = await get_user_tomorrow(telegram_id=message.chat.id, is_searching=False)
         await send_message(
             message,
             text=text,
             keyboard=TEACHER_MAIN_KEYBOARD,
-            parse_mode="markdown",
+            parse_mode="MarkdownV2",
         )
         await call.answer()
 
@@ -180,13 +159,12 @@ async def register_teacher_handlers():
     )
     async def teacher_week_handler(call: CallbackQuery):
         message = call.message
-        # FIX: format
         text = await get_user_week(telegram_id=message.chat.id, is_searching=False)
         await send_message(
             message,
             text=text,
             keyboard=TEACHER_MAIN_KEYBOARD,
-            parse_mode="markdown",
+            parse_mode="MarkdownV2",
         )
         await call.answer()
 
