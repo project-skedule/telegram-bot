@@ -141,10 +141,10 @@ async def register_find_handlers():
         message = call.message
 
         if await is_find_for_student(state):
-            text = f"Расписание ученика `{(await state.get_data())['find_subclass_name']}` класса"
+            text = f"Расписание ученика *{(await state.get_data())['find_subclass_name']}* класса"
         else:
             text = (
-                f"Расписание учителя `{(await state.get_data())['find_teacher_name']}`"
+                f"Расписание учителя *{(await state.get_data())['find_teacher_name']}*"
             )
         await send_message(
             message,
