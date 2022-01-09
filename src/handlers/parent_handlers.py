@@ -5,7 +5,6 @@ from src.api import (
     get_canteen_timetable,
     get_ring_timetable,
     get_user_day_of_week,
-    get_user_next_lesson,
     get_user_today,
     get_user_tomorrow,
     get_user_week,
@@ -140,23 +139,6 @@ async def register_parent_handlers():
             text=Texts.parent_main_menu,
             keyboard=PARENT_MISC_MENU_FIRST_KEYBOARD,
             parse_mode="markdown",
-        )
-        await call.answer()
-
-    # ~=============================
-    @dp.callback_query_handler(
-        cf.filter(action=["next_lesson"]),
-        state=[States.child_menu],
-    )
-    async def student_next_lesson_handler(call: CallbackQuery, state: FSMContext):
-        await States.child_menu.set()
-        message = call.message
-        # FIX format
-        text = await get_user_next_lesson(
-            telegram_id=(await state.get_data())["child"], is_searching=False
-        )
-        await send_message(
-            message, text=text, keyboard=CHILD_MAIN_KEYBOARD, parse_mode="markdown"
         )
         await call.answer()
 

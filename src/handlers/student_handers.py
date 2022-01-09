@@ -5,7 +5,6 @@ from src.api import (
     get_canteen_timetable,
     get_ring_timetable,
     get_user_day_of_week,
-    get_user_next_lesson,
     get_user_today,
     get_user_tomorrow,
     get_user_week,
