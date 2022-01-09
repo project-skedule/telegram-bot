@@ -233,7 +233,7 @@ async def register_student_handlers():
     async def student_canteen_timetable_handler(call: CallbackQuery):
         await States.student_menu.set()
         message = call.message
-        text = Texts.help_message
+        text = Texts.help_message.format(telegram_id=message.chat.id)
         await send_message(
             message,
             text=text,

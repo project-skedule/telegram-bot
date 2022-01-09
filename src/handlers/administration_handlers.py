@@ -106,7 +106,7 @@ async def register_administration_handlers():
     async def student_canteen_timetable_handler(call: CallbackQuery):
         await States.administration_menu_first.set()
         message = call.message
-        text = Texts.help_message
+        text = Texts.help_message.format(telegram_id=call.message.chat.id)
         await send_message(
             message,
             text=text,
