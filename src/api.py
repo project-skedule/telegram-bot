@@ -464,12 +464,8 @@ async def get_user_roles(telegram_id):
 
 
 async def get_subclass_name_by_id(subclass_id):
-    data = await get_request(f"/idgetter/teacher/{subclass_id}")
-    return (
-        data["educational_level"]
-        + data["identificator"]
-        + data["additional_identificator"]
-    )
+    data = await get_request(f"/idgetter/subclass/{subclass_id}")
+    return f"{data['educational_level']}{data['identificator']}{data['additional_identificator']}"
 
 
 async def get_teacher_name_by_id(teacher_id):

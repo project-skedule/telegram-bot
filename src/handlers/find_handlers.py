@@ -120,6 +120,7 @@ async def register_find_handlers():
                 subclass=f"{parallel}{letter}{group}"
             ),
             keyboard=FIND_STUDENT_SUBMIT_KEYBOARD,
+            parse_mode = "Markdown"
         )
 
         await call.answer()
