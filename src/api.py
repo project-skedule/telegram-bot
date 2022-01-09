@@ -46,41 +46,6 @@ async def put_request(request: str, data=None):  # TODO 200 status code handler
 # ~=============================
 
 
-async def get_user_next_lesson(
-    telegram_id, is_searching=False, teacher_id=None, subclass_id=None
-):
-    """
-    Returns timetable for user with `telegram_id` if `is_searching` == False
-    Else return timetable for `teacher_id` or `subclass_id` (Only one must be set)
-    """
-    school_id = await get_school_id(telegram_id)
-    # TODO: understand next lesson number and day of week
-    lesson_number = 1
-    day_of_week = 1
-
-    if is_searching:
-        if teacher_id is not None:
-            data = {"teacher_id": teacher_id}
-        else:
-            data = {"subclass_id": subclass_id}
-    else:
-        main_role = await get_main_role(telegram_id)
-        if main_role == "teacher":
-            data = {"teacher_id": await get_teacher_id(telegram_id)}
-        else:
-            data = {"subclass_id": await get_subclass_id(teacher_id)}
-    data = await get_request(
-        "/lesson/get/certain",
-        data={
-            "data": data,
-            "school_id": school_id,
-            "day_of_week": day_of_week,
-            "lesson_number": lesson_number,
-        },
-    )
-    return data
-
-
 async def get_user_today(
     telegram_id, is_searching=False, teacher_id=None, subclass_id=None
 ):
@@ -105,7 +70,9 @@ async def get_user_tomorrow(
     )
 
 
-async def get_student_day_of_week(telegram_id, day_of_week, subclass_id):
+async def get_student_day_of_week(
+    telegram_id, day_of_week, subclass_id, subclass_name=None
+):
     school_id = await get_school_id(telegram_id)
 
     data = {"subclass_id": subclass_id}
@@ -117,7 +84,11 @@ async def get_student_day_of_week(telegram_id, day_of_week, subclass_id):
 
     lessons = data["lessons"]
 
-    result = f"Ваше расписание *{DAYS_OF_WEEK[day_of_week]}*:\n"
+    if subclass_name is not None:
+        result = f"Расписание класса {subclass_name} *{DAYS_OF_WEEK[day_of_week]}*:\n"
+    else:
+        result = f"Ваше расписание *{DAYS_OF_WEEK[day_of_week]}*:\n"
+
     for lesson in lessons:
         number = lesson["lesson_number"]
         result += markdown.underline(
@@ -136,7 +107,9 @@ async def get_student_day_of_week(telegram_id, day_of_week, subclass_id):
     return result
 
 
-async def get_teacher_day_of_week(telegram_id, day_of_week, teacher_id):
+async def get_teacher_day_of_week(
+    telegram_id, day_of_week, teacher_id, teacher_name=None
+):
     school_id = await get_school_id(telegram_id)
 
     data = {"teacher_id": teacher_id}
@@ -147,7 +120,10 @@ async def get_teacher_day_of_week(telegram_id, day_of_week, teacher_id):
     )
 
     lessons = data["lessons"]
-    result = f"Ваше расписание *{DAYS_OF_WEEK[day_of_week]}*:\n"
+    if teacher_name is not None:
+        result = f"Расписание учителя {markdown.escape_md(teacher_name)} *{DAYS_OF_WEEK[day_of_week]}*:\n"
+    else:
+        result = f"Ваше расписание *{DAYS_OF_WEEK[day_of_week]}*:\n"
     for lesson in lessons:
         number = lesson["lesson_number"]
         result += markdown.underline(
@@ -158,9 +134,9 @@ async def get_teacher_day_of_week(telegram_id, day_of_week, teacher_id):
         result += f"Предмет: {subject}\n"
         subclasses = lesson["subclasses"]
         for subclass in subclasses:
-            name = f"*{subclass['educational_level']}{subclass['identificator']}{subclass['additional_identificator']}* "
-            result += markdown.escape_md(name)
-        result += "\n"
+            name = f"*{subclass['educational_level']}{subclass['identificator']}{subclass['additional_identificator']}*, "
+            result += name
+        result = result[:-2] + "\n"
 
         corpus = markdown.escape_md(lesson["cabinet"]["corpus"]["name"])
         cabinet = markdown.escape_md(lesson["cabinet"]["name"])
@@ -180,9 +156,15 @@ async def get_user_day_of_week(
     """
     if is_searching:
         if teacher_id is not None:
-            return await get_teacher_day_of_week(telegram_id, day_of_week, teacher_id)
+            teacher_name = await get_teacher_name_by_id(teacher_id)
+            return await get_teacher_day_of_week(
+                telegram_id, day_of_week, teacher_id, teacher_name
+            )
         else:
-            return await get_student_day_of_week(telegram_id, day_of_week, subclass_id)
+            subclass_name = await get_subclass_name_by_id(subclass_id)
+            return await get_student_day_of_week(
+                telegram_id, day_of_week, subclass_id, subclass_name
+            )
     else:
         main_role = await get_main_role(telegram_id)
 
@@ -196,7 +178,7 @@ async def get_user_day_of_week(
             )
 
 
-async def get_student_week(telegram_id, student_id):
+async def get_student_week(telegram_id, student_id, subclass_name=None):
     school_id = await get_school_id(telegram_id)
 
     data = {"subclass_id": student_id}
@@ -218,7 +200,12 @@ async def get_student_week(telegram_id, student_id):
         day_of_week = day["day_of_week"]
 
         name_day = DAYS_OF_WEEK[day_of_week]
-        result += markdown.underline(f"Ваше расписание {name_day}:\n")
+        if subclass_name is not None:
+            result += markdown.underline(
+                f"Расписание класса {subclass_name} {name_day}:\n"
+            )
+        else:
+            result += markdown.underline(f"Ваше расписание {name_day}:\n")
 
         for lesson in lessons:
             number = lesson["lesson_number"]
@@ -240,7 +227,7 @@ async def get_student_week(telegram_id, student_id):
     return result
 
 
-async def get_teacher_week(telegram_id, teacher_id):
+async def get_teacher_week(telegram_id, teacher_id, teacher_name=None):
     school_id = await get_school_id(telegram_id)
 
     data = {"teacher_id": teacher_id}
@@ -261,28 +248,34 @@ async def get_teacher_week(telegram_id, teacher_id):
         lessons = day["lessons"]
         day_of_week = day["day_of_week"]
         name_day = DAYS_OF_WEEK[day_of_week]
-        result += markdown.underline(f"Ваше расписание {name_day}:\n")
+        if teacher_name is not None:
+            result += markdown.underline(
+                f"Расписание учителя {markdown.escape_md(teacher_name)} {name_day}:\n"
+            )
+        else:
+            result += markdown.underline(f"Ваше расписание {name_day}:\n")
 
         for lesson in lessons:
             number = lesson["lesson_number"]
-            result += markdown.underline(
+            result += markdown.escape_md(
                 f"Урок №{number['number']} {number['time_start']} - {number['time_end']}\n"
             )
 
             subject = markdown.escape_md(lesson["subject"])
             result += f"Предмет: {subject}\n"
             subclasses = lesson["subclasses"]
+
             for subclass in subclasses:
-                name = f"*{subclass['educational_level']}{subclass['identificator']}{subclass['additional_identificator']}* "
-                result += markdown.escape_md(name)
-            result += "\n"
+                name = f"*{subclass['educational_level']}{subclass['identificator']}{subclass['additional_identificator']}*, "
+                result += name
+            result = result[:-2] + "\n"
 
             corpus = markdown.escape_md(lesson["cabinet"]["corpus"]["name"])
             cabinet = markdown.escape_md(lesson["cabinet"]["name"])
 
             result += f"{corpus}, {cabinet}\n"
             result += "\n"
-        result += f"\n"
+        result += "\n"
 
     return result
 
@@ -297,9 +290,11 @@ async def get_user_week(
     school_id = await get_school_id(telegram_id)
     if is_searching:
         if teacher_id is not None:
-            return await get_teacher_week(telegram_id, teacher_id)
+            teacher_name = await get_teacher_name_by_id(teacher_id)
+            return await get_teacher_week(telegram_id, teacher_id, teacher_name)
         else:
-            return await get_student_week(telegram_id, subclass_id)
+            subclass_name = await get_subclass_name_by_id(subclass_id)
+            return await get_student_week(telegram_id, subclass_id, subclass_name)
     else:
         main_role = await get_main_role(telegram_id)
 
@@ -311,57 +306,6 @@ async def get_user_week(
             return await get_student_week(
                 telegram_id, await get_subclass_id(telegram_id)
             )
-
-    lessons = data["lessons"]
-
-    result = ""
-    for lesson in lessons:
-        number = lesson["lesson_number"]
-        result += (
-            f"Урок №{number['number']} {number['time_start']} - {number['time_end']}\n"
-        )
-        result += f"Предмет: *{lesson['subject']}*\n"
-        result += f"{lesson['teacher']['name']}\n"
-        result += (
-            f"{lesson['cabinet']['corpus']['name']}, {lesson['cabinet']['name']}\n"
-        )
-        result += f"\n"
-
-    return result
-
-    lessons = data["lessons"]
-
-    result = ""
-    for lesson in lessons:
-        number = lesson["lesson_number"]
-        result += (
-            f"Урок №{number['number']} {number['time_start']} - {number['time_end']}\n"
-        )
-        result += f"Предмет: *{lesson['subject']}*\n"
-        result += f"{lesson['teacher']['name']}\n"
-        result += (
-            f"{lesson['cabinet']['corpus']['name']}, {lesson['cabinet']['name']}\n"
-        )
-        result += f"\n"
-
-    return result
-
-    lessons = data["lessons"]
-
-    result = ""
-    for lesson in lessons:
-        number = lesson["lesson_number"]
-        result += (
-            f"Урок №{number['number']} {number['time_start']} - {number['time_end']}\n"
-        )
-        result += f"Предмет: *{lesson['subject']}*\n"
-        result += f"{lesson['teacher']['name']}\n"
-        result += (
-            f"{lesson['cabinet']['corpus']['name']}, {lesson['cabinet']['name']}\n"
-        )
-        result += f"\n"
-
-    return result
 
 
 # ~=============================
@@ -517,6 +461,13 @@ async def get_user_roles(telegram_id):
 
 
 # ~=============================
+
+
+async def get_subclass_name_by_id(subclass_id):
+    data = await get_request(f"/idgetter/subclass/{subclass_id}")
+    return f"{data['educational_level']}{data['identificator']}{data['additional_identificator']}"
+
+
 async def get_teacher_name_by_id(teacher_id):
     data = await get_request(f"/idgetter/teacher/{teacher_id}")
     return data["name"]
