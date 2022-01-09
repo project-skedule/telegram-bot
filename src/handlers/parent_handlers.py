@@ -207,7 +207,6 @@ async def register_parent_handlers():
             Texts.rings_timetable_format.format(
                 lesson_number=lsn["number"],
                 time=lsn["time_start"] + " - " + lsn["time_end"],
-                _break="",
             )
             for lsn in data
         )
