@@ -457,7 +457,7 @@ async def get_user_roles(telegram_id):
     Returns all user roles by telegram_id
     """
     data = await post_request("/rolemanagement/get", {"telegram_id": telegram_id})
-    await save_to_redis(data)
+    await save_to_redis(telegram_id)
 
 
 # ~=============================
