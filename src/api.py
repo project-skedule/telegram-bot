@@ -423,7 +423,7 @@ async def register_student(telegram_id, subclass_id):
         "/registration/student",
         {"telegram_id": telegram_id, "subclass_id": subclass_id},
     )
-    # await save_to_redis(data)
+    await save_to_redis(telegram_id)
 
 
 async def register_child(telegram_id, subclass_id):
@@ -431,14 +431,14 @@ async def register_child(telegram_id, subclass_id):
         "/rolemanagement/add/child",
         {"parent_id": telegram_id, "subclass_id": subclass_id},
     )
-    await save_to_redis(data)
+    await save_to_redis(telegram_id)
 
 
 async def register_teacher(telegram_id, teacher_id):
     data = await post_request(
         "/registration/teacher", {"telegram_id": telegram_id, "teacher_id": teacher_id}
     )
-    await save_to_redis(data)
+    await save_to_redis(telegram_id)
 
 
 async def register_administration(telegram_id, school_id):
@@ -446,7 +446,7 @@ async def register_administration(telegram_id, school_id):
         "/registration/administration",
         {"telegram_id": telegram_id, "school_id": school_id},
     )
-    await save_to_redis(data)
+    await save_to_redis(telegram_id)
 
 
 # ~=============================
