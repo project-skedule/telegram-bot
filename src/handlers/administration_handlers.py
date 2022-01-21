@@ -1,16 +1,18 @@
 from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery, Message
 from src.texts import Texts
-from src.api import get_canteen_timetable, get_ring_timetable
+from src.api import get_canteen_timetable, get_ring_timetable, get_free_cabinets
 from src.bot import bot, dp
 from src.keyboards import (
     ADMINISTRATION_MENU_FIRST_KEYBOARD,
     ADMINISTRATION_MENU_SECOND_KEYBOARD,
     cf,
+    get_corpuses_keyboard,
 )
 from src.logger import logger
 from src.some_functions import send_message
 from src.states import States
+from src.redis import get_school_id
 
 
 async def register_administration_handlers():
@@ -123,6 +125,46 @@ async def register_administration_handlers():
         await States.administration_menu_first.set()
         message = call.message
         text = Texts.donate_message
+        await send_message(
+            message,
+            text=text,
+            keyboard=ADMINISTRATION_MENU_FIRST_KEYBOARD,
+            parse_mode="markdown",
+        )
+        await call.answer()
+
+    # =============================
+
+    @dp.callback_query_handler(
+        cf.filter(action=["free_cabinets"]),
+        state=[States.administration_menu_first],
+    )
+    async def administration_free_cabinets_handler(call: CallbackQuery):
+        await States.administration_free_cabinets_corpuses.set()
+        message = call.message
+        text = Texts.free_cabinets_choose_corpuses
+        await send_message(
+            message,
+            text=text,
+            keyboard=await get_corpuses_keyboard(await get_school_id(message.chat.id)),
+            parse_mode="markdown",
+        )
+        await call.answer()
+
+    # =============================
+
+    @dp.callback_query_handler(
+        cf.filter(action=["choose_corpuses"]),
+        state=[States.administration_free_cabinets_corpuses],
+    )
+    async def administration_free_cabinets_corpuses_handler(
+        call: CallbackQuery, state: FSMContext, callback_data: dict
+    ):
+        await States.administration_menu_first.set()
+        message = call.message
+        text = await get_free_cabinets(
+            await get_school_id(message.chat.id), callback_data["data"]
+        )
         await send_message(
             message,
             text=text,

@@ -6,6 +6,7 @@ from datetime import datetime
 import aiohttp
 import ujson
 from aiogram.utils import markdown
+from src.texts import Texts
 
 from src.constants import DAYS_OF_WEEK
 
@@ -404,6 +405,39 @@ async def get_similar_teachers(teacher_name, school_id):
     return data["data"]
 
 
+async def get_current_lesson(school_id):
+    data = await get_request("/info/lessontimetables/all", {"school_id": school_id})
+    for lesson in data["data"]:
+        start = datetime.strptime(lesson["time_start"], "%H:%M").time()
+        end = datetime.strptime(lesson["time_end"], "%H:%M").time()
+        now = datetime.now().time()
+        if start <= now <= end or start >= now:
+            return lesson["number"]
+    return None
+
+
+async def get_free_cabinets(school_id, corpus_id):
+    lesson_number = await get_current_lesson(school_id)
+    if lesson_number is None:
+        return Texts.no_current_lessons
+    data = await get_request(
+        "/info/cabinets/free",
+        {
+            "corpus_id": corpus_id,
+            "day_of_week": get_current_day_of_week(),
+            "lesson_number": lesson_number,
+        },
+    )
+    if not data["data"]:
+        return Texts.no_free_cabinets
+    result = Texts.free_cabinets.format(
+        lesson_number=lesson_number, corpus_name=await get_corpus_name_by_id(corpus_id)
+    )
+    for cabinet in data["data"]:
+        result += cabinet["name"] + "\n"
+    return result
+
+
 # ~=============================
 async def get_subclass_by_params(school, parallel, letter, group):
     data = await get_request(
@@ -478,6 +512,11 @@ async def get_school_name_by_id(school_id):
     return data["name"]
 
 
+async def get_corpus_name_by_id(corpus_id):
+    data = await get_request(f"/idgetter/corpus/{corpus_id}")
+    return data["name"]
+
+
 # ~=============================
 async def change_role(telegram_id, subclass_id=None, teacher_id=None, school_id=None):
     if subclass_id is not None:
@@ -534,3 +573,11 @@ async def save_to_redis(telegram_id):
         await storage.update_data(
             data={"school": role["data"]["school"]["id"]}, user=telegram_id
         )
+
+
+# ~=============================
+
+
+async def get_all_corpuses(school_id):
+    data = await get_request("/info/corpuses/all", {"school_id": school_id})
+    return data["data"]

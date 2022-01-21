@@ -4,6 +4,7 @@ from aiogram.types.inline_keyboard import InlineKeyboardButton, InlineKeyboardMa
 from aiogram.utils.callback_data import CallbackData
 
 from src.api import (
+    get_all_corpuses,
     get_allowed_group,
     get_allowed_letter,
     get_allowed_parallel,
@@ -120,6 +121,7 @@ STUDENT_MISC_MENU_SECOND_KEYBOARD = generate_markup(
 
 TEACHER_MISC_MENU_FIRST_KEYBOARD = generate_markup(
     [
+        [("Свободные кабинеты", cf.new(action="free_cabinets", data=0))],
         [("Расписание звонков", cf.new(action="ring_timetable", data=0))],
         [("Написать разработчикам", cf.new(action="contact_devs", data=0))],
         [("Поддержать разработчиков", cf.new(action="support_devs", data=0))],
@@ -169,6 +171,7 @@ ADMINISTRATION_MENU_FIRST_KEYBOARD = generate_markup(
             ("Найти класс", cf.new(action="find_class", data=0)),
             ("Найти учителя", cf.new(action="find_teacher", data=0)),
         ],
+        [("Свободные кабинеты", cf.new(action="free_cabinets", data=0))],
         [("Расписание звонков", cf.new(action="ring_timetable", data=0))],
         [("Написать разработчикам", cf.new(action="contact_devs", data=0))],
         [("Поддержать разработчиков", cf.new(action="support_devs", data=0))],
@@ -445,3 +448,13 @@ ADD_MORE_CHILDREN_KEYBOARD = generate_markup(
         [("Нет", cf.new(action="choose_child", data=0))],
     ]
 )
+
+
+async def get_corpuses_keyboard(school_id):
+    corpuses = await get_all_corpuses(school_id)
+    return generate_markup(
+        [
+            [(corpus["name"], cf.new(action="choose_corpuses", data=corpus["id"]))]
+            for corpus in corpuses
+        ]
+    )

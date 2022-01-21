@@ -46,4 +46,7 @@ class States(StatesGroup):
     enter_group = State()
     student_submit = State()
 
-    misc_menu_second = State()  # compile
+    misc_menu_second = State()
+
+    teacher_free_cabinets_corpuses = State()
+    administration_free_cabinets_corpuses = State()

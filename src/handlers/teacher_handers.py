@@ -3,6 +3,7 @@ from aiogram.types import CallbackQuery, Message
 from src.texts import Texts
 from src.api import (
     get_canteen_timetable,
+    get_free_cabinets,
     get_ring_timetable,
     get_user_day_of_week,
     get_user_today,
@@ -16,10 +17,12 @@ from src.keyboards import (
     TEACHER_MISC_MENU_FIRST_KEYBOARD,
     TEACHER_MISC_MENU_SECOND_KEYBOARD,
     cf,
+    get_corpuses_keyboard,
 )
 from src.logger import logger
 from src.some_functions import send_message
 from src.states import States
+from src.redis import get_school_id
 
 
 async def register_teacher_handlers():
@@ -240,6 +243,46 @@ async def register_teacher_handlers():
         await States.teacher_menu.set()
         message = call.message
         text = Texts.donate_message
+        await send_message(
+            message,
+            text=text,
+            keyboard=TEACHER_MAIN_KEYBOARD,
+            parse_mode="markdown",
+        )
+        await call.answer()
+
+    # =============================
+
+    @dp.callback_query_handler(
+        cf.filter(action=["free_cabinets"]),
+        state=[States.teacher_misc_menu_first],
+    )
+    async def teacher_free_cabinets_handler(call: CallbackQuery):
+        await States.teacher_free_cabinets_corpuses.set()
+        message = call.message
+        text = Texts.free_cabinets_choose_corpuses
+        await send_message(
+            message,
+            text=text,
+            keyboard=await get_corpuses_keyboard(await get_school_id(message.chat.id)),
+            parse_mode="markdown",
+        )
+        await call.answer()
+
+    # =============================
+
+    @dp.callback_query_handler(
+        cf.filter(action=["choose_corpuses"]),
+        state=[States.teacher_free_cabinets_corpuses],
+    )
+    async def teacher_free_cabinets_corpuses_handler(
+        call: CallbackQuery, state: FSMContext, callback_data: dict
+    ):
+        await States.teacher_menu.set()
+        message = call.message
+        text = await get_free_cabinets(
+            await get_school_id(message.chat.id), callback_data["data"]
+        )
         await send_message(
             message,
             text=text,
