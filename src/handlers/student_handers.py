@@ -259,3 +259,21 @@ async def register_student_handlers():
         await call.answer()
 
     # =============================
+
+    @dp.callback_query_handler(
+        cf.filter(action=["anouns"]),
+        state=[States.student_misc_menu_second],
+    )
+    async def student_announcements_handler(call: CallbackQuery):
+        await States.student_menu.set()
+        message = call.message
+        text = Texts.announcements  # TODO announcements
+        await send_message(
+            message,
+            text=text,
+            keyboard=STUDENT_MAIN_KEYBOARD,
+            parse_mode="markdown",
+        )
+        await call.answer()
+
+    # =============================

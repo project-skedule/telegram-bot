@@ -136,6 +136,17 @@ async def register_administration_handlers():
     # =============================
 
     @dp.callback_query_handler(
+        cf.filter(action=["anouns"]),
+        state=[States.administration_menu_second],
+    )
+    async def student_announcements_handler(call: CallbackQuery):
+        await States.administration_menu_second.set()
+        message = call.message
+        text = Texts.announcements  # TODO announcements
+        await send_message(
+            message,
+            text=text,
+            keyboard=ADMINISTRATION_MENU_SECOND_KEYBOARD,
         cf.filter(action=["free_cabinets"]),
         state=[States.administration_menu_first],
     )

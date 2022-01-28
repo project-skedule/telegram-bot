@@ -254,6 +254,16 @@ async def register_teacher_handlers():
     # =============================
 
     @dp.callback_query_handler(
+        cf.filter(action=["anouns"]),
+        state=[States.teacher_misc_menu_second],
+    )
+    async def teacher_announcements_handler(call: CallbackQuery):
+        await States.teacher_menu.set()
+        message = call.message
+        text = Texts.announcements  # TODO announcements
+
+
+    @dp.callback_query_handler(
         cf.filter(action=["free_cabinets"]),
         state=[States.teacher_misc_menu_first],
     )
@@ -283,6 +293,7 @@ async def register_teacher_handlers():
         text = await get_free_cabinets(
             await get_school_id(message.chat.id), callback_data["data"]
         )
+
         await send_message(
             message,
             text=text,
