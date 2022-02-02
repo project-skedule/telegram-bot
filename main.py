@@ -59,7 +59,7 @@ async def zmq(socket):
     while True:
         json = await socket.recv_json()
         logger.debug(f"ZMQ receive json {json}")
-        text = json.get("text")
+        text = json.get("link")
         if text is None or not isinstance(text, str) or text.strip() == "":
             continue
 
