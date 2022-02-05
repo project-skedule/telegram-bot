@@ -85,10 +85,7 @@ async def get_student_day_of_week(
 
     lessons = data["lessons"]
 
-    if subclass_name is not None:
-        result = f"Расписание класса {subclass_name} *{DAYS_OF_WEEK[day_of_week]}*:\n"
-    else:
-        result = f"Ваше расписание *{DAYS_OF_WEEK[day_of_week]}*:\n"
+    result = ""
 
     for lesson in lessons:
         number = lesson["lesson_number"]
@@ -105,8 +102,18 @@ async def get_student_day_of_week(
         result += f"{corpus}, {cabinet}\n"
         result += "\n"
 
-    return result
-
+    day_of_week = DAYS_OF_WEEK[day_of_week]
+    if result.strip() == "":
+        if subclass_name is not None:
+            return f"У класса {subclass_name} нет уроков *{day_of_week}*\n"
+        else:
+            return f"У вас нет уроков *{day_of_week}*\n"
+    else:
+        if subclass_name is not None:
+            return f"Расписание класса {subclass_name} *{day_of_week}*:\n" + result
+        else:
+            return f"Ваше расписание *{day_of_week}*:\n" + result
+    
 
 async def get_teacher_day_of_week(
     telegram_id, day_of_week, teacher_id, teacher_name=None
@@ -121,10 +128,8 @@ async def get_teacher_day_of_week(
     )
 
     lessons = data["lessons"]
-    if teacher_name is not None:
-        result = f"Расписание учителя {markdown.escape_md(teacher_name)} *{DAYS_OF_WEEK[day_of_week]}*:\n"
-    else:
-        result = f"Ваше расписание *{DAYS_OF_WEEK[day_of_week]}*:\n"
+    
+    result = ""
     for lesson in lessons:
         number = lesson["lesson_number"]
         result += markdown.underline(
@@ -145,7 +150,19 @@ async def get_teacher_day_of_week(
         result += f"{corpus}, {cabinet}\n"
         result += "\n"
 
-    return result
+
+    day_of_week = DAYS_OF_WEEK[day_of_week]
+    if result.strip() == "":
+        if teacher_name is not None:
+            return f"У учителя {markdown.escape_md(teacher_name)} нет уроков *{day_of_week}*\n"
+        else:
+            return f"У вас нет уроков *{day_of_week}*\n"
+    else:
+        if teacher_name is not None:
+            return f"Расписание учителя {markdown.escape_md(teacher_name)} *{day_of_week}*:\n" + result
+        else:
+            return f"Ваше расписание *{day_of_week}*:\n" + result
+    
 
 
 async def get_user_day_of_week(
