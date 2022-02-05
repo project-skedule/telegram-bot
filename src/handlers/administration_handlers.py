@@ -149,7 +149,8 @@ async def register_administration_handlers():
             keyboard=ADMINISTRATION_MENU_SECOND_KEYBOARD,
         )
         cf.filter(action=["free_cabinets"]),
-        state=[States.administration_menu_first],
+        state = ([States.administration_menu_first],)
+
     async def administration_free_cabinets_handler(call: CallbackQuery):
         await States.administration_free_cabinets_corpuses.set()
         message = call.message

@@ -262,7 +262,6 @@ async def register_teacher_handlers():
         message = call.message
         text = Texts.announcements  # TODO announcements
 
-
     @dp.callback_query_handler(
         cf.filter(action=["free_cabinets"]),
         state=[States.teacher_misc_menu_first],
