@@ -53,7 +53,7 @@ async def register_registration_handlers():
             await message.answer(
                 text=Texts.greeting,
                 reply_markup=CHOOSE_ROLE_KEYBOARD,
-                parse_mode="Markdownv2",
+                parse_mode="markdown",
             )
         else:  # TODO add dump to redis from api here (because of role changes (or redis breaks))
             await save_to_redis(message.chat.id)
