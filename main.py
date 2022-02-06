@@ -68,7 +68,12 @@ async def zmq(socket):
 
         for id in ids:
             logger.debug(f"Send message to {id}")
-            await bot.send_message(chat_id=id, text=text, parse_mode="markdown", **args)
+            try:
+                await bot.send_message(
+                    chat_id=id, text=text, parse_mode="markdown", **args
+                )
+            except Exception as e:
+                pass
 
 
 async def main():

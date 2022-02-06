@@ -113,7 +113,7 @@ async def get_student_day_of_week(
             return f"Расписание класса {subclass_name} *{day_of_week}*:\n" + result
         else:
             return f"Ваше расписание *{day_of_week}*:\n" + result
-    
+
 
 async def get_teacher_day_of_week(
     telegram_id, day_of_week, teacher_id, teacher_name=None
@@ -128,7 +128,7 @@ async def get_teacher_day_of_week(
     )
 
     lessons = data["lessons"]
-    
+
     result = ""
     for lesson in lessons:
         number = lesson["lesson_number"]
@@ -150,7 +150,6 @@ async def get_teacher_day_of_week(
         result += f"{corpus}, {cabinet}\n"
         result += "\n"
 
-
     day_of_week = DAYS_OF_WEEK[day_of_week]
     if result.strip() == "":
         if teacher_name is not None:
@@ -159,10 +158,12 @@ async def get_teacher_day_of_week(
             return f"У вас нет уроков *{day_of_week}*\n"
     else:
         if teacher_name is not None:
-            return f"Расписание учителя {markdown.escape_md(teacher_name)} *{day_of_week}*:\n" + result
+            return (
+                f"Расписание учителя {markdown.escape_md(teacher_name)} *{day_of_week}*:\n"
+                + result
+            )
         else:
             return f"Ваше расписание *{day_of_week}*:\n" + result
-    
 
 
 async def get_user_day_of_week(
