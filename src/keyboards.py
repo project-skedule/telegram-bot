@@ -402,6 +402,7 @@ async def get_teachers_keyboard(teacher, school_id):
             [(teacher["name"], cf.new(action="choose_teacher", data=teacher["id"]))]
             for teacher in teachers
         ]
+        + [[("Назад", cf.new(action="choose_school", data="None"))]]
     )
 
 
@@ -442,7 +443,7 @@ SUBMIT_ADMINISTRATION_KEYBOARD = generate_markup(
 TEACHER_SUBMIT_KEYBOARD = generate_markup(
     [
         [("Да", cf.new(action="teacher_menu", data=0))],
-        [("Нет", cf.new(action="input_school", data=0))],
+        [("Нет", cf.new(action="choose_school", data="None"))],
     ]
 )
 
@@ -468,4 +469,8 @@ BACK_FROM_INPUT_SCHOOL_KEYBOARD = generate_markup(
     [
         [("Назад", cf.new(action="choose_role", data=0))],
     ]
+)
+
+BACK_FROM_INPUT_TEACHER_NAME_KEYBOARD = generate_markup(
+    [[("Назад", cf.new(action="show_schools", data="None"))]]
 )

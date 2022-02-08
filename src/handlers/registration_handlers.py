@@ -18,6 +18,7 @@ from src.keyboards import (
     ADD_MORE_CHILDREN_KEYBOARD,
     ADMINISTRATION_MENU_FIRST_KEYBOARD,
     BACK_FROM_INPUT_SCHOOL_KEYBOARD,
+    BACK_FROM_INPUT_TEACHER_NAME_KEYBOARD,
     CHOOSE_ROLE_KEYBOARD,
     STUDENT_MAIN_KEYBOARD,
     STUDENT_SUBMIT_KEYBOARD,
@@ -177,7 +178,7 @@ async def register_registration_handlers():
     # =============================
     @dp.callback_query_handler(
         cf.filter(action=["show_schools"]),
-        state=[States.enter_parallel],
+        state=[States.enter_parallel, States.input_teacher],
     )
     async def show_schools_handler(  # equivalent to input_school_message
         call: CallbackQuery, state: FSMContext, callback_data: dict
@@ -197,7 +198,7 @@ async def register_registration_handlers():
     # =============================
     @dp.callback_query_handler(
         cf.filter(action=["choose_school"]),
-        state=[States.choose_school, States.enter_letter],
+        state=[States.choose_school, States.enter_letter, States.choose_teacher, States.teacher_submit],
     )
     async def choose_school_handler(
         call: CallbackQuery, state: FSMContext, callback_data: dict
@@ -231,7 +232,7 @@ async def register_registration_handlers():
             await send_message(
                 message,
                 text=Texts.enter_name,
-                keyboard=None,
+                keyboard=BACK_FROM_INPUT_TEACHER_NAME_KEYBOARD,
                 parse_mode="markdown",
             )
         elif role == "Administration":
