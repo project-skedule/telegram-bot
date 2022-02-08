@@ -38,6 +38,7 @@ async def register_find_handlers():
             States.teacher_menu,
             States.administration_menu_first,
             States.find_student_submit,
+            States.find_enter_letter
         ],
     )
     async def find_class_handler(call: CallbackQuery, state: FSMContext):
@@ -56,7 +57,7 @@ async def register_find_handlers():
     # =============================
     @dp.callback_query_handler(
         cf.filter(action=["find_enter_letter"]),
-        state=[States.find_enter_parallel],
+        state=[States.find_enter_parallel, States.find_enter_groupin],
     )
     async def find_enter_letter_handler(
         call: CallbackQuery, state: FSMContext, callback_data: dict
