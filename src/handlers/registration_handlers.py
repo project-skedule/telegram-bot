@@ -17,6 +17,7 @@ from src.bot import bot, dp
 from src.keyboards import (
     ADD_MORE_CHILDREN_KEYBOARD,
     ADMINISTRATION_MENU_FIRST_KEYBOARD,
+    BACK_FROM_INPUT_SCHOOL_KEYBOARD,
     CHOOSE_ROLE_KEYBOARD,
     STUDENT_MAIN_KEYBOARD,
     STUDENT_SUBMIT_KEYBOARD,
@@ -121,6 +122,7 @@ async def register_registration_handlers():
             States.student_misc_menu_second,
             States.teacher_misc_menu_second,
             States.administration_submit,
+            States.input_school,
         ],
     )
     async def choose_role_handler(
@@ -140,33 +142,29 @@ async def register_registration_handlers():
     # =============================
     @dp.callback_query_handler(
         cf.filter(action=["input_school"]),
-        state=[
-            States.choose_role,
-            States.show_childs,
-        ],
+        state=[States.choose_role, States.show_childs, States.choose_school],
     )
     async def input_school_handler(
         call: CallbackQuery, state: FSMContext, callback_data: dict
     ):
         logger.debug("input school")
         await States.input_school.set()
-        # if (await state.get_data()).get("role") is None:
-        await state.update_data({"role": callback_data["data"]})
+        if callback_data["data"] != "0":  # back button
+            await state.update_data({"role": callback_data["data"]})
         message = call.message
         await send_message(
             message,
             text=Texts.enter_school_name,
-            keyboard=None,
+            keyboard=BACK_FROM_INPUT_SCHOOL_KEYBOARD,
             parse_mode="markdown",
         )
         await call.answer()
 
     # =============================
     @dp.message_handler(
-        lambda message: True,  # TODO add re magic
         state=[States.input_school],
     )
-    async def input_school_message(message: Message):
+    async def input_school_message(message: Message, state: FSMContext):
         logger.debug(f"input school message: {message.text}")
         await States.choose_school.set()
         await message.answer(
@@ -174,28 +172,50 @@ async def register_registration_handlers():
             reply_markup=(await get_schools_keyboard(message.text)),
             parse_mode="markdown",
         )
+        await state.update_data({"user_school_input": message.text})
+
+    # =============================
+    @dp.callback_query_handler(
+        cf.filter(action=["show_schools"]),
+        state=[States.enter_parallel],
+    )
+    async def show_schools_handler(  # equivalent to input_school_message
+        call: CallbackQuery, state: FSMContext, callback_data: dict
+    ):
+        message = call.message
+        await States.choose_school.set()
+        await send_message(
+            message,
+            text=Texts.select_school_name,
+            keyboard=await get_schools_keyboard(
+                (await state.get_data())["user_school_input"]
+            ),
+            parse_mode="markdown",
+        )
+        await call.answer()
 
     # =============================
     @dp.callback_query_handler(
         cf.filter(action=["choose_school"]),
-        state=[States.choose_school],
+        state=[States.choose_school, States.enter_letter],
     )
     async def choose_school_handler(
         call: CallbackQuery, state: FSMContext, callback_data: dict
     ):
         logger.debug(f"choose school")
         role = (await state.get_data())["role"]
-
-        school = callback_data["data"]
-        school_name = await get_school_name_by_id(school)
-
         message = call.message
-        await state.update_data(
-            {
-                "school": school,
-                "school_name": school_name,
-            }
-        )
+
+        if callback_data["data"] != "None":
+            school = callback_data["data"]
+            school_name = await get_school_name_by_id(school)
+
+            await state.update_data(
+                {
+                    "school": school,
+                    "school_name": school_name,
+                }
+            )
 
         if role in ["Parent", "Student"]:
             await States.enter_parallel.set()
@@ -230,7 +250,6 @@ async def register_registration_handlers():
 
     # ! =============================
     @dp.message_handler(
-        # lambda message: True,  # TODO add re magick #
         state=[States.input_teacher],
     )
     async def choose_teacher_handler(message: Message, state: FSMContext):
@@ -295,16 +314,19 @@ async def register_registration_handlers():
     # =============================
     @dp.callback_query_handler(
         cf.filter(action=["enter_letter"]),
-        state=[States.enter_parallel],
+        state=[States.enter_parallel, States.enter_group],
     )
     async def enter_letter_handler(
         call: CallbackQuery, state: FSMContext, callback_data: dict
     ):
         logger.debug(f"enter letter")
-        await States.enter_letter.set()
-        parallel = callback_data["data"]
-        await state.update_data({"parallel": f"{parallel}"})
         message = call.message
+        await States.enter_letter.set()
+        if callback_data["data"] != "None":
+            parallel = callback_data["data"]
+            await state.update_data({"parallel": f"{parallel}"})
+
+        parallel = (await state.get_data())["parallel"]
         await send_message(
             message,
             text=Texts.enter_letter,

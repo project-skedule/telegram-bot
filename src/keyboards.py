@@ -287,9 +287,10 @@ async def get_find_enter_group_keyboard(telegram_id, parallel, letter):
 
 async def get_enter_parallel_keyboard(telegram_id):
     allowed_parallel = await get_allowed_parallel(telegram_id=telegram_id)
-    allowed_parallel.sort()  # TODO time
+    # allowed_parallel.sort()  # TODO time
     return generate_markup(
         [[(f"{i}", cf.new(action="enter_letter", data=i))] for i in allowed_parallel]
+        + [[("Назад", cf.new(action="show_schools", data="None"))]]
     )
 
 
@@ -297,7 +298,7 @@ async def get_enter_letter_keyboard(telegram_id, parallel):
     allowed_letter = await get_allowed_letter(
         telegram_id=telegram_id, parallel=parallel
     )
-    allowed_letter.sort()  # TODO time
+    # allowed_letter.sort()  # TODO time
     n = len(allowed_letter)
     logger.debug(f"{allowed_letter}")
     keyboard = []
@@ -315,6 +316,7 @@ async def get_enter_letter_keyboard(telegram_id, parallel):
             else:
                 row.append((f" ", cf.new(action="none", data=0)))
         keyboard.append(row)
+    keyboard += [[("Назад", cf.new(action="choose_school", data="None"))]]
     logger.debug(f"{keyboard}")
     return generate_markup(keyboard)
 
@@ -325,9 +327,10 @@ async def get_enter_group_keyboard(telegram_id, parallel, letter):
         parallel=parallel,
         letter=letter,
     )
-    allowed_group.sort()  # TODO time
+    # allowed_group.sort()  # TODO time
     return generate_markup(
         [[(f"{i}", cf.new(action="student_submit", data=i))] for i in allowed_group]
+        + [[("Назад", cf.new(action="enter_letter", data="None"))]]
     )
 
 
@@ -424,6 +427,7 @@ async def get_schools_keyboard(school: str):
         [(school["name"], cf.new(action="choose_school", data=school["id"]))]
         for school in schools
     ]
+    keyboard += [[("Назад", cf.new(action="input_school", data=0))]]
 
     return generate_markup(keyboard)
 
@@ -458,3 +462,10 @@ async def get_corpuses_keyboard(school_id):
             for corpus in corpuses
         ]
     )
+
+
+BACK_FROM_INPUT_SCHOOL_KEYBOARD = generate_markup(
+    [
+        [("Назад", cf.new(action="choose_role", data=0))],
+    ]
+)
