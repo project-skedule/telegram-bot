@@ -57,7 +57,7 @@ async def register_find_handlers():
     # =============================
     @dp.callback_query_handler(
         cf.filter(action=["find_enter_letter"]),
-        state=[States.find_enter_parallel, States.find_enter_groupin],
+        state=[States.find_enter_parallel, States.find_enter_group],
     )
     async def find_enter_letter_handler(
         call: CallbackQuery, state: FSMContext, callback_data: dict
