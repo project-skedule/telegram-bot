@@ -13,6 +13,7 @@ from src.api import (
 
 from src.bot import bot, dp
 from src.keyboards import (
+    BACK_FROM_FIND_TEACHER_KEYBOARD,
     FIND_DAY_OF_WEEK_KEYBOARD,
     FIND_MAIN_KEYBOARD,
     FIND_STUDENT_SUBMIT_KEYBOARD,
@@ -38,7 +39,7 @@ async def register_find_handlers():
             States.teacher_menu,
             States.administration_menu_first,
             States.find_student_submit,
-            States.find_enter_letter
+            States.find_enter_letter,
         ],
     )
     async def find_class_handler(call: CallbackQuery, state: FSMContext):
@@ -63,8 +64,10 @@ async def register_find_handlers():
         call: CallbackQuery, state: FSMContext, callback_data: dict
     ):
         await States.find_enter_letter.set()
-        parallel = callback_data["data"]
-        await state.update_data({"find_parallel": f"{parallel}"})
+        if callback_data["data"] != "None":
+            parallel = callback_data["data"]
+            await state.update_data({"find_parallel": f"{parallel}"})
+        parallel = (await state.get_data())["find_parallel"]
         message = call.message
         await send_message(
             message,
@@ -295,6 +298,7 @@ async def register_find_handlers():
             States.teacher_menu,
             States.administration_menu_first,
             States.find_teacher_submit,
+            States.find_choose_teacher,
         ],
     )
     async def find_enter_teacher_handler(
@@ -305,12 +309,16 @@ async def register_find_handlers():
         await state.update_data({"find_teacher_id": None})
         message = call.message
         text = Texts.enter_name
-        await send_message(message, text=text, keyboard=None, parse_mode="markdown")
+        await send_message(
+            message,
+            text=text,
+            keyboard=BACK_FROM_FIND_TEACHER_KEYBOARD,
+            parse_mode="markdown",
+        )
         await call.answer()
 
     # =============================
     @dp.message_handler(
-        lambda message: True,  # TODO add re magic #
         state=[States.find_input_teacher],
     )
     async def find_choose_teacher_handler(message: Message, state: FSMContext):

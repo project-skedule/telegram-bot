@@ -9,8 +9,8 @@ from src.handlers.teacher_handers import register_teacher_handlers
 from src.handlers.administration_handlers import register_administration_handlers
 from src.handlers.find_handlers import register_find_handlers
 from src.handlers.registration_handlers import register_registration_handlers
+from src.handlers.universal_handler import register_universal_handlers
 
-# from src.handlers.registration_handlers import register_changing_role_handlers
 from os import getenv
 import aiohttp
 
@@ -39,6 +39,7 @@ async def run():
     await register_administration_handlers()
     await register_find_handlers()
     await register_registration_handlers()
+    await register_universal_handlers()
 
     logger.debug("Registered handlers")
 

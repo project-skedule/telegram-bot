@@ -242,6 +242,7 @@ async def get_find_enter_parallel_keyboard(telegram_id):
             [(f"{i}", cf.new(action="find_enter_letter", data=i))]
             for i in allowed_parallel
         ]
+        + [[("Назад", cf.new(action="main_menu", data="None"))]]
     )
 
 
@@ -387,6 +388,8 @@ async def find_get_teachers_keyboard(teacher, school_id):
             ]
             for teacher in teachers
         ]
+        + [[("Назад", cf.new(action="find_teacher", data="None"))]]
+
     )
 
 
@@ -468,4 +471,8 @@ BACK_FROM_INPUT_SCHOOL_KEYBOARD = generate_markup(
 
 BACK_FROM_INPUT_TEACHER_NAME_KEYBOARD = generate_markup(
     [[("Назад", cf.new(action="show_schools", data="None"))]]
+)
+
+BACK_FROM_FIND_TEACHER_KEYBOARD = generate_markup(
+    [[("Назад", cf.new(action="main_menu", data="None"))]]
 )

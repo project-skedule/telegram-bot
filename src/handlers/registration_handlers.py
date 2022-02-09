@@ -198,7 +198,12 @@ async def register_registration_handlers():
     # =============================
     @dp.callback_query_handler(
         cf.filter(action=["choose_school"]),
-        state=[States.choose_school, States.enter_letter, States.choose_teacher, States.teacher_submit],
+        state=[
+            States.choose_school,
+            States.enter_letter,
+            States.choose_teacher,
+            States.teacher_submit,
+        ],
     )
     async def choose_school_handler(
         call: CallbackQuery, state: FSMContext, callback_data: dict
