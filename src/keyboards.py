@@ -389,7 +389,6 @@ async def find_get_teachers_keyboard(teacher, school_id):
             for teacher in teachers
         ]
         + [[("Назад", cf.new(action="find_teacher", data="None"))]]
-
     )
 
 

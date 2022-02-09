@@ -37,7 +37,6 @@ async def register_teacher_handlers():
         ],
     )
     async def teacher_menu_handler(call: CallbackQuery):
-        await States.teacher_menu.set()
         message = call.message
         await send_message(
             message,
@@ -46,6 +45,7 @@ async def register_teacher_handlers():
             parse_mode="markdown",
         )
         await call.answer()
+        await States.teacher_menu.set()
 
     # ==============================
     @dp.callback_query_handler(
@@ -53,7 +53,6 @@ async def register_teacher_handlers():
         state=[States.teacher_menu],
     )
     async def teacher_day_of_week_handler(call: CallbackQuery):
-        await States.teacher_day_of_week.set()
         message = call.message
         await send_message(
             message,
@@ -62,6 +61,7 @@ async def register_teacher_handlers():
             parse_mode="Markdown",
         )
         await call.answer()
+        await States.teacher_day_of_week.set()
 
     # ==============================
     @dp.callback_query_handler(
@@ -71,7 +71,6 @@ async def register_teacher_handlers():
     async def teacher_choose_day_of_week_handler(
         call: CallbackQuery, callback_data: dict
     ):
-        await States.teacher_menu.set()
         message = call.message
         text = await get_user_day_of_week(
             telegram_id=message.chat.id,
@@ -85,6 +84,7 @@ async def register_teacher_handlers():
             parse_mode="MarkdownV2",
         )
         await call.answer()
+        await States.teacher_menu.set()
 
     # =============================
     @dp.callback_query_handler(
@@ -92,7 +92,6 @@ async def register_teacher_handlers():
         state=[States.teacher_menu, States.teacher_misc_menu_second],
     )
     async def teacher_misc_menu_first_handler(call: CallbackQuery, callback_data: dict):
-        await States.teacher_misc_menu_first.set()
         message = call.message
         await send_message(
             message,
@@ -101,6 +100,7 @@ async def register_teacher_handlers():
             parse_mode="markdown",
         )
         await call.answer()
+        await States.teacher_misc_menu_first.set()
 
     # =============================
 
@@ -111,7 +111,6 @@ async def register_teacher_handlers():
     async def teacher_misc_menu_second_handler(
         call: CallbackQuery, callback_data: dict
     ):
-        await States.teacher_misc_menu_second.set()
         message = call.message
         await send_message(
             message,
@@ -120,6 +119,7 @@ async def register_teacher_handlers():
             parse_mode="markdown",
         )
         await call.answer()
+        await States.teacher_misc_menu_second.set()
 
     # =============================
     @dp.callback_query_handler(
@@ -175,10 +175,8 @@ async def register_teacher_handlers():
         state=[States.teacher_misc_menu_first],
     )
     async def student_ring_timetable_handler(call: CallbackQuery):
-        await States.teacher_menu.set()
         message = call.message
         data = await get_ring_timetable(message.chat.id)
-        # FIX: add break
         text = Texts.rings_timetable_header + "".join(
             Texts.rings_timetable_format.format(
                 lesson_number=lsn["number"],
@@ -193,6 +191,7 @@ async def register_teacher_handlers():
             parse_mode="markdown",
         )
         await call.answer()
+        await States.teacher_menu.set()
 
     # =============================
     @dp.callback_query_handler(
@@ -200,7 +199,6 @@ async def register_teacher_handlers():
         state=[States.teacher_misc_menu_second],
     )
     async def student_canteen_timetable_handler(call: CallbackQuery):
-        await States.teacher_menu.set()
         message = call.message
         canteens = await get_canteen_timetable(message.chat.id)
         text = Texts.canteen_timetable_header + "".join(
@@ -216,6 +214,7 @@ async def register_teacher_handlers():
             parse_mode="markdown",
         )
         await call.answer()
+        await States.teacher_menu.set()
 
     # =============================
     @dp.callback_query_handler(
@@ -223,7 +222,6 @@ async def register_teacher_handlers():
         state=[States.teacher_misc_menu_first],
     )
     async def student_canteen_timetable_handler(call: CallbackQuery):
-        await States.teacher_menu.set()
         message = call.message
         text = Texts.help_message.format(telegram_id=message.chat.id)
         await send_message(
@@ -233,6 +231,7 @@ async def register_teacher_handlers():
             parse_mode="markdown",
         )
         await call.answer()
+        await States.teacher_menu.set()
 
     # =============================
     @dp.callback_query_handler(
@@ -240,7 +239,6 @@ async def register_teacher_handlers():
         state=[States.teacher_misc_menu_first],
     )
     async def student_canteen_timetable_handler(call: CallbackQuery):
-        await States.teacher_menu.set()
         message = call.message
         text = Texts.donate_message
         await send_message(
@@ -250,6 +248,7 @@ async def register_teacher_handlers():
             parse_mode="markdown",
         )
         await call.answer()
+        await States.teacher_menu.set()
 
     # =============================
 
@@ -258,16 +257,22 @@ async def register_teacher_handlers():
         state=[States.teacher_misc_menu_second],
     )
     async def teacher_announcements_handler(call: CallbackQuery):
-        await States.teacher_menu.set()
         message = call.message
-        text = Texts.announcements  # TODO announcements
+        text = Texts.announcements
+        await send_message(
+            message,
+            text=text,
+            keyboard=TEACHER_MAIN_KEYBOARD,
+            parse_mode="markdown",
+        )
+        await call.answer()
+        await States.teacher_menu.set()
 
     @dp.callback_query_handler(
         cf.filter(action=["free_cabinets"]),
         state=[States.teacher_misc_menu_first],
     )
     async def teacher_free_cabinets_handler(call: CallbackQuery):
-        await States.teacher_free_cabinets_corpuses.set()
         message = call.message
         text = Texts.free_cabinets_choose_corpuses
         await send_message(
@@ -277,6 +282,7 @@ async def register_teacher_handlers():
             parse_mode="markdown",
         )
         await call.answer()
+        await States.teacher_free_cabinets_corpuses.set()
 
     # =============================
 
@@ -287,7 +293,6 @@ async def register_teacher_handlers():
     async def teacher_free_cabinets_corpuses_handler(
         call: CallbackQuery, state: FSMContext, callback_data: dict
     ):
-        await States.teacher_menu.set()
         message = call.message
         text = await get_free_cabinets(
             await get_school_id(message.chat.id), callback_data["data"]
@@ -300,5 +305,6 @@ async def register_teacher_handlers():
             parse_mode="markdown",
         )
         await call.answer()
+        await States.teacher_menu.set()
 
     # =============================

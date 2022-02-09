@@ -22,38 +22,37 @@ async def register_universal_handlers():
         message = call.message
         role = (await state.get_data())["role"]
 
-        
         if role == "Parent":
-            await States.child_menu.set()
             await send_message(
                 message,
                 text=Texts.parent_main_menu,
                 keyboard=CHILD_MAIN_KEYBOARD,
                 parse_mode="markdown",
             )
+            await States.child_menu.set()
         elif role == "Student":
-            await States.student_menu.set()
             await send_message(
                 message,
                 text=Texts.student_main_menu,
                 keyboard=STUDENT_MAIN_KEYBOARD,
                 parse_mode="markdown",
             )
+            await States.student_menu.set()
         elif role == "Teacher":
-            await States.teacher_menu.set()
             await send_message(
                 message,
                 text=Texts.teacher_main_menu,
                 keyboard=TEACHER_MAIN_KEYBOARD,
                 parse_mode="markdown",
             )
+            await States.teacher_menu.set()
         elif role == "Administration":
-            await States.administration_menu_first.set()
             await send_message(
                 message,
                 text=Texts.admin_main_menu,
                 keyboard=ADMINISTRATION_MENU_FIRST_KEYBOARD,
                 parse_mode="markdown",
             )
+            await States.administration_menu_first.set()
 
         await call.answer()

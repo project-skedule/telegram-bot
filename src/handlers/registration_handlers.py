@@ -50,7 +50,6 @@ async def register_registration_handlers():
         logger.debug("/start")
         logger.debug(f"{await state.get_data()}")
         if not await is_registered(message.chat.id):
-            # await state.set_data({})
             await States.choose_role.set()
             await message.answer(
                 text=Texts.greeting,
@@ -62,33 +61,33 @@ async def register_registration_handlers():
             data = await state.get_data()
             role = data["role"]
             if role == "Parent":
-                await States.choose_child.set()
                 await message.answer(
                     text=Texts.choose_children,
                     reply_markup=await get_child_keyboard(message.chat.id),
                     parse_mode="markdown",
                 )
+                await States.choose_child.set()
             elif role == "Student":
-                await States.student_menu.set()
                 await message.answer(
                     text=Texts.student_main_menu,
                     reply_markup=STUDENT_MAIN_KEYBOARD,
                     parse_mode="markdown",
                 )
+                await States.student_menu.set()
             elif role == "Teacher":
-                await States.teacher_menu.set()
                 await message.answer(
                     text=Texts.teacher_main_menu,
                     reply_markup=TEACHER_MAIN_KEYBOARD,
                     parse_mode="markdown",
                 )
+                await States.teacher_menu.set()
             elif role == "Administration":
-                await States.administration_menu_first.set()
                 await message.answer(
                     text=Texts.admin_main_menu,
                     reply_markup=ADMINISTRATION_MENU_FIRST_KEYBOARD,
                     parse_mode="markdown",
                 )
+                await States.administration_menu_first.set()
 
     # =============================
     @dp.callback_query_handler(
@@ -103,14 +102,15 @@ async def register_registration_handlers():
         message = call.message
         logger.debug("role change")
         await state.set_data({"changed": True})
-        await States.choose_role.set()
         await send_message(
             message=message,
             text=Texts.choose_role,
             keyboard=CHOOSE_ROLE_KEYBOARD,
             parse_mode="markdown",
         )
+
         await call.answer()
+        await States.choose_role.set()
 
     # ============================
     @dp.callback_query_handler(
@@ -130,7 +130,6 @@ async def register_registration_handlers():
         call: CallbackQuery, state: FSMContext, callback_data: dict
     ):
         logger.debug("choose role")
-        await States.choose_role.set()
         message = call.message
         await send_message(
             message,
@@ -139,6 +138,7 @@ async def register_registration_handlers():
             parse_mode="markdown",
         )
         await call.answer()
+        await States.choose_role.set()
 
     # =============================
     @dp.callback_query_handler(
@@ -149,7 +149,6 @@ async def register_registration_handlers():
         call: CallbackQuery, state: FSMContext, callback_data: dict
     ):
         logger.debug("input school")
-        await States.input_school.set()
         if callback_data["data"] != "0":  # back button
             await state.update_data({"role": callback_data["data"]})
         message = call.message
@@ -160,6 +159,7 @@ async def register_registration_handlers():
             parse_mode="markdown",
         )
         await call.answer()
+        await States.input_school.set()
 
     # =============================
     @dp.message_handler(
@@ -167,13 +167,13 @@ async def register_registration_handlers():
     )
     async def input_school_message(message: Message, state: FSMContext):
         logger.debug(f"input school message: {message.text}")
-        await States.choose_school.set()
         await message.answer(
             text=Texts.select_school_name,
             reply_markup=(await get_schools_keyboard(message.text)),
             parse_mode="markdown",
         )
         await state.update_data({"user_school_input": message.text})
+        await States.choose_school.set()
 
     # =============================
     @dp.callback_query_handler(
@@ -184,7 +184,6 @@ async def register_registration_handlers():
         call: CallbackQuery, state: FSMContext, callback_data: dict
     ):
         message = call.message
-        await States.choose_school.set()
         await send_message(
             message,
             text=Texts.select_school_name,
@@ -194,6 +193,7 @@ async def register_registration_handlers():
             parse_mode="markdown",
         )
         await call.answer()
+        await States.choose_school.set()
 
     # =============================
     @dp.callback_query_handler(
@@ -224,24 +224,23 @@ async def register_registration_handlers():
             )
 
         if role in ["Parent", "Student"]:
-            await States.enter_parallel.set()
             await send_message(
                 message,
                 text=Texts.enter_parallel,
                 keyboard=(await get_enter_parallel_keyboard(message.chat.id)),
                 parse_mode="markdown",
             )
+            await States.enter_parallel.set()
 
         elif role == "Teacher":
-            await States.input_teacher.set()
             await send_message(
                 message,
                 text=Texts.enter_name,
                 keyboard=BACK_FROM_INPUT_TEACHER_NAME_KEYBOARD,
                 parse_mode="markdown",
             )
+            await States.input_teacher.set()
         elif role == "Administration":
-            await States.administration_submit.set()
             text = Texts.confirm_for_admin.format(
                 school_name=(await state.get_data())["school_name"]
             )
@@ -251,6 +250,7 @@ async def register_registration_handlers():
                 keyboard=SUBMIT_ADMINISTRATION_KEYBOARD,
                 parse_mode="markdown",
             )
+            await States.administration_submit.set()
 
         await call.answer()
 
@@ -260,7 +260,6 @@ async def register_registration_handlers():
     )
     async def choose_teacher_handler(message: Message, state: FSMContext):
         logger.debug("choose teacher")
-        await States.choose_teacher.set()
         await message.answer(
             text=Texts.select_teacher_from_list,
             reply_markup=await get_teachers_keyboard(
@@ -268,6 +267,7 @@ async def register_registration_handlers():
             ),
             parse_mode="markdown",
         )
+        await States.choose_teacher.set()
 
     # =============================
     @dp.callback_query_handler(
@@ -278,7 +278,6 @@ async def register_registration_handlers():
         call: CallbackQuery, state: FSMContext, callback_data: dict
     ):
         logger.debug("input teacher")
-        await States.teacher_submit.set()
         message = call.message
         teacher = callback_data["data"]
         teacher_name = await get_teacher_name_by_id(teacher)
@@ -297,6 +296,7 @@ async def register_registration_handlers():
             parse_mode="markdown",
         )
         await call.answer()
+        await States.teacher_submit.set()
 
     # =============================
     @dp.callback_query_handler(
@@ -308,7 +308,6 @@ async def register_registration_handlers():
     ):
         logger.debug(f"enter parallel")
         message = call.message
-        await States.enter_parallel.set()
         await send_message(
             message,
             text=Texts.enter_parallel,
@@ -316,6 +315,7 @@ async def register_registration_handlers():
             parse_mode="markdown",
         )
         await call.answer()
+        await States.enter_parallel.set()
 
     # =============================
     @dp.callback_query_handler(
@@ -327,7 +327,6 @@ async def register_registration_handlers():
     ):
         logger.debug(f"enter letter")
         message = call.message
-        await States.enter_letter.set()
         if callback_data["data"] != "None":
             parallel = callback_data["data"]
             await state.update_data({"parallel": f"{parallel}"})
@@ -340,6 +339,7 @@ async def register_registration_handlers():
             parse_mode="markdown",
         )
         await call.answer()
+        await States.enter_letter.set()
 
     # =============================
     @dp.callback_query_handler(
@@ -350,7 +350,6 @@ async def register_registration_handlers():
         call: CallbackQuery, state: FSMContext, callback_data: dict
     ):
         logger.debug(f"enter group")
-        await States.enter_group.set()
         parallel = (await state.get_data())["parallel"]
         letter = callback_data["data"]
         await state.update_data({"letter": f"{letter}"})
@@ -364,6 +363,7 @@ async def register_registration_handlers():
             parse_mode="markdown",
         )
         await call.answer()
+        await States.enter_group.set()
 
     # =============================
     @dp.callback_query_handler(
@@ -374,7 +374,6 @@ async def register_registration_handlers():
         call: CallbackQuery, state: FSMContext, callback_data: dict
     ):
         logger.debug(f"submit student")
-        await States.student_submit.set()
         await state.update_data({"group": f"{callback_data['data']}"})
         message = call.message
         parallel = (await state.get_data())["parallel"]
@@ -388,6 +387,7 @@ async def register_registration_handlers():
         )
 
         await call.answer()
+        await States.student_submit.set()
 
     # =============================
     @dp.callback_query_handler(
@@ -410,7 +410,6 @@ async def register_registration_handlers():
         role = (await state.get_data())["role"]
         if role == "Parent":
             await register_child(telegram_id=message.chat.id, subclass_id=subclass_id)
-            await States.show_childs.set()
             children = await get_children(message.chat.id)
             await send_message(
                 message,
@@ -419,6 +418,7 @@ async def register_registration_handlers():
                 keyboard=ADD_MORE_CHILDREN_KEYBOARD,
                 parse_mode="markdown",
             )
+            await States.show_childs.set()
         elif role == "Student":
             (await state.get_data())["school"]
             if (await state.get_data()).get("changed") is None:
@@ -429,7 +429,6 @@ async def register_registration_handlers():
                 await change_role(telegram_id=message.chat.id, subclass_id=subclass_id)
                 await save_to_redis(message.chat.id)
                 await state.update_data({"changed": None})
-            await States.student_menu.set()
 
             await send_message(
                 message,
@@ -439,6 +438,7 @@ async def register_registration_handlers():
                 keyboard=STUDENT_MAIN_KEYBOARD,
                 parse_mode="markdown",
             )
+            await States.student_menu.set()
 
         await call.answer()
 
@@ -451,7 +451,6 @@ async def register_registration_handlers():
         call: CallbackQuery, state: FSMContext, callback_data: dict
     ):
         message = call.message
-        await States.show_childs.set()
         await state.update_data({"role": "Parent"})
         children = await get_children(message.chat.id)
         await send_message(
@@ -462,6 +461,7 @@ async def register_registration_handlers():
             parse_mode="markdown",
         )
         await call.answer()
+        await States.show_childs.set()
 
     # =============================
     @dp.callback_query_handler(
@@ -472,7 +472,6 @@ async def register_registration_handlers():
         call: CallbackQuery, state: FSMContext, callback_data: dict
     ):
         message = call.message
-        await States.teacher_menu.set()
         school = (await state.get_data())["school"]
         teacher_id = (await state.get_data())["teacher"]
         teacher_name = (await state.get_data())["teacher_name"]
@@ -491,6 +490,7 @@ async def register_registration_handlers():
             parse_mode="markdown",
         )
         await call.answer()
+        await States.teacher_menu.set()
 
     # =============================
     @dp.callback_query_handler(
@@ -501,7 +501,6 @@ async def register_registration_handlers():
         call: CallbackQuery, state: FSMContext, callback_data: dict
     ):
         message = call.message
-        await States.administration_menu_first.set()
         school_id = (await state.get_data())["school"]
         school_name = (await state.get_data())["school_name"]
         if (await state.get_data()).get("changed") is None:
@@ -519,3 +518,4 @@ async def register_registration_handlers():
             parse_mode="markdown",
         )
         await call.answer()
+        await States.administration_menu_first.set()

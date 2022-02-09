@@ -25,7 +25,6 @@ async def register_administration_handlers():
         ],
     )
     async def administration_menu_first_handler(call: CallbackQuery):
-        await States.administration_menu_first.set()
         message = call.message
         await send_message(
             message,
@@ -33,7 +32,9 @@ async def register_administration_handlers():
             keyboard=ADMINISTRATION_MENU_FIRST_KEYBOARD,
             parse_mode="markdown",
         )
+
         await call.answer()
+        await States.administration_menu_first.set()
 
     # =============================
     @dp.callback_query_handler(
@@ -41,7 +42,6 @@ async def register_administration_handlers():
         state=[States.administration_menu_first],
     )
     async def administration_menu_second_handler(call: CallbackQuery):
-        await States.administration_menu_second.set()
         message = call.message
         await send_message(
             message,
@@ -49,7 +49,9 @@ async def register_administration_handlers():
             keyboard=ADMINISTRATION_MENU_SECOND_KEYBOARD,
             parse_mode="markdown",
         )
+
         await call.answer()
+        await States.administration_menu_second.set()
 
     # ~=============================
     @dp.callback_query_handler(
@@ -105,7 +107,6 @@ async def register_administration_handlers():
         state=[States.administration_menu_first],
     )
     async def student_canteen_timetable_handler(call: CallbackQuery):
-        await States.administration_menu_first.set()
         message = call.message
         text = Texts.help_message.format(telegram_id=message.chat.id)
         await send_message(
@@ -114,7 +115,9 @@ async def register_administration_handlers():
             keyboard=ADMINISTRATION_MENU_FIRST_KEYBOARD,
             parse_mode="markdown",
         )
+
         await call.answer()
+        await States.administration_menu_first.set()
 
     # =============================
     @dp.callback_query_handler(
@@ -122,7 +125,6 @@ async def register_administration_handlers():
         state=[States.administration_menu_first],
     )
     async def student_canteen_timetable_handler(call: CallbackQuery):
-        await States.administration_menu_first.set()
         message = call.message
         text = Texts.donate_message
         await send_message(
@@ -131,7 +133,9 @@ async def register_administration_handlers():
             keyboard=ADMINISTRATION_MENU_FIRST_KEYBOARD,
             parse_mode="markdown",
         )
+
         await call.answer()
+        await States.administration_menu_first.set()
 
     # =============================
 
@@ -140,7 +144,6 @@ async def register_administration_handlers():
         state=[States.administration_menu_second],
     )
     async def student_announcements_handler(call: CallbackQuery):
-        await States.administration_menu_second.set()
         message = call.message
         text = Texts.announcements  # TODO announcements
         await send_message(
@@ -148,11 +151,14 @@ async def register_administration_handlers():
             text=text,
             keyboard=ADMINISTRATION_MENU_SECOND_KEYBOARD,
         )
-        cf.filter(action=["free_cabinets"]),
-        state = ([States.administration_menu_first],)
+        await call.answer()
+        await States.administration_menu_second.set()
 
+    @dp.callback_query_handler(
+        cf.filter(action=["free_cabinets"]),
+        state=[States.administration_menu_first],
+    )
     async def administration_free_cabinets_handler(call: CallbackQuery):
-        await States.administration_free_cabinets_corpuses.set()
         message = call.message
         text = Texts.free_cabinets_choose_corpuses
         await send_message(
@@ -162,6 +168,7 @@ async def register_administration_handlers():
             parse_mode="markdown",
         )
         await call.answer()
+        await States.administration_free_cabinets_corpuses.set()
 
     # =============================
 
@@ -172,7 +179,6 @@ async def register_administration_handlers():
     async def administration_free_cabinets_corpuses_handler(
         call: CallbackQuery, state: FSMContext, callback_data: dict
     ):
-        await States.administration_menu_first.set()
         message = call.message
         text = await get_free_cabinets(
             await get_school_id(message.chat.id), callback_data["data"]
@@ -184,5 +190,6 @@ async def register_administration_handlers():
             parse_mode="markdown",
         )
         await call.answer()
+        await States.administration_menu_first.set()
 
     # =============================

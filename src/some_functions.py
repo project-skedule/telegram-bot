@@ -30,28 +30,28 @@ async def dispatcher_menu(
     message: Message, role: str, text: str, parse_mode="markdown"
 ):
     if role == "Parent":
-        await States.child_menu.set()
         await send_message(
             message, text=text, keyboard=CHILD_MAIN_KEYBOARD, parse_mode=parse_mode
         )
+        await States.child_menu.set()
     elif role == "Student":
-        await States.student_menu.set()
         await send_message(
             message, text=text, keyboard=STUDENT_MAIN_KEYBOARD, parse_mode=parse_mode
         )
+        await States.student_menu.set()
     elif role == "Teacher":
-        await States.teacher_menu.set()
         await send_message(
             message, text=text, keyboard=TEACHER_MAIN_KEYBOARD, parse_mode=parse_mode
         )
+        await States.teacher_menu.set()
     elif role == "Administration":
-        await States.administration_menu_first.set()
         await send_message(
             message,
             text=text,
             keyboard=ADMINISTRATION_MENU_FIRST_KEYBOARD,
             parse_mode=parse_mode,
         )
+        await States.administration_menu_first.set()
 
 
 async def is_find_for_student(state: FSMContext):

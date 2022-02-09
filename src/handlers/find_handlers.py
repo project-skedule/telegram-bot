@@ -43,7 +43,6 @@ async def register_find_handlers():
         ],
     )
     async def find_class_handler(call: CallbackQuery, state: FSMContext):
-        await States.find_enter_parallel.set()
         await state.update_data({"find_subclass_id": None})
         await state.update_data({"find_teacher_id": None})
 
@@ -54,6 +53,7 @@ async def register_find_handlers():
             keyboard=await get_find_enter_parallel_keyboard(message.chat.id),
         )
         await call.answer()
+        await States.find_enter_parallel.set()
 
     # =============================
     @dp.callback_query_handler(
@@ -63,7 +63,6 @@ async def register_find_handlers():
     async def find_enter_letter_handler(
         call: CallbackQuery, state: FSMContext, callback_data: dict
     ):
-        await States.find_enter_letter.set()
         if callback_data["data"] != "None":
             parallel = callback_data["data"]
             await state.update_data({"find_parallel": f"{parallel}"})
@@ -75,6 +74,7 @@ async def register_find_handlers():
             keyboard=await get_find_enter_letter_keyboard(message.chat.id, parallel),
         )
         await call.answer()
+        await States.find_enter_letter.set()
 
     # =============================
     @dp.callback_query_handler(
@@ -84,7 +84,6 @@ async def register_find_handlers():
     async def find_enter_group_handler(
         call: CallbackQuery, state: FSMContext, callback_data: dict
     ):
-        await States.find_enter_group.set()
         parallel = (await state.get_data())["find_parallel"]
         letter = callback_data["data"]
         await state.update_data({"find_letter": letter})
@@ -97,6 +96,7 @@ async def register_find_handlers():
             ),
         )
         await call.answer()
+        await States.find_enter_group.set()
 
     # =============================
     @dp.callback_query_handler(
@@ -107,7 +107,6 @@ async def register_find_handlers():
         call: CallbackQuery, state: FSMContext, callback_data: dict
     ):
         message = call.message
-        await States.find_student_submit.set()
         await state.update_data({"find_group": callback_data["data"]})
         parallel = (await state.get_data())["find_parallel"]
         letter = (await state.get_data())["find_letter"]
@@ -128,6 +127,7 @@ async def register_find_handlers():
         )
 
         await call.answer()
+        await States.find_student_submit.set()
 
     # =============================
     @dp.callback_query_handler(
@@ -141,7 +141,6 @@ async def register_find_handlers():
     async def find_menu_handler(
         call: CallbackQuery, state: FSMContext, callback_data: dict
     ):
-        await States.find_menu.set()
         message = call.message
 
         if await is_find_for_student(state):
@@ -157,6 +156,7 @@ async def register_find_handlers():
             parse_mode="markdown",
         )
         await call.answer()
+        await States.find_menu.set()
 
     # =============================
     @dp.callback_query_handler(
@@ -166,7 +166,6 @@ async def register_find_handlers():
     async def find_day_of_week_handler(
         call: CallbackQuery, state: FSMContext, callback_data: dict
     ):
-        await States.find_day_of_week.set()
         message = call.message
 
         await send_message(
@@ -176,6 +175,7 @@ async def register_find_handlers():
             parse_mode="markdown",
         )
         await call.answer()
+        await States.find_day_of_week.set()
 
     # =============================
     @dp.callback_query_handler(
@@ -304,7 +304,6 @@ async def register_find_handlers():
     async def find_enter_teacher_handler(
         call: CallbackQuery, state: FSMContext, callback_data: dict
     ):
-        await States.find_input_teacher.set()
         await state.update_data({"find_subclass_id": None})
         await state.update_data({"find_teacher_id": None})
         message = call.message
@@ -315,20 +314,23 @@ async def register_find_handlers():
             keyboard=BACK_FROM_FIND_TEACHER_KEYBOARD,
             parse_mode="markdown",
         )
+
         await call.answer()
+        await States.find_input_teacher.set()
 
     # =============================
     @dp.message_handler(
         state=[States.find_input_teacher],
     )
     async def find_choose_teacher_handler(message: Message, state: FSMContext):
-        await States.find_choose_teacher.set()
         await message.answer(
             text=Texts.select_teacher_from_list,
             reply_markup=await find_get_teachers_keyboard(
                 message.text, await get_school_id(message.chat.id)
             ),
         )
+
+        await States.find_choose_teacher.set()
 
     # =============================
     @dp.callback_query_handler(
@@ -338,7 +340,6 @@ async def register_find_handlers():
     async def find_input_teacher_handler(
         call: CallbackQuery, state: FSMContext, callback_data: dict
     ):
-        await States.find_teacher_submit.set()
         message = call.message
 
         teacher_id = callback_data["data"]
@@ -352,4 +353,6 @@ async def register_find_handlers():
             keyboard=FIND_TEACHER_SUBMIT_KEYBOARD,
             parse_mode="markdown",
         )
+
         await call.answer()
+        await States.find_teacher_submit.set()
