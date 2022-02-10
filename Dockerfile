@@ -20,9 +20,5 @@ WORKDIR /skedule-telegram
 # copy all files
 COPY . /skedule-telegram/
 
-RUN ["python", "-c", "import src.compile_texts"]
-RUN mv src/texts.py src/texts/texts.py
-
-
 # Run app
 CMD ["python3", "main.py"]

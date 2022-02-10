@@ -313,7 +313,3 @@ no_free_cabinets = """
 free_cabinets_choose_corpuses = """
 Вsыберите, пожалуйста, корпус, в котором хотите найти свободный кабинет.
 """
-
-long_name = """
-ячыы
-"""

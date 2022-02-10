@@ -1,6 +1,6 @@
 from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery, Message
-from src.texts.texts import Texts
+from src.texts import Texts
 
 
 from src.bot import bot, dp

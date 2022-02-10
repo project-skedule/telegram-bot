@@ -39,7 +39,7 @@ from src.logger import logger
 from src.redis import get_school_id
 from src.some_functions import is_changing_role, send_message
 from src.states import States
-from src.texts.texts import Texts
+from src.texts import Texts
 
 
 

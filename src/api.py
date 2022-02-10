@@ -6,7 +6,7 @@ from datetime import datetime
 import aiohttp
 import ujson
 from aiogram.utils import markdown
-from src.texts.texts import Texts
+from src.texts import Texts
 
 from src.constants import DAYS_OF_WEEK
 
