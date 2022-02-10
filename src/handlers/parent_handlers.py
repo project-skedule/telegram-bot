@@ -21,7 +21,7 @@ from src.keyboards import (
 from src.logger import logger
 from src.some_functions import send_message
 from src.states import States
-from src.texts import Texts
+from src.texts.texts import Texts
 
 
 async def register_parent_handlers():

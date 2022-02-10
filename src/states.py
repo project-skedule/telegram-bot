@@ -50,3 +50,5 @@ class States(StatesGroup):
 
     teacher_free_cabinets_corpuses = State()
     administration_free_cabinets_corpuses = State()
+
+    register_parent = State()

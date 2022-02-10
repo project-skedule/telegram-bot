@@ -1,5 +1,5 @@
 from aiogram.types import Update
-from src.texts import Texts
+from src.texts.texts import Texts
 from src.bot import dp
 from src.logger import logger
 

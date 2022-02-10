@@ -405,7 +405,7 @@ async def get_teachers_keyboard(teacher, school_id):
 
 CHOOSE_ROLE_KEYBOARD = generate_markup(
     [
-        # [("Parent", cf.new(action="show_childs", data=0))],
+        [("Parent", cf.new(action="register_parent", data=0))],
         [("Ученик", cf.new(action="input_school", data="Student"))],
         [("Учитель", cf.new(action="input_school", data="Teacher"))],
         [
@@ -474,4 +474,11 @@ BACK_FROM_INPUT_TEACHER_NAME_KEYBOARD = generate_markup(
 
 BACK_FROM_FIND_TEACHER_KEYBOARD = generate_markup(
     [[("Назад", cf.new(action="main_menu", data="None"))]]
+)
+
+SUBMIT_PARENT_REGISTRATION = generate_markup(
+    [
+        [("Да", cf.new(action="input_school", data=0))],
+        [("Нет", cf.new(action="choose_role", data=0))],
+    ]
 )

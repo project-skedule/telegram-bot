@@ -12,6 +12,7 @@ from src.api import (
     register_student,
     register_teacher,
     save_to_redis,
+    register_parent
 )
 from src.bot import bot, dp
 from src.keyboards import (
@@ -38,7 +39,8 @@ from src.logger import logger
 from src.redis import get_school_id
 from src.some_functions import is_changing_role, send_message
 from src.states import States
-from src.texts import Texts
+from src.texts.texts import Texts
+
 
 
 async def register_registration_handlers():
@@ -124,6 +126,7 @@ async def register_registration_handlers():
             States.teacher_misc_menu_second,
             States.administration_submit,
             States.input_school,
+            States.register_parent,
         ],
     )
     async def choose_role_handler(
@@ -443,6 +446,35 @@ async def register_registration_handlers():
         await call.answer()
 
     # =============================
+
+    @dp.callback_query_handler(
+        cf.filter(action=["register_parent"]),
+        state=[States.choose_child, States.choose_role],
+    )
+    async def show_children_handler(
+        call: CallbackQuery, state: FSMContext, callback_data: dict
+    ):
+        message = call.message
+        if (await state.get_data()).get("changed") is None:
+            await register_parent(telegram_id=message.chat.id)
+
+        else:
+            await change_role(telegram_id=message.chat.id)
+            await save_to_redis(message.chat.id)
+            await state.update_data({"changed": None})
+
+        await state.update_data({"role": "Parent"})
+        await send_message(
+            message,
+            text="Register you?",
+            keyboard=ADD_MORE_CHILDREN_KEYBOARD,
+            parse_mode="markdown",
+        )
+        await call.answer()
+        await States.register_parent.set()
+
+    # =============================
+
     @dp.callback_query_handler(
         cf.filter(action=["show_childs"]),
         state=[States.choose_child, States.choose_role],

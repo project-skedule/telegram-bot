@@ -1,6 +1,6 @@
 from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery, Message
-from src.texts import Texts
+from src.texts.texts import Texts
 from src.api import get_canteen_timetable, get_ring_timetable, get_free_cabinets
 from src.bot import bot, dp
 from src.keyboards import (

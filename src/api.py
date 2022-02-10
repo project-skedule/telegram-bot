@@ -6,7 +6,7 @@ from datetime import datetime
 import aiohttp
 import ujson
 from aiogram.utils import markdown
-from src.texts import Texts
+from src.texts.texts import Texts
 
 from src.constants import DAYS_OF_WEEK
 
@@ -487,6 +487,13 @@ async def register_child(telegram_id, subclass_id):
 
 
 async def register_teacher(telegram_id, teacher_id):
+    data = await post_request(
+        "/registration/teacher", {"telegram_id": telegram_id, "teacher_id": teacher_id}
+    )
+    await save_to_redis(telegram_id)
+
+
+async def register_parent(telegram_id):
     data = await post_request(
         "/registration/teacher", {"telegram_id": telegram_id, "teacher_id": teacher_id}
     )
