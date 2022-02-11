@@ -495,7 +495,7 @@ async def register_teacher(telegram_id, teacher_id):
 
 async def register_parent(telegram_id):
     data = await post_request(
-        "/registration/teacher", {"telegram_id": telegram_id, "teacher_id": teacher_id}
+        "/registration/parent", {"telegram_id": telegram_id}
     )
     await save_to_redis(telegram_id)
 
