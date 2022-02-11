@@ -3,7 +3,7 @@ from src.config import TEXTS_PATH
 from pathlib import Path
 import toml
 
-path = Path(__file__).parent / "texts.py"
+path = Path(__file__).parent / "src" / "texts.py"
 
 
 texts = toml.load(TEXTS_PATH.open("r", encoding="utf-8"))["russian"]
