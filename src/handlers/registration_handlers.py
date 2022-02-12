@@ -440,8 +440,6 @@ async def register_registration_handlers():
                 )
             else:
                 await change_role(telegram_id=message.chat.id, subclass_id=subclass_id)
-                await save_to_redis(message.chat.id)
-                await state.update_data({"changed": None})
 
             await send_message(
                 message,
@@ -486,11 +484,8 @@ async def register_registration_handlers():
         message = call.message
         if (await state.get_data()).get("changed") is None:
             await register_parent(telegram_id=message.chat.id)
-
         else:
             await change_role(telegram_id=message.chat.id)
-            await save_to_redis(message.chat.id)
-            await state.update_data({"changed": None})
 
         await send_message(
             message,
@@ -540,8 +535,6 @@ async def register_registration_handlers():
 
         else:
             await change_role(telegram_id=message.chat.id, teacher_id=teacher_id)
-            await save_to_redis(message.chat.id)
-            await state.update_data({"changed": None})
 
         await send_message(
             message,
@@ -569,8 +562,6 @@ async def register_registration_handlers():
             )
         else:
             await change_role(telegram_id=message.chat.id, school_id=school_id)
-            await save_to_redis(message.chat.id)
-            await state.update_data({"changed": None})
         await send_message(
             message,
             text=Texts.successful_reg_admin.format(school_name=school_name),

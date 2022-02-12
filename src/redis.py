@@ -54,6 +54,3 @@ async def get_main_role(telegram_id):
     """
     return (await storage.get_data(user=telegram_id))["role"]
 
-
-async def get_children(name: int):
-    return {"child 1": "id1", "child 2": "id2"}

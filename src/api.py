@@ -409,6 +409,10 @@ async def is_registered(telegram_id):
     return data["data"]
 
 
+async def get_children(name: int):
+    return {"child 1": "id1", "child 2": "id2"}
+
+
 async def get_similar_schools(school):
     data = await get_request("/info/schools/distance", {"name": school})
     # data = {"data": [{"id": 2147483647, "name": "1580"}]}
@@ -494,9 +498,7 @@ async def register_teacher(telegram_id, teacher_id):
 
 
 async def register_parent(telegram_id):
-    data = await post_request(
-        "/registration/parent", {"telegram_id": telegram_id}
-    )
+    data = await post_request("/registration/parent", {"telegram_id": telegram_id})
     await save_to_redis(telegram_id)
 
 
@@ -556,6 +558,9 @@ async def change_role(telegram_id, subclass_id=None, teacher_id=None, school_id=
     else:
         data = {"telegram_id": telegram_id}
         data = await put_request("/rolemanagement/change/parent", data=data)
+
+    await storage.set_data({}, user=telegram_id)
+    await save_to_redis(telegram_id)
 
 
 # ~=============================
