@@ -12,7 +12,7 @@ from src.api import (
     register_student,
     register_teacher,
     save_to_redis,
-    register_parent
+    register_parent,
 )
 from src.bot import bot, dp
 from src.keyboards import (
@@ -26,6 +26,7 @@ from src.keyboards import (
     SUBMIT_ADMINISTRATION_KEYBOARD,
     TEACHER_MAIN_KEYBOARD,
     TEACHER_SUBMIT_KEYBOARD,
+    SUBMIT_PARENT_REGISTRATION,
     cf,
     generate_markup,
     get_child_keyboard,
@@ -40,7 +41,6 @@ from src.redis import get_school_id
 from src.some_functions import is_changing_role, send_message
 from src.states import States
 from src.texts import Texts
-
 
 
 async def register_registration_handlers():
@@ -98,6 +98,7 @@ async def register_registration_handlers():
             States.student_misc_menu_second,
             States.teacher_misc_menu_second,
             States.administration_menu_second,
+            States.parent_misc_menu_first,
         ],
     )
     async def changing_role(call: CallbackQuery, state: FSMContext):
@@ -458,7 +459,26 @@ async def register_registration_handlers():
 
     @dp.callback_query_handler(
         cf.filter(action=["register_parent"]),
-        state=[States.choose_child, States.choose_role],
+        state=[States.choose_role],
+    )
+    async def register_parent_handler(
+        call: CallbackQuery, state: FSMContext, callback_data: dict
+    ):
+        message = call.message
+        await send_message(
+            message,
+            text="Register you?",
+            keyboard=SUBMIT_PARENT_REGISTRATION,
+            parse_mode="markdown",
+        )
+        await call.answer()
+        await States.register_parent.set()
+
+    # =============================
+
+    @dp.callback_query_handler(
+        cf.filter(action=["register_parent_yes"]),
+        state=[States.register_parent],
     )
     async def show_children_handler(
         call: CallbackQuery, state: FSMContext, callback_data: dict
@@ -472,37 +492,36 @@ async def register_registration_handlers():
             await save_to_redis(message.chat.id)
             await state.update_data({"changed": None})
 
-        await state.update_data({"role": "Parent"})
         await send_message(
             message,
-            text="Register you?",
-            keyboard=ADD_MORE_CHILDREN_KEYBOARD,
-            parse_mode="markdown",
-        )
-        await call.answer()
-        await States.register_parent.set()
-
-    # =============================
-
-    @dp.callback_query_handler(
-        cf.filter(action=["show_childs"]),
-        state=[States.choose_child, States.choose_role],
-    )
-    async def show_children_handler(
-        call: CallbackQuery, state: FSMContext, callback_data: dict
-    ):
-        message = call.message
-        await state.update_data({"role": "Parent"})
-        children = await get_children(message.chat.id)
-        await send_message(
-            message,
-            text="\n".join(children.keys())
-            + "\nwanna more?",  # FIX: children names from redis
-            keyboard=ADD_MORE_CHILDREN_KEYBOARD,
+            text="Successfully registered, add children",
+            keyboard=await get_child_keyboard(message.chat.id),
             parse_mode="markdown",
         )
         await call.answer()
         await States.show_childs.set()
+
+    # =============================
+
+    # @dp.callback_query_handler(
+    #     cf.filter(action=["show_childs"]),
+    #     state=[States.choose_child, States.choose_role],
+    # )
+    # async def show_children_handler(
+    #     call: CallbackQuery, state: FSMContext, callback_data: dict
+    # ):
+    #     message = call.message
+    #     await state.update_data({"role": "Parent"})
+    #     children = await get_children(message.chat.id)
+    #     await send_message(
+    #         message,
+    #         text="\n".join(children.keys())
+    #         + "\nwanna more?",  # FIX: children names from redis
+    #         keyboard=ADD_MORE_CHILDREN_KEYBOARD,
+    #         parse_mode="markdown",
+    #     )
+    #     await call.answer()
+    #     await States.show_childs.set()
 
     # =============================
     @dp.callback_query_handler(

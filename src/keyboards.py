@@ -224,8 +224,8 @@ TEACHER_DAY_OF_WEEK_KEYBOARD = generate_markup(
 )
 
 
-async def get_child_keyboard(name: int):  # TODO add api
-    children = await get_children(name)
+async def get_child_keyboard(telegram_id: int):  # TODO add api
+    children = await get_children(telegram_id)
     keyboard = [
         [(child_name, cf.new(action="child_menu", data=child_id))]
         for child_name, child_id in children.items()
@@ -478,7 +478,7 @@ BACK_FROM_FIND_TEACHER_KEYBOARD = generate_markup(
 
 SUBMIT_PARENT_REGISTRATION = generate_markup(
     [
-        [("Да", cf.new(action="input_school", data=0))],
+        [("Да", cf.new(action="register_parent_yes", data=0))],
         [("Нет", cf.new(action="choose_role", data=0))],
     ]
 )
