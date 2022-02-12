@@ -226,10 +226,19 @@ async def register_registration_handlers():
                 }
             )
 
-        if role in ["Parent", "Student"]:
+        if role == "Student":
             await send_message(
                 message,
-                text=Texts.enter_parallel,
+                text=Texts.enter_parallel_on_register_student,
+                keyboard=(await get_enter_parallel_keyboard(message.chat.id)),
+                parse_mode="markdown",
+            )
+            await States.enter_parallel.set()
+
+        elif role == "Parent":
+            await send_message(
+                message,
+                text=Texts.enter_parallel_on_register_parent,
                 keyboard=(await get_enter_parallel_keyboard(message.chat.id)),
                 parse_mode="markdown",
             )
@@ -238,7 +247,7 @@ async def register_registration_handlers():
         elif role == "Teacher":
             await send_message(
                 message,
-                text=Texts.enter_name,
+                text=Texts.enter_name_on_register,
                 keyboard=BACK_FROM_INPUT_TEACHER_NAME_KEYBOARD,
                 parse_mode="markdown",
             )

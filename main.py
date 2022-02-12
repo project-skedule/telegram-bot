@@ -84,6 +84,9 @@ async def main():
     await asyncio.wait([web_service, bot_service, zmq_service])
 
 
+logger.debug("#" * 50)
+logger.debug("BOT STARTED")
+logger.debug("#" * 50)
 if __name__ == "__main__":
     # TODO: load env variables for zmq
     main_loop = asyncio.get_event_loop()
