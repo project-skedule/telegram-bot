@@ -1,6 +1,5 @@
 from aiogram.dispatcher import FSMContext
-from aiogram.types import CallbackQuery, Message
-from src.texts import Texts
+from aiogram.types import CallbackQuery
 from src.api import (
     get_canteen_timetable,
     get_ring_timetable,
@@ -9,7 +8,7 @@ from src.api import (
     get_user_tomorrow,
     get_user_week,
 )
-from src.bot import bot, dp
+from src.bot import dp
 from src.keyboards import (
     STUDENT_DAY_OF_WEEK_KEYBOARD,
     STUDENT_MAIN_KEYBOARD,
@@ -20,6 +19,7 @@ from src.keyboards import (
 from src.logger import logger
 from src.some_functions import send_message
 from src.states import States
+from src.texts import Texts
 
 
 async def register_student_handlers():
@@ -49,7 +49,7 @@ async def register_student_handlers():
         cf.filter(action=["student_day_of_week"]),
         state=[States.student_menu],
     )
-    async def student_day_of_week_handler(call: CallbackQuery):
+    async def student_day_of_week_handler(call: CallbackQuery, state: FSMContext):
         message = call.message
         await send_message(
             message,

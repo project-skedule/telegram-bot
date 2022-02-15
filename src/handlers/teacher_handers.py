@@ -1,6 +1,5 @@
 from aiogram.dispatcher import FSMContext
-from aiogram.types import CallbackQuery, Message
-from src.texts import Texts
+from aiogram.types import CallbackQuery
 from src.api import (
     get_canteen_timetable,
     get_free_cabinets,
@@ -10,7 +9,7 @@ from src.api import (
     get_user_tomorrow,
     get_user_week,
 )
-from src.bot import bot, dp
+from src.bot import dp
 from src.keyboards import (
     TEACHER_DAY_OF_WEEK_KEYBOARD,
     TEACHER_MAIN_KEYBOARD,
@@ -20,9 +19,10 @@ from src.keyboards import (
     get_corpuses_keyboard,
 )
 from src.logger import logger
+from src.redis import get_school_id
 from src.some_functions import send_message
 from src.states import States
-from src.redis import get_school_id
+from src.texts import Texts
 
 
 async def register_teacher_handlers():

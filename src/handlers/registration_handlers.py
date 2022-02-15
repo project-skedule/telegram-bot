@@ -13,7 +13,7 @@ from src.api import (
     register_teacher,
     save_to_redis,
 )
-from src.bot import bot, dp
+from src.bot import dp
 from src.keyboards import (
     ADD_MORE_CHILDREN_KEYBOARD,
     ADMINISTRATION_MENU_FIRST_KEYBOARD,
@@ -36,7 +36,7 @@ from src.keyboards import (
 )
 from src.logger import logger
 from src.redis import get_school_id
-from src.some_functions import is_changing_role, send_message
+from src.some_functions import send_message
 from src.states import States
 from src.texts import Texts
 

@@ -3,7 +3,6 @@ from pathlib import Path
 
 from jproperties import Properties
 
-
 DEBUG = "DEBUG"
 PRODUCTION = "production"
 ####################################################################

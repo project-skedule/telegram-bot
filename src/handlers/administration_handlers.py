@@ -1,8 +1,7 @@
 from aiogram.dispatcher import FSMContext
-from aiogram.types import CallbackQuery, Message
-from src.texts import Texts
-from src.api import get_canteen_timetable, get_ring_timetable, get_free_cabinets
-from src.bot import bot, dp
+from aiogram.types import CallbackQuery
+from src.api import get_canteen_timetable, get_free_cabinets, get_ring_timetable
+from src.bot import dp
 from src.keyboards import (
     ADMINISTRATION_MENU_FIRST_KEYBOARD,
     ADMINISTRATION_MENU_SECOND_KEYBOARD,
@@ -10,9 +9,10 @@ from src.keyboards import (
     get_corpuses_keyboard,
 )
 from src.logger import logger
+from src.redis import get_school_id
 from src.some_functions import send_message
 from src.states import States
-from src.redis import get_school_id
+from src.texts import Texts
 
 
 async def register_administration_handlers():

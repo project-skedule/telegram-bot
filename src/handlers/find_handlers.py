@@ -1,17 +1,14 @@
 from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery, Message
-from src.texts import Texts
-
 from src.api import (
     get_subclass_by_params,
+    get_teacher_name_by_id,
     get_user_day_of_week,
     get_user_today,
     get_user_tomorrow,
     get_user_week,
-    get_teacher_name_by_id,
 )
-
-from src.bot import bot, dp
+from src.bot import dp
 from src.keyboards import (
     BACK_FROM_FIND_TEACHER_KEYBOARD,
     FIND_DAY_OF_WEEK_KEYBOARD,
@@ -25,9 +22,10 @@ from src.keyboards import (
     get_find_enter_parallel_keyboard,
 )
 from src.logger import logger
+from src.redis import get_school_id
 from src.some_functions import dispatcher_menu, is_find_for_student, send_message
 from src.states import States
-from src.redis import get_school_id
+from src.texts import Texts
 
 
 async def register_find_handlers():
