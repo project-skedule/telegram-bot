@@ -570,38 +570,46 @@ async def save_to_redis(telegram_id):
         if role["is_main_role"]:
             break
     if role["role_type"] == 0:  # TODO check roles
-        await storage.update_data(data={"role": "Student"}, user=telegram_id)
         await storage.update_data(
-            data={"subclass_id": role["data"]["subclass"]["id"]}, user=telegram_id
-        )
-        await storage.update_data(
-            data={"parallel": role["data"]["subclass"]["educational_level"]},
+            data={
+                "role": "Student",
+                "subclass_id": role["data"]["subclass"]["id"],
+                "parallel": role["data"]["subclass"]["educational_level"],
+                "letter": role["data"]["subclass"]["identificator"],
+                "group": role["data"]["subclass"]["additional_identificator"],
+                "school": role["data"]["school"]["id"],
+            },
             user=telegram_id,
         )
-        await storage.update_data(
-            data={"letter": role["data"]["subclass"]["identificator"]}, user=telegram_id
-        )
-        await storage.update_data(
-            data={"group": role["data"]["subclass"]["additional_identificator"]},
-            user=telegram_id,
-        )
-        await storage.update_data(
-            data={"school": role["data"]["school"]["id"]}, user=telegram_id
-        )
+
     elif role["role_type"] == 1:
-        await storage.update_data(data={"role": "Teacher"}, user=telegram_id)
         await storage.update_data(
-            data={"teacher": role["data"]["teacher_id"]}, user=telegram_id
+            data={
+                "role": "Teacher",
+                "teacher": role["data"]["teacher_id"],
+                "school": role["data"]["school"]["id"],
+            },
+            user=telegram_id,
         )
+
+    elif role["role_type"] == 2:
+        children = role["data"]["children"]
+        children_for_redis = []
+        for child in children:
+            child_for_redis = {
+                "subclass_id": child["subclass"]["id"],
+                "school_id": child["school"]["id"],
+            }
+            children_for_redis.append(child_for_redis)
+
         await storage.update_data(
-            data={"school": role["data"]["school"]["id"]}, user=telegram_id
+            data={"role": "Parent", "children": children_for_redis}, user=telegram_id
         )
-    elif role["role_type"] == 2:  # TODO parent
-        await storage.update_data(data={"role": "Parent"}, user=telegram_id)
+
     elif role["role_type"] == 3:
-        await storage.update_data(data={"role": "Administration"}, user=telegram_id)
         await storage.update_data(
-            data={"school": role["data"]["school"]["id"]}, user=telegram_id
+            data={"role": "Administration", "school": role["data"]["school"]["id"]},
+            user=telegram_id,
         )
 
 
