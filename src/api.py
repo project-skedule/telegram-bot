@@ -1,14 +1,20 @@
-import asyncio
-from typing import Union
-from src.logger import logger
-from src.redis import *  # TODO remove star import
 from datetime import datetime
+from typing import Union
+
 import aiohttp
 import ujson
 from aiogram.utils import markdown
-from src.texts import Texts
 
 from src.constants import DAYS_OF_WEEK
+from src.logger import logger
+from src.redis import (
+    get_main_role,
+    get_school_id,
+    get_subclass_id,
+    get_teacher_id,
+    storage,
+)
+from src.texts import Texts
 
 url = "http://172.0.0.7:8009"
 
