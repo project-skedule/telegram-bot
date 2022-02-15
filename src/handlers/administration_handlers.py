@@ -62,7 +62,6 @@ async def register_administration_handlers():
         message = call.message
 
         data = await get_ring_timetable(message.chat.id)
-        # FIX: add break
         text = Texts.rings_timetable_header + "".join(
             Texts.rings_timetable_format.format(
                 lesson_number=lsn["number"],
@@ -106,7 +105,7 @@ async def register_administration_handlers():
         cf.filter(action=["contact_devs"]),
         state=[States.administration_menu_first],
     )
-    async def student_canteen_timetable_handler(call: CallbackQuery):
+    async def administration_contact_devs(call: CallbackQuery):
         message = call.message
         text = Texts.help_message.format(telegram_id=message.chat.id)
         await send_message(
@@ -124,7 +123,7 @@ async def register_administration_handlers():
         cf.filter(action=["support_devs"]),
         state=[States.administration_menu_first],
     )
-    async def student_canteen_timetable_handler(call: CallbackQuery):
+    async def administration_support_devs(call: CallbackQuery):
         message = call.message
         text = Texts.donate_message
         await send_message(
@@ -143,7 +142,7 @@ async def register_administration_handlers():
         cf.filter(action=["anouns"]),
         state=[States.administration_menu_second],
     )
-    async def student_announcements_handler(call: CallbackQuery):
+    async def administration_announcements_handler(call: CallbackQuery):
         message = call.message
         text = Texts.announcements
         await send_message(

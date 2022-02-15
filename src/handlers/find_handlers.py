@@ -186,7 +186,6 @@ async def register_find_handlers():
         message = call.message
         role = (await state.get_data())["role"]
         day_of_week = int(callback_data["data"])
-        # FIX: format
         if await is_find_for_student(state):
             text = await get_user_day_of_week(
                 telegram_id=message.chat.id,

@@ -224,7 +224,7 @@ async def register_student_handlers():
         cf.filter(action=["contact_devs"]),
         state=[States.student_misc_menu_first],
     )
-    async def student_canteen_timetable_handler(call: CallbackQuery):
+    async def student_contact_devs_handler(call: CallbackQuery):
         message = call.message
         text = Texts.help_message.format(telegram_id=message.chat.id)
         await send_message(
@@ -241,7 +241,7 @@ async def register_student_handlers():
         cf.filter(action=["support_devs"]),
         state=[States.student_misc_menu_first],
     )
-    async def student_canteen_timetable_handler(call: CallbackQuery):
+    async def student_support_devs_handler(call: CallbackQuery):
         message = call.message
         text = Texts.donate_message
         await send_message(

@@ -174,7 +174,7 @@ async def register_teacher_handlers():
         cf.filter(action=["ring_timetable"]),
         state=[States.teacher_misc_menu_first],
     )
-    async def student_ring_timetable_handler(call: CallbackQuery):
+    async def teacher_ring_timetable_handler(call: CallbackQuery):
         message = call.message
         data = await get_ring_timetable(message.chat.id)
         text = Texts.rings_timetable_header + "".join(
@@ -198,7 +198,7 @@ async def register_teacher_handlers():
         cf.filter(action=["canteen_timetable"]),
         state=[States.teacher_misc_menu_second],
     )
-    async def student_canteen_timetable_handler(call: CallbackQuery):
+    async def teacher_canteen_timetable_handler(call: CallbackQuery):
         message = call.message
         canteens = await get_canteen_timetable(message.chat.id)
         text = Texts.canteen_timetable_header + "".join(
@@ -221,7 +221,7 @@ async def register_teacher_handlers():
         cf.filter(action=["contact_devs"]),
         state=[States.teacher_misc_menu_first],
     )
-    async def student_canteen_timetable_handler(call: CallbackQuery):
+    async def teacher_contact_devs_handler(call: CallbackQuery):
         message = call.message
         text = Texts.help_message.format(telegram_id=message.chat.id)
         await send_message(
@@ -238,7 +238,7 @@ async def register_teacher_handlers():
         cf.filter(action=["support_devs"]),
         state=[States.teacher_misc_menu_first],
     )
-    async def student_canteen_timetable_handler(call: CallbackQuery):
+    async def teacher_support_devs_handler(call: CallbackQuery):
         message = call.message
         text = Texts.donate_message
         await send_message(
