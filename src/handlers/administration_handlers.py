@@ -145,7 +145,7 @@ async def register_administration_handlers():
     )
     async def student_announcements_handler(call: CallbackQuery):
         message = call.message
-        text = Texts.announcements  # TODO announcements
+        text = Texts.announcements
         await send_message(
             message,
             text=text,

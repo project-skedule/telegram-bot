@@ -56,7 +56,7 @@ async def register_registration_handlers():
                 reply_markup=CHOOSE_ROLE_KEYBOARD,
                 parse_mode="markdown",
             )
-        else:  # TODO add dump to redis from api here (because of role changes (or redis breaks))
+        else:
             await save_to_redis(message.chat.id)
             data = await state.get_data()
             role = data["role"]

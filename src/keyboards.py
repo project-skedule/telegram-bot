@@ -224,7 +224,7 @@ TEACHER_DAY_OF_WEEK_KEYBOARD = generate_markup(
 )
 
 
-async def get_child_keyboard(name: int):  # TODO add api
+async def get_child_keyboard(name: int):
     children = await get_children(name)
     keyboard = [
         [(child_name, cf.new(action="child_menu", data=child_id))]
