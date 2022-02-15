@@ -605,3 +605,7 @@ async def save_to_redis(telegram_id):
 async def get_all_corpuses(school_id):
     data = await get_request("/info/corpuses/all", {"school_id": school_id})
     return data["data"]
+
+async def get_children(school_id):
+    return {"TODO":1}
+    

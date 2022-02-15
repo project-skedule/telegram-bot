@@ -1,6 +1,5 @@
-FROM base:latest
+FROM mrcatcis/awesome-python:1.0
 
-RUN pip install --no-cache-dir --upgrade pip
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
