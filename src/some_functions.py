@@ -33,7 +33,7 @@ async def dispatcher_menu(
         await send_message(
             message, text=text, keyboard=CHILD_MAIN_KEYBOARD, parse_mode=parse_mode
         )
-        await States.child_menu.set()
+        await States.show_childs.set()
     elif role == "Student":
         await send_message(
             message, text=text, keyboard=STUDENT_MAIN_KEYBOARD, parse_mode=parse_mode

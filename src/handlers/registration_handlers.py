@@ -68,7 +68,7 @@ async def register_registration_handlers():
                     reply_markup=await get_child_keyboard(message.chat.id),
                     parse_mode="markdown",
                 )
-                await States.choose_child.set()
+                await States.show_childs.set()
             elif role == "Student":
                 await message.answer(
                     text=Texts.student_main_menu,
@@ -422,13 +422,11 @@ async def register_registration_handlers():
 
         role = (await state.get_data())["role"]
         if role == "Parent":
-            await register_child(telegram_id=message.chat.id, subclass_id=subclass_id)
-            children = await get_children(message.chat.id)
+            await register_child(telegram_id=message.chat.id, subclass_id=subclass_id, name="hahaha")
             await send_message(
                 message,
-                text="\n".join(children.keys())
-                + "\nwanna more?",  # FIX: children names from redis
-                keyboard=ADD_MORE_CHILDREN_KEYBOARD,
+                text="hz",
+                keyboard=await get_child_keyboard(message.chat.id),
                 parse_mode="markdown",
             )
             await States.show_childs.set()
@@ -495,28 +493,6 @@ async def register_registration_handlers():
         )
         await call.answer()
         await States.show_childs.set()
-
-    # =============================
-
-    # @dp.callback_query_handler(
-    #     cf.filter(action=["show_childs"]),
-    #     state=[States.choose_child, States.choose_role],
-    # )
-    # async def show_children_handler(
-    #     call: CallbackQuery, state: FSMContext, callback_data: dict
-    # ):
-    #     message = call.message
-    #     await state.update_data({"role": "Parent"})
-    #     children = await get_children(message.chat.id)
-    #     await send_message(
-    #         message,
-    #         text="\n".join(children.keys())
-    #         + "\nwanna more?",  # FIX: children names from redis
-    #         keyboard=ADD_MORE_CHILDREN_KEYBOARD,
-    #         parse_mode="markdown",
-    #     )
-    #     await call.answer()
-    #     await States.show_childs.set()
 
     # =============================
     @dp.callback_query_handler(

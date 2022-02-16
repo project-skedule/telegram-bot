@@ -409,10 +409,6 @@ async def is_registered(telegram_id):
     return data["data"]
 
 
-async def get_children(name: int):
-    return {"child 1": "id1", "child 2": "id2"}
-
-
 async def get_similar_schools(school):
     data = await get_request("/info/schools/distance", {"name": school})
     # data = {"data": [{"id": 2147483647, "name": "1580"}]}
@@ -482,12 +478,15 @@ async def register_student(telegram_id, subclass_id):
     await save_to_redis(telegram_id)
 
 
-async def register_child(telegram_id, subclass_id):
-    data = await post_request(
+async def register_child(telegram_id, subclass_id, name):
+    data = await put_request(
         "/rolemanagement/add/child",
-        {"parent_id": telegram_id, "subclass_id": subclass_id},
+        {"telegram_id": telegram_id, "subclass_id": subclass_id},
     )
-    await save_to_redis(telegram_id)
+
+    storage_data = (await storage.get_data(user=telegram_id))["children"]
+    storage_data.append({"name": name, "subclass_id": subclass_id, "school_id": 1})
+    await storage.update_data(data={"chidlren": storage_data}, user=telegram_id)
 
 
 async def register_teacher(telegram_id, teacher_id):
@@ -559,7 +558,7 @@ async def change_role(telegram_id, subclass_id=None, teacher_id=None, school_id=
         data = {"telegram_id": telegram_id}
         data = await put_request("/rolemanagement/change/parent", data=data)
 
-    await storage.set_data({}, user=telegram_id)
+    await storage.set_data(data={}, user=telegram_id)
     await save_to_redis(telegram_id)
 
 
@@ -569,7 +568,7 @@ async def save_to_redis(telegram_id):
     for role in data["roles"]:
         if role["is_main_role"]:
             break
-    if role["role_type"] == 0:  # TODO check roles
+    if role["role_type"] == 0:  # Student
         await storage.update_data(
             data={
                 "role": "Student",
@@ -582,7 +581,7 @@ async def save_to_redis(telegram_id):
             user=telegram_id,
         )
 
-    elif role["role_type"] == 1:
+    elif role["role_type"] == 1:  # Teacher
         await storage.update_data(
             data={
                 "role": "Teacher",
@@ -592,6 +591,7 @@ async def save_to_redis(telegram_id):
             user=telegram_id,
         )
 
+    # Parent ### it's save to redis for register/change only so children will not be saves because of names
     elif role["role_type"] == 2:
         children = role["data"]["children"]
         children_for_redis = []
@@ -606,7 +606,7 @@ async def save_to_redis(telegram_id):
             data={"role": "Parent", "children": children_for_redis}, user=telegram_id
         )
 
-    elif role["role_type"] == 3:
+    elif role["role_type"] == 3:  # Administration
         await storage.update_data(
             data={"role": "Administration", "school": role["data"]["school"]["id"]},
             user=telegram_id,

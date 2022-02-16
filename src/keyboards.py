@@ -8,11 +8,11 @@ from src.api import (
     get_allowed_group,
     get_allowed_letter,
     get_allowed_parallel,
-    get_children,
     get_similar_schools,
     get_similar_teachers,
 )
 from src.logger import logger
+from src.redis import get_children
 
 cf = CallbackData("callback", "action", "data")
 
@@ -224,13 +224,13 @@ TEACHER_DAY_OF_WEEK_KEYBOARD = generate_markup(
 )
 
 
-async def get_child_keyboard(telegram_id: int):  # TODO add api
+async def get_child_keyboard(telegram_id: int):
     children = await get_children(telegram_id)
     keyboard = [
         [(child_name, cf.new(action="child_menu", data=child_id))]
         for child_name, child_id in children.items()
     ]
-
+    keyboard += [[("add_child", cf.new(action="input_school", data=0))]]
     keyboard += [[("parent menu #1", cf.new(action="parent_misc_menu_first", data=0))]]
     return generate_markup(keyboard)
 
