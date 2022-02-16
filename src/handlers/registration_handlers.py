@@ -424,8 +424,11 @@ async def register_registration_handlers():
         role = (await state.get_data())["role"]
         if role == "Parent":
             await register_child(
-                telegram_id=message.chat.id, subclass_id=subclass_id, name="hahaha"
+                telegram_id=message.chat.id,
+                subclass_id=subclass_id,
+                name=(await state.get_data())["reg_child_name"],
             )
+
             await send_message(
                 message,
                 text="hz",

@@ -490,9 +490,14 @@ async def register_child(telegram_id, subclass_id, name):
         {"telegram_id": telegram_id, "subclass_id": subclass_id},
     )
 
+    school_id = data["school"]["id"]
+
     storage_data = (await storage.get_data(user=telegram_id))["children"]
-    storage_data.append({"name": name, "subclass_id": subclass_id, "school_id": 1})
-    await storage.update_data(data={"chidlren": storage_data}, user=telegram_id)
+    storage_data.append(
+        {"name": name, "subclass_id": subclass_id, "school_id": school_id}
+    )
+    await storage.update_data(data={"children": storage_data}, user=telegram_id)
+    logger.debug(f"{await storage.get_data(user=telegram_id)}")
 
 
 async def register_teacher(telegram_id, teacher_id):
