@@ -1,9 +1,5 @@
-import asyncio
-import re
-from asyncio.tasks import ensure_future
 from aiogram.dispatcher import FSMContext
-from src.bot import bot
-from aiogram.types import Message, ReplyKeyboardRemove
+from aiogram.types import Message
 from aiogram.types.inline_keyboard import InlineKeyboardMarkup
 
 from src.bot import bot, dp

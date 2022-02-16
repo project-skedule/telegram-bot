@@ -1,6 +1,5 @@
 from aiogram.dispatcher import FSMContext
-from aiogram.types import CallbackQuery, Message
-from src.texts import Texts
+from aiogram.types import CallbackQuery
 from src.api import (
     get_canteen_timetable,
     get_ring_timetable,
@@ -9,7 +8,7 @@ from src.api import (
     get_user_tomorrow,
     get_user_week,
 )
-from src.bot import bot, dp
+from src.bot import dp
 from src.keyboards import (
     STUDENT_DAY_OF_WEEK_KEYBOARD,
     STUDENT_MAIN_KEYBOARD,
@@ -20,6 +19,7 @@ from src.keyboards import (
 from src.logger import logger
 from src.some_functions import send_message
 from src.states import States
+from src.texts import Texts
 
 
 async def register_student_handlers():
@@ -49,7 +49,7 @@ async def register_student_handlers():
         cf.filter(action=["student_day_of_week"]),
         state=[States.student_menu],
     )
-    async def student_day_of_week_handler(call: CallbackQuery):
+    async def student_day_of_week_handler(call: CallbackQuery, state: FSMContext):
         message = call.message
         await send_message(
             message,
@@ -224,7 +224,7 @@ async def register_student_handlers():
         cf.filter(action=["contact_devs"]),
         state=[States.student_misc_menu_first],
     )
-    async def student_canteen_timetable_handler(call: CallbackQuery):
+    async def student_contact_devs_handler(call: CallbackQuery):
         message = call.message
         text = Texts.help_message.format(telegram_id=message.chat.id)
         await send_message(
@@ -241,7 +241,7 @@ async def register_student_handlers():
         cf.filter(action=["support_devs"]),
         state=[States.student_misc_menu_first],
     )
-    async def student_canteen_timetable_handler(call: CallbackQuery):
+    async def student_support_devs_handler(call: CallbackQuery):
         message = call.message
         text = Texts.donate_message
         await send_message(
@@ -261,7 +261,7 @@ async def register_student_handlers():
     )
     async def student_announcements_handler(call: CallbackQuery):
         message = call.message
-        text = Texts.announcements  # TODO announcements
+        text = Texts.announcements
         await send_message(
             message,
             text=text,

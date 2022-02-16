@@ -1,6 +1,5 @@
 from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery, Message
-
 from src.api import (
     get_canteen_timetable,
     get_ring_timetable,
@@ -9,7 +8,7 @@ from src.api import (
     get_user_tomorrow,
     get_user_week,
 )
-from src.bot import bot, dp
+from src.bot import dp
 from src.keyboards import (
     CHILD_DAY_OF_WEEK_KEYBOARD,
     CHILD_MAIN_KEYBOARD,

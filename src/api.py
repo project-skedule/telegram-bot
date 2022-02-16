@@ -1,14 +1,20 @@
-import asyncio
-from typing import Union
-from src.logger import logger
-from src.redis import *  # TODO remove star import
 from datetime import datetime
+from typing import Union
+
 import aiohttp
 import ujson
 from aiogram.utils import markdown
-from src.texts import Texts
 
 from src.constants import DAYS_OF_WEEK
+from src.logger import logger
+from src.redis import (
+    get_main_role,
+    get_school_id,
+    get_subclass_id,
+    get_teacher_id,
+    storage,
+)
+from src.texts import Texts
 
 url = "http://172.0.0.7:8009"
 
@@ -17,7 +23,7 @@ def get_current_day_of_week():
     return datetime.today().weekday() + 1
 
 
-async def get_request(request: str, data=None):  # TODO 200 status code handler
+async def get_request(request: str, data=None):
     logger.debug(f"get_request to {url}/api{request} with data: {data}")
     async with aiohttp.ClientSession() as session:
         async with session.get(f"{url}/api{request}", json=data) as response:
@@ -26,7 +32,7 @@ async def get_request(request: str, data=None):  # TODO 200 status code handler
             return ujson.loads(response)
 
 
-async def post_request(request: str, data=None):  # TODO 200 status code handler
+async def post_request(request: str, data=None):
     logger.debug(f"post_request to {url}/api{request} with data: {data}")
     async with aiohttp.ClientSession() as session:
         async with session.post(f"{url}/api{request}", json=data) as response:
@@ -35,7 +41,7 @@ async def post_request(request: str, data=None):  # TODO 200 status code handler
             return ujson.loads(response)
 
 
-async def put_request(request: str, data=None):  # TODO 200 status code handler
+async def put_request(request: str, data=None):
     logger.debug(f"put_request to {url}/api{request} with data: {data}")
     async with aiohttp.ClientSession() as session:
         async with session.put(f"{url}/api{request}", json=data) as response:
@@ -568,7 +574,7 @@ async def save_to_redis(telegram_id):
     for role in data["roles"]:
         if role["is_main_role"]:
             break
-    if role["role_type"] == 0:  # Student
+    if role["role_type"] == 0:
         await storage.update_data(
             data={
                 "role": "Student",
@@ -591,22 +597,10 @@ async def save_to_redis(telegram_id):
             user=telegram_id,
         )
 
-    # Parent ### it's save to redis for register/change only so children will not be saves because of names
     elif role["role_type"] == 2:
-        children = role["data"]["children"]
-        children_for_redis = []
-        for child in children:
-            child_for_redis = {
-                "subclass_id": child["subclass"]["id"],
-                "school_id": child["school"]["id"],
-            }
-            children_for_redis.append(child_for_redis)
-
-        await storage.update_data(
-            data={"role": "Parent", "children": children_for_redis}, user=telegram_id
-        )
-
-    elif role["role_type"] == 3:  # Administration
+        await storage.update_data(data={"role": "Parent"}, user=telegram_id)
+    elif role["role_type"] == 3:
+        await storage.update_data(data={"role": "Administration"}, user=telegram_id)
         await storage.update_data(
             data={"role": "Administration", "school": role["data"]["school"]["id"]},
             user=telegram_id,
@@ -619,3 +613,7 @@ async def save_to_redis(telegram_id):
 async def get_all_corpuses(school_id):
     data = await get_request("/info/corpuses/all", {"school_id": school_id})
     return data["data"]
+
+
+async def get_children(school_id):
+    return {"TODO": 1}

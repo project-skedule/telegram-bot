@@ -1,7 +1,7 @@
 from aiogram.types import Update
-from src.texts import Texts
 from src.bot import dp
 from src.logger import logger
+from src.texts import Texts
 
 
 async def register_error_handlers():

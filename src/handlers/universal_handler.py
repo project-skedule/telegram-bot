@@ -1,9 +1,6 @@
 from aiogram.dispatcher import FSMContext
-from aiogram.types import CallbackQuery, Message
-from src.texts import Texts
-
-
-from src.bot import bot, dp
+from aiogram.types import CallbackQuery
+from src.bot import dp
 from src.keyboards import (
     ADMINISTRATION_MENU_FIRST_KEYBOARD,
     CHILD_MAIN_KEYBOARD,
@@ -12,8 +9,9 @@ from src.keyboards import (
     cf,
 )
 from src.logger import logger
-from src.some_functions import dispatcher_menu, send_message
+from src.some_functions import send_message
 from src.states import States
+from src.texts import Texts
 
 
 async def register_universal_handlers():

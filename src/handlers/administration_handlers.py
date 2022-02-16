@@ -1,8 +1,7 @@
 from aiogram.dispatcher import FSMContext
-from aiogram.types import CallbackQuery, Message
-from src.texts import Texts
-from src.api import get_canteen_timetable, get_ring_timetable, get_free_cabinets
-from src.bot import bot, dp
+from aiogram.types import CallbackQuery
+from src.api import get_canteen_timetable, get_free_cabinets, get_ring_timetable
+from src.bot import dp
 from src.keyboards import (
     ADMINISTRATION_MENU_FIRST_KEYBOARD,
     ADMINISTRATION_MENU_SECOND_KEYBOARD,
@@ -10,9 +9,10 @@ from src.keyboards import (
     get_corpuses_keyboard,
 )
 from src.logger import logger
+from src.redis import get_school_id
 from src.some_functions import send_message
 from src.states import States
-from src.redis import get_school_id
+from src.texts import Texts
 
 
 async def register_administration_handlers():
@@ -62,7 +62,6 @@ async def register_administration_handlers():
         message = call.message
 
         data = await get_ring_timetable(message.chat.id)
-        # FIX: add break
         text = Texts.rings_timetable_header + "".join(
             Texts.rings_timetable_format.format(
                 lesson_number=lsn["number"],
@@ -106,7 +105,7 @@ async def register_administration_handlers():
         cf.filter(action=["contact_devs"]),
         state=[States.administration_menu_first],
     )
-    async def student_canteen_timetable_handler(call: CallbackQuery):
+    async def administration_contact_devs(call: CallbackQuery):
         message = call.message
         text = Texts.help_message.format(telegram_id=message.chat.id)
         await send_message(
@@ -124,7 +123,7 @@ async def register_administration_handlers():
         cf.filter(action=["support_devs"]),
         state=[States.administration_menu_first],
     )
-    async def student_canteen_timetable_handler(call: CallbackQuery):
+    async def administration_support_devs(call: CallbackQuery):
         message = call.message
         text = Texts.donate_message
         await send_message(
@@ -143,9 +142,9 @@ async def register_administration_handlers():
         cf.filter(action=["anouns"]),
         state=[States.administration_menu_second],
     )
-    async def student_announcements_handler(call: CallbackQuery):
+    async def administration_announcements_handler(call: CallbackQuery):
         message = call.message
-        text = Texts.announcements  # TODO announcements
+        text = Texts.announcements
         await send_message(
             message,
             text=text,

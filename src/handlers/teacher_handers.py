@@ -1,6 +1,5 @@
 from aiogram.dispatcher import FSMContext
-from aiogram.types import CallbackQuery, Message
-from src.texts import Texts
+from aiogram.types import CallbackQuery
 from src.api import (
     get_canteen_timetable,
     get_free_cabinets,
@@ -10,7 +9,7 @@ from src.api import (
     get_user_tomorrow,
     get_user_week,
 )
-from src.bot import bot, dp
+from src.bot import dp
 from src.keyboards import (
     TEACHER_DAY_OF_WEEK_KEYBOARD,
     TEACHER_MAIN_KEYBOARD,
@@ -20,9 +19,10 @@ from src.keyboards import (
     get_corpuses_keyboard,
 )
 from src.logger import logger
+from src.redis import get_school_id
 from src.some_functions import send_message
 from src.states import States
-from src.redis import get_school_id
+from src.texts import Texts
 
 
 async def register_teacher_handlers():
@@ -174,7 +174,7 @@ async def register_teacher_handlers():
         cf.filter(action=["ring_timetable"]),
         state=[States.teacher_misc_menu_first],
     )
-    async def student_ring_timetable_handler(call: CallbackQuery):
+    async def teacher_ring_timetable_handler(call: CallbackQuery):
         message = call.message
         data = await get_ring_timetable(message.chat.id)
         text = Texts.rings_timetable_header + "".join(
@@ -198,7 +198,7 @@ async def register_teacher_handlers():
         cf.filter(action=["canteen_timetable"]),
         state=[States.teacher_misc_menu_second],
     )
-    async def student_canteen_timetable_handler(call: CallbackQuery):
+    async def teacher_canteen_timetable_handler(call: CallbackQuery):
         message = call.message
         canteens = await get_canteen_timetable(message.chat.id)
         text = Texts.canteen_timetable_header + "".join(
@@ -221,7 +221,7 @@ async def register_teacher_handlers():
         cf.filter(action=["contact_devs"]),
         state=[States.teacher_misc_menu_first],
     )
-    async def student_canteen_timetable_handler(call: CallbackQuery):
+    async def teacher_contact_devs_handler(call: CallbackQuery):
         message = call.message
         text = Texts.help_message.format(telegram_id=message.chat.id)
         await send_message(
@@ -238,7 +238,7 @@ async def register_teacher_handlers():
         cf.filter(action=["support_devs"]),
         state=[States.teacher_misc_menu_first],
     )
-    async def student_canteen_timetable_handler(call: CallbackQuery):
+    async def teacher_support_devs_handler(call: CallbackQuery):
         message = call.message
         text = Texts.donate_message
         await send_message(
