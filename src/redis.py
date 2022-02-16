@@ -9,7 +9,6 @@ async def get_school_id(telegram_id):
     return (await storage.get_data(user=telegram_id))["school"]
 
 
-
 async def get_subclass_id(telegram_id):
     """
     Returns subclass_id for user
