@@ -35,6 +35,7 @@ from src.keyboards import (
     get_enter_parallel_keyboard,
     get_schools_keyboard,
     get_teachers_keyboard,
+    SUBMIT_CHILD_NAME,
 )
 from src.logger import logger
 from src.redis import get_school_id
@@ -147,7 +148,7 @@ async def register_registration_handlers():
     # =============================
     @dp.callback_query_handler(
         cf.filter(action=["input_school"]),
-        state=[States.choose_role, States.show_childs, States.choose_school],
+        state=[States.choose_role, States.choose_school, States.submit_child_name],
     )
     async def input_school_handler(
         call: CallbackQuery, state: FSMContext, callback_data: dict
@@ -422,7 +423,9 @@ async def register_registration_handlers():
 
         role = (await state.get_data())["role"]
         if role == "Parent":
-            await register_child(telegram_id=message.chat.id, subclass_id=subclass_id, name="hahaha")
+            await register_child(
+                telegram_id=message.chat.id, subclass_id=subclass_id, name="hahaha"
+            )
             await send_message(
                 message,
                 text="hz",
@@ -493,6 +496,39 @@ async def register_registration_handlers():
         )
         await call.answer()
         await States.show_childs.set()
+
+    # =============================
+    @dp.callback_query_handler(
+        cf.filter(action=["enter_child_name"]),
+        state=[States.show_childs, States.submit_child_name],
+    )
+    async def enter_child_name_handler(
+        call: CallbackQuery, state: FSMContext, callback_data: dict
+    ):
+        message = call.message
+
+        await send_message(
+            message,
+            text="enter child name",
+            keyboard=None,  # add back button
+            parse_mode="markdown",
+        )
+        await call.answer()
+        await States.enter_child_name.set()
+
+    # =============================
+    @dp.message_handler(
+        state=[States.enter_child_name],
+    )
+    async def submit_child_name_handler(message: Message, state: FSMContext):
+        await state.update_data({"reg_child_name": message.text})
+        await message.answer(
+            text=f"entered child name {message.text}",
+            reply_markup=SUBMIT_CHILD_NAME,  # add back button
+            parse_mode="markdown",
+        )
+
+        await States.submit_child_name.set()
 
     # =============================
     @dp.callback_query_handler(

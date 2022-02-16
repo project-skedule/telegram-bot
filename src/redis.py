@@ -57,7 +57,14 @@ async def get_main_role(telegram_id):
 
 async def get_children(telegram_id: int):
     data = (await storage.get_data(user=telegram_id))["children"]
-    answer = {}
-    for i in data:
-        answer.update({})
-    return {"child 1": "id1", "child 2": "id2"}
+    answer = []
+    for child in data:
+        answer.append(
+            {
+                "name": child["name"],
+                "subclass_id": child["subclass_id"],
+                "school_id": child["school_id"],
+            }
+        )
+
+    return answer

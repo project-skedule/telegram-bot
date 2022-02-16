@@ -52,3 +52,5 @@ class States(StatesGroup):
     administration_free_cabinets_corpuses = State()
 
     register_parent = State()
+    enter_child_name = State()
+    submit_child_name = State()

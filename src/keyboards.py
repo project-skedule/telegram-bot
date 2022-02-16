@@ -230,7 +230,7 @@ async def get_child_keyboard(telegram_id: int):
         [(child_name, cf.new(action="child_menu", data=child_id))]
         for child_name, child_id in children.items()
     ]
-    keyboard += [[("add_child", cf.new(action="input_school", data=0))]]
+    keyboard += [[("add_child", cf.new(action="enter_child_name", data=0))]]
     keyboard += [[("parent menu #1", cf.new(action="parent_misc_menu_first", data=0))]]
     return generate_markup(keyboard)
 
@@ -480,5 +480,12 @@ SUBMIT_PARENT_REGISTRATION = generate_markup(
     [
         [("Да", cf.new(action="register_parent_yes", data=0))],
         [("Нет", cf.new(action="choose_role", data=0))],
+    ]
+)
+
+SUBMIT_CHILD_NAME = generate_markup(
+    [
+        [("Да", cf.new(action="input_school", data=0))],
+        [("Нет", cf.new(action="enter_child_name", data=0))],
     ]
 )
