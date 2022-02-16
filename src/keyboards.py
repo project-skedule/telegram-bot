@@ -227,11 +227,19 @@ TEACHER_DAY_OF_WEEK_KEYBOARD = generate_markup(
 async def get_child_keyboard(telegram_id: int):
     children = await get_children(telegram_id)
     keyboard = [
-        [(child["name"], cf.new(action="child_menu", data=child["subclass_id"]))]
+        [
+            (
+                child["name"],
+                cf.new(
+                    action="child_menu",
+                    data=[child["subclass_id"], child["name"]],
+                ),
+            )
+        ]
         for child in children
     ]
-    keyboard += [[("add_child", cf.new(action="enter_child_name", data=0))]]
-    keyboard += [[("parent menu #1", cf.new(action="parent_misc_menu_first", data=0))]]
+    keyboard += [[("Добавить ребёнка", cf.new(action="enter_child_name", data=0))]]
+    keyboard += [[("Меню родителя", cf.new(action="parent_misc_menu_first", data=0))]]
     return generate_markup(keyboard)
 
 

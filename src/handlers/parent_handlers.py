@@ -24,52 +24,54 @@ from src.texts import Texts
 
 
 async def register_parent_handlers():
-    @dp.callback_query_handler(
-        cf.filter(action=["choose_child"]),
-        state=[
-            States.add_more_childs,
-            States.child_menu,
-            States.find_menu,
-            States.find_day_of_week,
-            States.parent_misc_menu_first,
-            States.show_childs,
-        ],
-    )
-    async def choose_child_handler(call: CallbackQuery):
-        await States.choose_child.set()
-        message = call.message
-        await send_message(
-            message,
-            Texts.choose_children,
-            await get_child_keyboard(message.chat.id),
-            parse_mode="markdown",
-        )
-        await call.answer()
+    # @dp.callback_query_handler(
+    #     cf.filter(action=["choose_child"]),
+    #     state=[
+    #         States.add_more_childs,
+    #         States.child_menu,
+    #         States.find_menu,
+    #         States.find_day_of_week,
+    #         States.parent_misc_menu_first,
+    #         States.show_childs,
+    #     ],
+    # )
+    # async def choose_child_handler(call: CallbackQuery):
+    #     await States.choose_child.set()
+    #     message = call.message
+    #     await send_message(
+    #         message,
+    #         Texts.choose_children,
+    #         await get_child_keyboard(message.chat.id),
+    #         parse_mode="markdown",
+    #     )
+    #     await call.answer()
 
     # ==============================
     @dp.callback_query_handler(
         cf.filter(action=["child_menu"]),
         state=[
-            States.choose_child,
+            States.show_childs,
             States.child_day_of_week,
             States.child_misc_menu_first,
         ],
     )
     async def child_menu_handler(
-        call: CallbackQuery, callback_data: dict, state: FSMContext
+        call: CallbackQuery, state: FSMContext, callback_data: dict
     ):
-        await States.child_menu.set()
+        await state.update_data({"current_child_id": callback_data["data"][0]})
+        await state.update_data({"current_child_name": callback_data["data"][1]})
+
         message = call.message
         if callback_data["data"] != "0":
             await state.update_data({"child": callback_data["data"]})
 
-        # FIX: what is going on here?
         await send_message(
             message,
-            f"child menu {(await state.get_data())['child']}",
+            f"child menu {(await state.get_data())['current_child_name']}",
             CHILD_MAIN_KEYBOARD,
         )
         await call.answer()
+        await States.child_menu.set()
 
     # ==============================
     @dp.callback_query_handler(
@@ -77,7 +79,6 @@ async def register_parent_handlers():
         state=[States.child_menu],
     )
     async def child_day_of_week_handler(call: CallbackQuery):
-        await States.child_day_of_week.set()
         message = call.message
         await send_message(
             message,
@@ -87,6 +88,7 @@ async def register_parent_handlers():
         )
 
         await call.answer()
+        await States.child_day_of_week.set()
 
     # ==============================
     @dp.callback_query_handler(
@@ -98,14 +100,16 @@ async def register_parent_handlers():
     ):
         await States.child_menu.set()
         message = call.message
-        # FIX format
-        text = await get_user_day_of_week(
-            telegram_id=(await state.get_data())["child"],
-            day_of_week=callback_data["data"],
+        text = await get_user_day_of_week(  # TODO
+            subclass_id=(await state.get_data())["current_child_id"],
+            day_of_week=int(callback_data["data"]),
             is_searching=False,
         )
         await send_message(
-            message, text=text, keyboard=CHILD_MAIN_KEYBOARD, parse_mode="markdown"
+            message,
+            text=text,
+            keyboard=CHILD_MAIN_KEYBOARD,
+            parse_mode="markdown",
         )
         await call.answer()
 
