@@ -173,7 +173,7 @@ async def get_teacher_day_of_week(
 
 
 async def get_user_day_of_week(
-    telegram_id, day_of_week, is_searching=False, teacher_id=None, subclass_id=None
+    telegram_id, day_of_week, is_searching=False, teacher_id=None, subclass_id=None, child_name=None
 ):
     """
     Returns timetable for user with `telegram_id` if `is_searching` == False
@@ -604,6 +604,9 @@ async def save_to_redis(telegram_id):
 
     elif role["role_type"] == 2:
         await storage.update_data(data={"role": "Parent"}, user=telegram_id)
+        if (await storage.get_data(user=telegram_id)).get("children") is None:
+            await storage.update_data(data={"children": []}, user=telegram_id)
+
     elif role["role_type"] == 3:
         await storage.update_data(data={"role": "Administration"}, user=telegram_id)
         await storage.update_data(

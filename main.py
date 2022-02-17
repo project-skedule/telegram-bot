@@ -1,18 +1,22 @@
 import asyncio
-import zmq, zmq.asyncio as azmq
-from src.bot import dp, bot
-from src.logger import logger
+from os import getenv
+from src.config import DEBUG, PROFILE
+
+import aiohttp
+import zmq
+import zmq.asyncio as azmq
+
+from src.bot import bot, dp
+from src.handlers.administration_handlers import register_administration_handlers
+from src.handlers.debug_handlers import register_debug_handlers
 from src.handlers.error_handlers import register_error_handlers
+from src.handlers.find_handlers import register_find_handlers
 from src.handlers.parent_handlers import register_parent_handlers
+from src.handlers.registration_handlers import register_registration_handlers
 from src.handlers.student_handers import register_student_handlers
 from src.handlers.teacher_handers import register_teacher_handlers
-from src.handlers.administration_handlers import register_administration_handlers
-from src.handlers.find_handlers import register_find_handlers
-from src.handlers.registration_handlers import register_registration_handlers
 from src.handlers.universal_handler import register_universal_handlers
-
-from os import getenv
-import aiohttp
+from src.logger import logger
 
 
 async def web():
@@ -38,8 +42,11 @@ async def run():
     await register_teacher_handlers()
     await register_administration_handlers()
     await register_find_handlers()
+
     await register_registration_handlers()
     await register_universal_handlers()
+    if PROFILE == DEBUG:
+        await register_debug_handlers()
 
     logger.debug("Registered handlers")
 

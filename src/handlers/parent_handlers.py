@@ -24,27 +24,24 @@ from src.texts import Texts
 
 
 async def register_parent_handlers():
-    # @dp.callback_query_handler(
-    #     cf.filter(action=["choose_child"]),
-    #     state=[
-    #         States.add_more_childs,
-    #         States.child_menu,
-    #         States.find_menu,
-    #         States.find_day_of_week,
-    #         States.parent_misc_menu_first,
-    #         States.show_childs,
-    #     ],
-    # )
-    # async def choose_child_handler(call: CallbackQuery):
-    #     await States.choose_child.set()
-    #     message = call.message
-    #     await send_message(
-    #         message,
-    #         Texts.choose_children,
-    #         await get_child_keyboard(message.chat.id),
-    #         parse_mode="markdown",
-    #     )
-    #     await call.answer()
+    @dp.callback_query_handler(
+        cf.filter(action=["show_childs"]),
+        state=[
+            States.child_menu,
+            States.parent_misc_menu_first,
+            States.child_misc_menu_first,
+        ],
+    )
+    async def show_childs_handler(call: CallbackQuery):
+        message = call.message
+        await send_message(
+            message,
+            Texts.choose_children,
+            await get_child_keyboard(message.chat.id),
+            parse_mode="markdown",
+        )
+        await call.answer()
+        await States.show_childs.set()
 
     # ==============================
     @dp.callback_query_handler(
@@ -132,10 +129,9 @@ async def register_parent_handlers():
     # =============================
     @dp.callback_query_handler(
         cf.filter(action=["parent_misc_menu_first"]),
-        state=[States.choose_child],
+        state=[States.show_childs],
     )
     async def parent_misc_menu_first_handler(call: CallbackQuery, callback_data: dict):
-        await States.parent_misc_menu_first.set()
         message = call.message
         await send_message(
             message,
@@ -144,6 +140,7 @@ async def register_parent_handlers():
             parse_mode="markdown",
         )
         await call.answer()
+        await States.parent_misc_menu_first.set()
 
     # =============================
     @dp.callback_query_handler(

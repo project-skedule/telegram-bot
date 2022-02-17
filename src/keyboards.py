@@ -87,7 +87,6 @@ TEACHER_MAIN_KEYBOARD = generate_markup(
 
 CHILD_MAIN_KEYBOARD = generate_markup(
     [
-        # [("Следующий урок", cf.new(action="next_lesson", data=0))],
         [
             ("Сегодня", cf.new(action="today", data=0)),
             ("Завтра", cf.new(action="tomorrow", data=0)),
@@ -95,7 +94,7 @@ CHILD_MAIN_KEYBOARD = generate_markup(
         [("Определённый день недели", cf.new(action="child_day_of_week", data=0))],
         [("Неделя", cf.new(action="week", data=0))],
         [("Другое меню", cf.new(action="child_misc_menu_first", data=0))],
-        [("Go back", cf.new(action="choose_child", data=0))],
+        [("Выбрать другого ребёнка", cf.new(action="show_childs", data=0))],
     ]
 )
 
@@ -150,7 +149,7 @@ CHILD_MISC_MENU_FIRST_KEYBOARD = generate_markup(
 PARENT_MISC_MENU_FIRST_KEYBOARD = generate_markup(
     [
         [("Изменить тип аккаунта", cf.new(action="registration", data=0))],
-        [("Вернуться в главное меню", cf.new(action="choose_child", data=0))],
+        [("Вернуться в главное меню", cf.new(action="show_childs", data=0))],
     ]
 )
 

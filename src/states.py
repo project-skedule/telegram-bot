@@ -2,7 +2,6 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 
 
 class States(StatesGroup):
-    choose_child = State()
     student_menu = State()
     teacher_menu = State()
     administration_menu_first = State()
