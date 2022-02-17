@@ -54,7 +54,7 @@ async def put_request(request: str, data=None):
 
 
 async def get_user_today(
-    telegram_id, is_searching=False, teacher_id=None, subclass_id=None
+    telegram_id, is_searching=False, teacher_id=None, subclass_id=None, child_name=None
 ):
     return await get_user_day_of_week(
         telegram_id,
@@ -62,11 +62,12 @@ async def get_user_today(
         is_searching=is_searching,
         teacher_id=teacher_id,
         subclass_id=subclass_id,
+        child_name=child_name,
     )
 
 
 async def get_user_tomorrow(
-    telegram_id, is_searching=False, teacher_id=None, subclass_id=None
+    telegram_id, is_searching=False, teacher_id=None, subclass_id=None, child_name=None
 ):
     return await get_user_day_of_week(
         telegram_id,
@@ -74,11 +75,12 @@ async def get_user_tomorrow(
         is_searching=is_searching,
         teacher_id=teacher_id,
         subclass_id=subclass_id,
+        child_name=child_name,
     )
 
 
 async def get_student_day_of_week(
-    telegram_id, day_of_week, subclass_id, subclass_name=None
+    telegram_id, day_of_week, subclass_id, subclass_name=None, child_name=None
 ):
     school_id = await get_school_id(telegram_id)
 
@@ -110,12 +112,16 @@ async def get_student_day_of_week(
 
     day_of_week = DAYS_OF_WEEK[day_of_week]
     if result.strip() == "":
-        if subclass_name is not None:
+        if child_name is not None:
+            return f"У ребёнка {child_name} нет уроков *{day_of_week}*\n"
+        elif subclass_name is not None:
             return f"У класса {subclass_name} нет уроков *{day_of_week}*\n"
         else:
             return f"У вас нет уроков *{day_of_week}*\n"
     else:
-        if subclass_name is not None:
+        if child_name is not None:
+            return f"Расписание ребёнка {child_name} *{day_of_week}*:\n" + result
+        elif subclass_name is not None:
             return f"Расписание класса {subclass_name} *{day_of_week}*:\n" + result
         else:
             return f"Ваше расписание *{day_of_week}*:\n" + result
@@ -173,7 +179,12 @@ async def get_teacher_day_of_week(
 
 
 async def get_user_day_of_week(
-    telegram_id, day_of_week, is_searching=False, teacher_id=None, subclass_id=None, child_name=None
+    telegram_id,
+    day_of_week,
+    is_searching=False,
+    teacher_id=None,
+    subclass_id=None,
+    child_name=None,
 ):
     """
     Returns timetable for user with `telegram_id` if `is_searching` == False
@@ -188,7 +199,7 @@ async def get_user_day_of_week(
         else:
             subclass_name = await get_subclass_name_by_id(subclass_id)
             return await get_student_day_of_week(
-                telegram_id, day_of_week, subclass_id, subclass_name
+                telegram_id, day_of_week, subclass_id, subclass_name, child_name
             )
     else:
         main_role = await get_main_role(telegram_id)
@@ -199,14 +210,18 @@ async def get_user_day_of_week(
             )
         else:
             return await get_student_day_of_week(
-                telegram_id, day_of_week, await get_subclass_id(telegram_id)
+                telegram_id,
+                day_of_week,
+                await get_subclass_id(telegram_id),
             )
 
 
-async def get_student_week(telegram_id, student_id, subclass_name=None):
+async def get_student_week(
+    telegram_id, subclass_id, subclass_name=None, child_name=None
+):
     school_id = await get_school_id(telegram_id)
 
-    data = {"subclass_id": student_id}
+    data = {"subclass_id": subclass_id}
 
     data = await get_request(
         "/lesson/get/range",
@@ -225,7 +240,11 @@ async def get_student_week(telegram_id, student_id, subclass_name=None):
         day_of_week = day["day_of_week"]
 
         name_day = DAYS_OF_WEEK[day_of_week]
-        if subclass_name is not None:
+        if child_name is not None:
+            result += markdown.underline(
+                f"Расписание ребёнка {child_name} {name_day}:\n"
+            )
+        elif subclass_name is not None:
             result += markdown.underline(
                 f"Расписание класса {subclass_name} {name_day}:\n"
             )
@@ -306,7 +325,7 @@ async def get_teacher_week(telegram_id, teacher_id, teacher_name=None):
 
 
 async def get_user_week(
-    telegram_id, is_searching=False, teacher_id=None, subclass_id=None
+    telegram_id, is_searching=False, teacher_id=None, subclass_id=None, child_name=None
 ):
     """
     Returns timetable for user with `telegram_id` if `is_searching` == False
@@ -319,7 +338,9 @@ async def get_user_week(
             return await get_teacher_week(telegram_id, teacher_id, teacher_name)
         else:
             subclass_name = await get_subclass_name_by_id(subclass_id)
-            return await get_student_week(telegram_id, subclass_id, subclass_name)
+            return await get_student_week(
+                telegram_id, subclass_id, subclass_name, child_name
+            )
     else:
         main_role = await get_main_role(telegram_id)
 
@@ -336,16 +357,18 @@ async def get_user_week(
 # ~=============================
 
 
-async def get_ring_timetable(telegram_id: int):
-    school_id = await get_school_id(telegram_id)
+async def get_ring_timetable(telegram_id: int = None, school_id=None):
+    if school_id is None:
+        school_id = await get_school_id(telegram_id)
     data = await get_request(
         "/info/lessontimetables/all", data={"school_id": school_id}
     )
     return data["data"]
 
 
-async def get_canteen_timetable(telegram_id: int):
-    school_id = await get_school_id(telegram_id)
+async def get_canteen_timetable(telegram_id: int = None, school_id=None):
+    if school_id is None:
+        school_id = await get_school_id(telegram_id)
     corpuses = await get_request("/info/corpuses/all", data={"school_id": school_id})
     corpuses = list(map(lambda c: (c["name"], c["id"]), corpuses["data"]))
 

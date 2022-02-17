@@ -231,7 +231,7 @@ async def get_child_keyboard(telegram_id: int):
                 child["name"],
                 cf.new(
                     action="child_menu",
-                    data=[child["subclass_id"], child["name"]],
+                    data=[child["subclass_id"], child["name"], child["school_id"]],
                 ),
             )
         ]
