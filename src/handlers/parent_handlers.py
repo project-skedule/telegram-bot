@@ -55,13 +55,14 @@ async def register_parent_handlers():
     )
     async def child_menu_handler(
         call: CallbackQuery, state: FSMContext, callback_data: dict
-    ):  
-        data = ujson.loads(callback_data["data"].replace("'", '"'))
-        
-        await state.update_data({"current_child_id": data[0]})
-        await state.update_data({"current_child_name": data[1]})
-        await state.update_data({"current_child_school_id": data[2]})
+    ):
+        logger.debug(f"{callback_data}")
+        if callback_data["data"] != "0":
+            data = ujson.loads(callback_data["data"].replace("'", '"'))
 
+            await state.update_data({"current_child_id": data[0]})
+            await state.update_data({"current_child_name": data[1]})
+            await state.update_data({"current_child_school_id": data[2]})
 
         message = call.message
         if callback_data["data"] != "0":
@@ -123,7 +124,6 @@ async def register_parent_handlers():
         state=[States.child_menu],
     )
     async def child_misc_menu_first_handler(call: CallbackQuery, callback_data: dict):
-        await States.child_misc_menu_first.set()
         message = call.message
         await send_message(
             message,
@@ -132,6 +132,7 @@ async def register_parent_handlers():
             parse_mode="markdown",
         )
         await call.answer()
+        await States.child_misc_menu_first.set()
 
     # =============================
     @dp.callback_query_handler(
@@ -217,9 +218,11 @@ async def register_parent_handlers():
         cf.filter(action=["ring_timetable"]),
         state=[States.child_misc_menu_first],
     )
-    async def student_ring_timetable_handler(call: CallbackQuery, state: FSMContext):
+    async def child_ring_timetable_handler(call: CallbackQuery, state: FSMContext):
         message = call.message
-        data = await get_ring_timetable(school_id=(await state.get_data())["current_child_school_id"])
+        data = await get_ring_timetable(
+            school_id=(await state.get_data())["current_child_school_id"]
+        )
         text = Texts.rings_timetable_header + "".join(
             Texts.rings_timetable_format.format(
                 lesson_number=lsn["number"],
@@ -240,7 +243,9 @@ async def register_parent_handlers():
     )
     async def student_canteen_timetable_handler(call: CallbackQuery, state: FSMContext):
         message = call.message
-        canteens = await get_canteen_timetable(school_id=(await state.get_data())["current_child_school_id"])
+        canteens = await get_canteen_timetable(
+            school_id=(await state.get_data())["current_child_school_id"]
+        )
         text = Texts.canteen_timetable_header + "".join(
             Texts.canteen_timetable_format.format(
                 corpus_name=corpus_name, canteen_text=canteen_text

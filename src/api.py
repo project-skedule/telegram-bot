@@ -599,10 +599,13 @@ async def change_role(telegram_id, subclass_id=None, teacher_id=None, school_id=
 # ~=============================
 async def save_to_redis(telegram_id):
     data = await get_request("/rolemanagement/get", data={"telegram_id": telegram_id})
+    await storage.update_data(
+        data={"premium_status": data["premium_status"]}, user=telegram_id
+    )
     for role in data["roles"]:
         if role["is_main_role"]:
             break
-    if role["role_type"] == 0:
+    if role["role_type"] == 0:  # Student
         await storage.update_data(
             data={
                 "role": "Student",
@@ -625,12 +628,12 @@ async def save_to_redis(telegram_id):
             user=telegram_id,
         )
 
-    elif role["role_type"] == 2:
+    elif role["role_type"] == 2:  # Parent
         await storage.update_data(data={"role": "Parent"}, user=telegram_id)
         if (await storage.get_data(user=telegram_id)).get("children") is None:
             await storage.update_data(data={"children": []}, user=telegram_id)
 
-    elif role["role_type"] == 3:
+    elif role["role_type"] == 3:  # Administration
         await storage.update_data(data={"role": "Administration"}, user=telegram_id)
         await storage.update_data(
             data={"role": "Administration", "school": role["data"]["school"]["id"]},

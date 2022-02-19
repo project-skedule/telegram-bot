@@ -9,10 +9,10 @@ from src.api import (
     is_registered,
     register_administration,
     register_child,
+    register_parent,
     register_student,
     register_teacher,
     save_to_redis,
-    register_parent,
 )
 from src.bot import dp
 from src.keyboards import (
@@ -24,9 +24,10 @@ from src.keyboards import (
     STUDENT_MAIN_KEYBOARD,
     STUDENT_SUBMIT_KEYBOARD,
     SUBMIT_ADMINISTRATION_KEYBOARD,
+    SUBMIT_CHILD_NAME,
+    SUBMIT_PARENT_REGISTRATION,
     TEACHER_MAIN_KEYBOARD,
     TEACHER_SUBMIT_KEYBOARD,
-    SUBMIT_PARENT_REGISTRATION,
     cf,
     generate_markup,
     get_child_keyboard,
@@ -35,10 +36,9 @@ from src.keyboards import (
     get_enter_parallel_keyboard,
     get_schools_keyboard,
     get_teachers_keyboard,
-    SUBMIT_CHILD_NAME,
 )
 from src.logger import logger
-from src.redis import get_school_id
+from src.redis import get_premium_status, get_school_id
 from src.some_functions import send_message
 from src.states import States
 from src.texts import Texts
@@ -322,9 +322,14 @@ async def register_registration_handlers():
     ):
         logger.debug(f"enter parallel")
         message = call.message
+        role = (await state.get_data())["role"]
+        if role == "Student":
+            text = Texts.enter_parallel_on_register_student
+        else:
+            text = Texts.enter_parallel_on_register_parent
         await send_message(
             message,
-            text=Texts.enter_parallel,
+            text=text,
             keyboard=(await get_enter_parallel_keyboard(message.chat.id)),
             parse_mode="markdown",
         )
@@ -390,12 +395,19 @@ async def register_registration_handlers():
         logger.debug(f"submit student")
         await state.update_data({"group": f"{callback_data['data']}"})
         message = call.message
+        role = (await state.get_data())["role"]
         parallel = (await state.get_data())["parallel"]
         letter = (await state.get_data())["letter"]
         group = (await state.get_data())["group"]
+
+        if role == "student":
+            text = Texts.confirm_class.format(subclass=parallel + letter + group)
+        else:
+            text = Texts.confirm_child_class.format(subclass=parallel + letter + group)
+
         await send_message(
             message,
-            text=Texts.confirm_class.format(subclass=parallel + letter + group),
+            text=text,
             keyboard=STUDENT_SUBMIT_KEYBOARD,
             parse_mode="markdown",
         )
@@ -510,14 +522,27 @@ async def register_registration_handlers():
     ):
         message = call.message
 
-        await send_message(
-            message,
-            text="enter child name",
-            keyboard=None,  # add back button
-            parse_mode="markdown",
-        )
+        if (
+            await get_premium_status(message.chat.id) == 0
+            and len(await get_children(message.chat.id)) == 1
+        ):
+            await send_message(
+                message,
+                text=Texts.not_enough_premium_children,
+                keyboard=await get_child_keyboard(message.chat.id),  # add back button
+                parse_mode="markdown",
+            )
+            await States.show_childs.set()
+
+        else:
+            await send_message(
+                message,
+                text=Texts.enter_child_name,
+                keyboard=None,  # add back button
+                parse_mode="markdown",
+            )
+            await States.enter_child_name.set()
         await call.answer()
-        await States.enter_child_name.set()
 
     # =============================
     @dp.message_handler(
@@ -526,7 +551,7 @@ async def register_registration_handlers():
     async def submit_child_name_handler(message: Message, state: FSMContext):
         await state.update_data({"reg_child_name": message.text})
         await message.answer(
-            text=f"entered child name {message.text}",
+            text=Texts.submit_child_name.format(child_name=message.text),
             reply_markup=SUBMIT_CHILD_NAME,  # add back button
             parse_mode="markdown",
         )

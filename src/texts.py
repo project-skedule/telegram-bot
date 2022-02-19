@@ -22,6 +22,10 @@ class Texts:
 """
     confirm_class = """Ваш класс - *{subclass}*, верно?
 """
+    confirm_child_class = """Класс вашего ребёнка - *{subclass}*, верно?
+"""
+    not_enough_premium_children = """Not enough premium for children
+"""
     confirm_another_class = """Вы ищите класс - *{subclass}*, верно?
 """
     confirm_name = """Ваше ФИО - *{teacher_name}*, верно?
@@ -52,17 +56,21 @@ class Texts:
 """
     enter_name = """Пожалуйста, введите фамилию учителя
 """
+    enter_child_name = """Enter child name
+"""
+    submit_child_name = """You entered child name {child_name}?
+"""
     enter_school_name = """Введите, пожалуйста номер или название школы
 """
     enter_parallel = """Выберите, пожалуйста, параллель из списка:
 """
-    enter_parallel_on_register_student = """Пожалуйста, сообщите мне свой класс. Я запомню эту информацию, в след.раз указывать ее не нужно будет указывать.
+    enter_parallel_on_register_student = """Пожалуйста, сообщите мне свой класс. Я запомню эту информацию, в следующий раз ее не нужно будет указывать.
 
 Круто же?
 
 Итак, выберите, пожалуйста, параллель из списка:
 """
-    enter_parallel_on_register_parent = """Пожалуйста, сообщите мне свой класс. Я запомню эту информацию, в след.раз указывать ее не нужно будет указывать.
+    enter_parallel_on_register_parent = """Пожалуйста, сообщите мне класс своего ребёнка. Я запомню эту информацию, в следующий раз ее не нужно будет указывать.
 
 Круто же?
 
@@ -326,5 +334,5 @@ class Texts:
 """
     no_free_cabinets = """Я не нашёл свободных кабинетов :(
 """
-    free_cabinets_choose_corpuses = """Выберите, пожалуйста, корпус, в котором хотите найти свободный кабинет.
+    free_cabinets_choose_corpuses = """Вsыберите, пожалуйста, корпус, в котором хотите найти свободный кабинет.
 """
