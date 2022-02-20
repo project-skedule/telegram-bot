@@ -233,3 +233,80 @@ async def register_parent_handlers():
             message, text=text, keyboard=CHILD_MAIN_KEYBOARD, parse_mode="markdown"
         )
         await call.answer()
+        await States.child_menu.set()
+
+    # =============================
+    @dp.callback_query_handler(
+        cf.filter(action=["delete_child"]),
+        state=[States.show_childs],
+    )
+    async def delete_child_handler(call: CallbackQuery, state: FSMContext):
+        logger.debug("delete child")
+        message = call.message
+
+        await send_message(
+            message,
+            text=Texts.choose_delete_child,
+            keyboard=await get_childs_to_delete_keyboard(message.chat.id),
+            parse_mode="markdown",
+        )
+        await call.answer()
+        await States.choose_delete_child.set()
+
+    # =============================
+    @dp.callback_query_handler(
+        cf.filter(action=["submit_delete_child"]),
+        state=[States.choose_delete_child],
+    )
+    async def submit_delete_child_handler(
+        call: CallbackQuery, state: FSMContext, callback_data: dict
+    ):
+        logger.debug(f"submit delete child callback: {callback_data}")
+
+        message = call.message
+        data = ujson.loads(callback_data["data"].replace("'", '"'))
+        child_name, child_id = data
+        await state.update_data({"delete_child_name": child_name})
+        await state.update_data({"delete_child_id": child_id})
+        await send_message(
+            message,
+            text=Texts.submit_delete_child.format(child_name=child_name),
+            keyboard=SUBMIT_DELETE_CHILD_KEYBOARD,
+            parse_mode="markdown",
+        )
+        await call.answer()
+        await States.submit_delete_child.set()
+
+    # =============================
+    @dp.callback_query_handler(
+        cf.filter(action=["support_devs"]),
+        state=[States.parent_misc_menu_first],
+    )
+    async def support_devs_parent_handler(
+        call: CallbackQuery, state: FSMContext, callback_data: dict
+    ):
+        message = call.message
+        await send_message(
+            message,
+            text=Texts.donate_message,
+            keyboard=PARENT_MISC_MENU_FIRST_KEYBOARD,
+            parse_mode="markdown",
+        )
+        await call.answer()
+
+    # =============================
+    @dp.callback_query_handler(
+        cf.filter(action=["contact_devs"]),
+        state=[States.parent_misc_menu_first],
+    )
+    async def contact_devs_parent_handler(
+        call: CallbackQuery, state: FSMContext, callback_data: dict
+    ):
+        message = call.message
+        await send_message(
+            message,
+            text=Texts.help_message,
+            keyboard=PARENT_MISC_MENU_FIRST_KEYBOARD,
+            parse_mode="markdown",
+        )
+        await call.answer()
