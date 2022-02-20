@@ -54,7 +54,7 @@ async def put_request(request: str, data=None):
 
 
 async def get_user_today(
-    telegram_id, is_searching=False, teacher_id=None, subclass_id=None, child_name=None
+    telegram_id, is_searching=False, teacher_id=None, subclass_id=None
 ):
     return await get_user_day_of_week(
         telegram_id,
@@ -62,12 +62,11 @@ async def get_user_today(
         is_searching=is_searching,
         teacher_id=teacher_id,
         subclass_id=subclass_id,
-        child_name=child_name,
     )
 
 
 async def get_user_tomorrow(
-    telegram_id, is_searching=False, teacher_id=None, subclass_id=None, child_name=None
+    telegram_id, is_searching=False, teacher_id=None, subclass_id=None
 ):
     return await get_user_day_of_week(
         telegram_id,
@@ -75,12 +74,11 @@ async def get_user_tomorrow(
         is_searching=is_searching,
         teacher_id=teacher_id,
         subclass_id=subclass_id,
-        child_name=child_name,
     )
 
 
 async def get_student_day_of_week(
-    telegram_id, day_of_week, subclass_id, subclass_name=None, child_name=None
+    telegram_id, day_of_week, subclass_id, subclass_name=None
 ):
     school_id = await get_school_id(telegram_id)
 
@@ -112,16 +110,12 @@ async def get_student_day_of_week(
 
     day_of_week = DAYS_OF_WEEK[day_of_week]
     if result.strip() == "":
-        if child_name is not None:
-            return f"У ребёнка {child_name} нет уроков *{day_of_week}*\n"
-        elif subclass_name is not None:
+        if subclass_name is not None:
             return f"У класса {subclass_name} нет уроков *{day_of_week}*\n"
         else:
             return f"У вас нет уроков *{day_of_week}*\n"
     else:
-        if child_name is not None:
-            return f"Расписание ребёнка {child_name} *{day_of_week}*:\n" + result
-        elif subclass_name is not None:
+        if subclass_name is not None:
             return f"Расписание класса {subclass_name} *{day_of_week}*:\n" + result
         else:
             return f"Ваше расписание *{day_of_week}*:\n" + result
@@ -179,12 +173,7 @@ async def get_teacher_day_of_week(
 
 
 async def get_user_day_of_week(
-    telegram_id,
-    day_of_week,
-    is_searching=False,
-    teacher_id=None,
-    subclass_id=None,
-    child_name=None,
+    telegram_id, day_of_week, is_searching=False, teacher_id=None, subclass_id=None
 ):
     """
     Returns timetable for user with `telegram_id` if `is_searching` == False
@@ -199,7 +188,7 @@ async def get_user_day_of_week(
         else:
             subclass_name = await get_subclass_name_by_id(subclass_id)
             return await get_student_day_of_week(
-                telegram_id, day_of_week, subclass_id, subclass_name, child_name
+                telegram_id, day_of_week, subclass_id, subclass_name
             )
     else:
         main_role = await get_main_role(telegram_id)
@@ -210,18 +199,14 @@ async def get_user_day_of_week(
             )
         else:
             return await get_student_day_of_week(
-                telegram_id,
-                day_of_week,
-                await get_subclass_id(telegram_id),
+                telegram_id, day_of_week, await get_subclass_id(telegram_id)
             )
 
 
-async def get_student_week(
-    telegram_id, subclass_id, subclass_name=None, child_name=None
-):
+async def get_student_week(telegram_id, student_id, subclass_name=None):
     school_id = await get_school_id(telegram_id)
 
-    data = {"subclass_id": subclass_id}
+    data = {"subclass_id": student_id}
 
     data = await get_request(
         "/lesson/get/range",
@@ -240,11 +225,7 @@ async def get_student_week(
         day_of_week = day["day_of_week"]
 
         name_day = DAYS_OF_WEEK[day_of_week]
-        if child_name is not None:
-            result += markdown.underline(
-                f"Расписание ребёнка {child_name} {name_day}:\n"
-            )
-        elif subclass_name is not None:
+        if subclass_name is not None:
             result += markdown.underline(
                 f"Расписание класса {subclass_name} {name_day}:\n"
             )
@@ -325,7 +306,7 @@ async def get_teacher_week(telegram_id, teacher_id, teacher_name=None):
 
 
 async def get_user_week(
-    telegram_id, is_searching=False, teacher_id=None, subclass_id=None, child_name=None
+    telegram_id, is_searching=False, teacher_id=None, subclass_id=None
 ):
     """
     Returns timetable for user with `telegram_id` if `is_searching` == False
@@ -338,9 +319,7 @@ async def get_user_week(
             return await get_teacher_week(telegram_id, teacher_id, teacher_name)
         else:
             subclass_name = await get_subclass_name_by_id(subclass_id)
-            return await get_student_week(
-                telegram_id, subclass_id, subclass_name, child_name
-            )
+            return await get_student_week(telegram_id, subclass_id, subclass_name)
     else:
         main_role = await get_main_role(telegram_id)
 
@@ -357,18 +336,16 @@ async def get_user_week(
 # ~=============================
 
 
-async def get_ring_timetable(telegram_id: int = None, school_id=None):
-    if school_id is None:
-        school_id = await get_school_id(telegram_id)
+async def get_ring_timetable(telegram_id: int):
+    school_id = await get_school_id(telegram_id)
     data = await get_request(
         "/info/lessontimetables/all", data={"school_id": school_id}
     )
     return data["data"]
 
 
-async def get_canteen_timetable(telegram_id: int = None, school_id=None):
-    if school_id is None:
-        school_id = await get_school_id(telegram_id)
+async def get_canteen_timetable(telegram_id: int):
+    school_id = await get_school_id(telegram_id)
     corpuses = await get_request("/info/corpuses/all", data={"school_id": school_id})
     corpuses = list(map(lambda c: (c["name"], c["id"]), corpuses["data"]))
 
@@ -435,8 +412,6 @@ async def get_allowed_group(parallel, letter, telegram_id=None):
 async def is_registered(telegram_id):
     logger.debug(f"request is_registered for {telegram_id}")
     data = await get_request("/info/check/telegramid", {"telegram_id": telegram_id})
-    if data is None:
-        return False
     return data["data"]
 
 
@@ -509,51 +484,18 @@ async def register_student(telegram_id, subclass_id):
     await save_to_redis(telegram_id)
 
 
-async def register_child(telegram_id, subclass_id, name):
-    data = await put_request(
+async def register_child(telegram_id, subclass_id):
+    data = await post_request(
         "/rolemanagement/add/child",
-        {"telegram_id": telegram_id, "subclass_id": subclass_id},
+        {"parent_id": telegram_id, "subclass_id": subclass_id},
     )
-
-    school_id = data["school"]["id"]
-    child_id = data["child_id"]
-
-    storage_data = (await storage.get_data(user=telegram_id))["children"]
-    storage_data.append(
-        {
-            "name": name,
-            "subclass_id": subclass_id,
-            "school_id": school_id,
-            "child_id": child_id,
-        }
-    )
-    await storage.update_data(data={"children": storage_data}, user=telegram_id)
-    logger.debug(f"{await storage.get_data(user=telegram_id)}")
-
-
-async def delete_child(telegram_id, child_id):
-    data = await put_request(
-        "/rolemanagement/delete/child",
-        {"telegram_id": telegram_id, "child_id": child_id},
-    )
-
-    children = (await storage.get_data(user=telegram_id))["children"]
-    for child in children:
-        if child["child_id"] == child_id:
-            children.remove(child)
-            break
-    await storage.update_data(data={"children": children}, user=telegram_id)
+    await save_to_redis(telegram_id)
 
 
 async def register_teacher(telegram_id, teacher_id):
     data = await post_request(
         "/registration/teacher", {"telegram_id": telegram_id, "teacher_id": teacher_id}
     )
-    await save_to_redis(telegram_id)
-
-
-async def register_parent(telegram_id):
-    data = await post_request("/registration/parent", {"telegram_id": telegram_id})
     await save_to_redis(telegram_id)
 
 
@@ -614,52 +556,46 @@ async def change_role(telegram_id, subclass_id=None, teacher_id=None, school_id=
         data = {"telegram_id": telegram_id}
         data = await put_request("/rolemanagement/change/parent", data=data)
 
-    await storage.set_data(data={}, user=telegram_id)
-    await save_to_redis(telegram_id)
-
 
 # ~=============================
 async def save_to_redis(telegram_id):
     data = await get_request("/rolemanagement/get", data={"telegram_id": telegram_id})
-    await storage.update_data(
-        data={"premium_status": data["premium_status"]}, user=telegram_id
-    )
     for role in data["roles"]:
         if role["is_main_role"]:
             break
-    if role["role_type"] == 0:  # Student
+    if role["role_type"] == 0:
+        await storage.update_data(data={"role": "Student"}, user=telegram_id)
         await storage.update_data(
-            data={
-                "role": "Student",
-                "subclass_id": role["data"]["subclass"]["id"],
-                "parallel": role["data"]["subclass"]["educational_level"],
-                "letter": role["data"]["subclass"]["identificator"],
-                "group": role["data"]["subclass"]["additional_identificator"],
-                "school": role["data"]["school"]["id"],
-            },
+            data={"subclass_id": role["data"]["subclass"]["id"]}, user=telegram_id
+        )
+        await storage.update_data(
+            data={"parallel": role["data"]["subclass"]["educational_level"]},
             user=telegram_id,
         )
-
-    elif role["role_type"] == 1:  # Teacher
         await storage.update_data(
-            data={
-                "role": "Teacher",
-                "teacher": role["data"]["teacher_id"],
-                "school": role["data"]["school"]["id"],
-            },
+            data={"letter": role["data"]["subclass"]["identificator"]}, user=telegram_id
+        )
+        await storage.update_data(
+            data={"group": role["data"]["subclass"]["additional_identificator"]},
             user=telegram_id,
         )
-
-    elif role["role_type"] == 2:  # Parent
+        await storage.update_data(
+            data={"school": role["data"]["school"]["id"]}, user=telegram_id
+        )
+    elif role["role_type"] == 1:
+        await storage.update_data(data={"role": "Teacher"}, user=telegram_id)
+        await storage.update_data(
+            data={"teacher": role["data"]["teacher_id"]}, user=telegram_id
+        )
+        await storage.update_data(
+            data={"school": role["data"]["school"]["id"]}, user=telegram_id
+        )
+    elif role["role_type"] == 2:
         await storage.update_data(data={"role": "Parent"}, user=telegram_id)
-        if (await storage.get_data(user=telegram_id)).get("children") is None:
-            await storage.update_data(data={"children": []}, user=telegram_id)
-
-    elif role["role_type"] == 3:  # Administration
+    elif role["role_type"] == 3:
         await storage.update_data(data={"role": "Administration"}, user=telegram_id)
         await storage.update_data(
-            data={"role": "Administration", "school": role["data"]["school"]["id"]},
-            user=telegram_id,
+            data={"school": role["data"]["school"]["id"]}, user=telegram_id
         )
 
 
@@ -669,3 +605,7 @@ async def save_to_redis(telegram_id):
 async def get_all_corpuses(school_id):
     data = await get_request("/info/corpuses/all", {"school_id": school_id})
     return data["data"]
+
+
+async def get_children(school_id):
+    return {"TODO": 1}

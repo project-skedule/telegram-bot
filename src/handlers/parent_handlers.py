@@ -1,8 +1,6 @@
-import ujson
 from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery, Message
 from src.api import (
-    delete_child,
     get_canteen_timetable,
     get_ring_timetable,
     get_user_day_of_week,
@@ -16,10 +14,8 @@ from src.keyboards import (
     CHILD_MAIN_KEYBOARD,
     CHILD_MISC_MENU_FIRST_KEYBOARD,
     PARENT_MISC_MENU_FIRST_KEYBOARD,
-    SUBMIT_DELETE_CHILD_KEYBOARD,
     cf,
     get_child_keyboard,
-    get_childs_to_delete_keyboard,
 )
 from src.logger import logger
 from src.some_functions import send_message
@@ -29,73 +25,51 @@ from src.texts import Texts
 
 async def register_parent_handlers():
     @dp.callback_query_handler(
-        cf.filter(action=["show_childs"]),
+        cf.filter(action=["choose_child"]),
         state=[
+            States.add_more_childs,
             States.child_menu,
+            States.find_menu,
+            States.find_day_of_week,
             States.parent_misc_menu_first,
-            States.child_misc_menu_first,
-            States.choose_delete_child,
-            States.submit_delete_child,
+            States.show_childs,
         ],
     )
-    async def show_childs_handler(
-        call: CallbackQuery, state: FSMContext, callback_data: dict
-    ):
+    async def choose_child_handler(call: CallbackQuery):
+        await States.choose_child.set()
         message = call.message
-        if callback_data["data"] == "delete_child":
-            child_id = (await state.get_data())["delete_child_id"]
-            child_name = (await state.get_data())["delete_child_name"]
-            await delete_child(message.chat.id, child_id)
-            await send_message(
-                message,
-                Texts.successful_delete_child.format(child_name=child_name),
-                await get_child_keyboard(message.chat.id),
-                parse_mode="markdown",
-            )
-
-        else:
-            await send_message(
-                message,
-                Texts.choose_children,
-                await get_child_keyboard(message.chat.id),
-                parse_mode="markdown",
-            )
+        await send_message(
+            message,
+            Texts.choose_children,
+            await get_child_keyboard(message.chat.id),
+            parse_mode="markdown",
+        )
         await call.answer()
-        await States.show_childs.set()
 
     # ==============================
     @dp.callback_query_handler(
         cf.filter(action=["child_menu"]),
         state=[
-            States.show_childs,
+            States.choose_child,
             States.child_day_of_week,
             States.child_misc_menu_first,
         ],
     )
     async def child_menu_handler(
-        call: CallbackQuery, state: FSMContext, callback_data: dict
+        call: CallbackQuery, callback_data: dict, state: FSMContext
     ):
-        logger.debug(f"{callback_data}")
-        if callback_data["data"] != "0":
-            data = ujson.loads(callback_data["data"].replace("'", '"'))
-
-            await state.update_data({"current_child_id": data[0]})
-            await state.update_data({"current_child_name": data[1]})
-            await state.update_data({"current_child_school_id": data[2]})
-
+        await States.child_menu.set()
         message = call.message
-        # if callback_data["data"] != "0":
-        #     await state.update_data({"child": callback_data["data"]})
+        if callback_data["data"] != "0":
+            await state.update_data({"child": callback_data["data"]})
 
+        # FIX: what is going on here?
         await send_message(
             message,
-            Texts.child_menu.format(
-                child_name=(await state.get_data())["current_child_name"]
-            ),
+            f"child menu {(await state.get_data())['child']}",
             CHILD_MAIN_KEYBOARD,
         )
         await call.answer()
-        await States.child_menu.set()
 
     # ==============================
     @dp.callback_query_handler(
@@ -103,6 +77,7 @@ async def register_parent_handlers():
         state=[States.child_menu],
     )
     async def child_day_of_week_handler(call: CallbackQuery):
+        await States.child_day_of_week.set()
         message = call.message
         await send_message(
             message,
@@ -112,7 +87,6 @@ async def register_parent_handlers():
         )
 
         await call.answer()
-        await States.child_day_of_week.set()
 
     # ==============================
     @dp.callback_query_handler(
@@ -124,18 +98,14 @@ async def register_parent_handlers():
     ):
         await States.child_menu.set()
         message = call.message
+        # FIX format
         text = await get_user_day_of_week(
-            telegram_id=message.chat.id,
-            is_searching=True,
-            subclass_id=(await state.get_data())["current_child_id"],
-            child_name=(await state.get_data())["current_child_name"],
-            day_of_week=int(callback_data["data"]),
+            telegram_id=(await state.get_data())["child"],
+            day_of_week=callback_data["data"],
+            is_searching=False,
         )
         await send_message(
-            message,
-            text=text,
-            keyboard=CHILD_MAIN_KEYBOARD,
-            parse_mode="MarkdownV2",
+            message, text=text, keyboard=CHILD_MAIN_KEYBOARD, parse_mode="markdown"
         )
         await call.answer()
 
@@ -145,6 +115,7 @@ async def register_parent_handlers():
         state=[States.child_menu],
     )
     async def child_misc_menu_first_handler(call: CallbackQuery, callback_data: dict):
+        await States.child_misc_menu_first.set()
         message = call.message
         await send_message(
             message,
@@ -153,14 +124,14 @@ async def register_parent_handlers():
             parse_mode="markdown",
         )
         await call.answer()
-        await States.child_misc_menu_first.set()
 
     # =============================
     @dp.callback_query_handler(
         cf.filter(action=["parent_misc_menu_first"]),
-        state=[States.show_childs],
+        state=[States.choose_child],
     )
     async def parent_misc_menu_first_handler(call: CallbackQuery, callback_data: dict):
+        await States.parent_misc_menu_first.set()
         message = call.message
         await send_message(
             message,
@@ -169,7 +140,6 @@ async def register_parent_handlers():
             parse_mode="markdown",
         )
         await call.answer()
-        await States.parent_misc_menu_first.set()
 
     # =============================
     @dp.callback_query_handler(
@@ -177,18 +147,16 @@ async def register_parent_handlers():
         state=[States.child_menu],
     )
     async def student_today_handler(call: CallbackQuery, state: FSMContext):
+        await States.child_menu.set()
         message = call.message
+        # FIX: format
         text = await get_user_today(
-            telegram_id=message.chat.id,
-            is_searching=True,
-            subclass_id=(await state.get_data())["current_child_id"],
-            child_name=(await state.get_data())["current_child_name"],
+            telegram_id=(await state.get_data())["child"], is_searching=False
         )
         await send_message(
-            message, text=text, keyboard=CHILD_MAIN_KEYBOARD, parse_mode="MarkdownV2"
+            message, text=text, keyboard=CHILD_MAIN_KEYBOARD, parse_mode="markdown"
         )
         await call.answer()
-        await States.child_menu.set()
 
     # =============================
     @dp.callback_query_handler(
@@ -196,21 +164,16 @@ async def register_parent_handlers():
         state=[States.child_menu],
     )
     async def student_tomorrow_handler(call: CallbackQuery, state: FSMContext):
+        await States.child_menu.set()
         message = call.message
+        # FIX format
         text = await get_user_tomorrow(
-            telegram_id=message.chat.id,
-            is_searching=True,
-            subclass_id=(await state.get_data())["current_child_id"],
-            child_name=(await state.get_data())["current_child_name"],
+            telegram_id=(await state.get_data())["child"], is_searching=False
         )
         await send_message(
-            message,
-            text=text,
-            keyboard=CHILD_MAIN_KEYBOARD,
-            parse_mode="MarkdownV2",
+            message, text=text, keyboard=CHILD_MAIN_KEYBOARD, parse_mode="markdown"
         )
         await call.answer()
-        await States.child_menu.set()
 
     # =============================
     @dp.callback_query_handler(
@@ -220,17 +183,12 @@ async def register_parent_handlers():
     async def student_week_handler(call: CallbackQuery, state: FSMContext):
         await States.child_menu.set()
         message = call.message
+        # FIX: format
         text = await get_user_week(
-            telegram_id=message.chat.id,
-            is_searching=True,
-            subclass_id=(await state.get_data())["current_child_id"],
-            child_name=(await state.get_data())["current_child_name"],
+            telegram_id=(await state.get_data())["child"], is_searching=False
         )
         await send_message(
-            message,
-            text=text,
-            keyboard=CHILD_MAIN_KEYBOARD,
-            parse_mode="MarkdownV2",
+            message, text=text, keyboard=CHILD_MAIN_KEYBOARD, parse_mode="markdown"
         )
         await call.answer()
 
@@ -239,11 +197,11 @@ async def register_parent_handlers():
         cf.filter(action=["ring_timetable"]),
         state=[States.child_misc_menu_first],
     )
-    async def child_ring_timetable_handler(call: CallbackQuery, state: FSMContext):
+    async def student_ring_timetable_handler(call: CallbackQuery, state: FSMContext):
+        await States.child_menu.set()
         message = call.message
-        data = await get_ring_timetable(
-            school_id=(await state.get_data())["current_child_school_id"]
-        )
+        data = await get_ring_timetable(message.chat.id)
+        # FIX: add break
         text = Texts.rings_timetable_header + "".join(
             Texts.rings_timetable_format.format(
                 lesson_number=lsn["number"],
@@ -255,18 +213,16 @@ async def register_parent_handlers():
             message, text=text, keyboard=CHILD_MAIN_KEYBOARD, parse_mode="markdown"
         )
         await call.answer()
-        await States.child_menu.set()
 
     # =============================
     @dp.callback_query_handler(
         cf.filter(action=["canteen_timetable"]),
         state=[States.child_misc_menu_first],
     )
-    async def child_canteen_timetable_handler(call: CallbackQuery, state: FSMContext):
+    async def student_canteen_timetable_handler(call: CallbackQuery, state: FSMContext):
+        await States.child_menu.set()
         message = call.message
-        canteens = await get_canteen_timetable(
-            school_id=(await state.get_data())["current_child_school_id"]
-        )
+        canteens = await get_canteen_timetable(message.chat.id)
         text = Texts.canteen_timetable_header + "".join(
             Texts.canteen_timetable_format.format(
                 corpus_name=corpus_name, canteen_text=canteen_text
@@ -277,46 +233,3 @@ async def register_parent_handlers():
             message, text=text, keyboard=CHILD_MAIN_KEYBOARD, parse_mode="markdown"
         )
         await call.answer()
-        await States.child_menu.set()
-
-    # =============================
-    @dp.callback_query_handler(
-        cf.filter(action=["delete_child"]),
-        state=[States.show_childs],
-    )
-    async def delete_child_handler(call: CallbackQuery, state: FSMContext):
-        logger.debug("delete child")
-        message = call.message
-
-        await send_message(
-            message,
-            text=Texts.choose_delete_child,
-            keyboard=await get_childs_to_delete_keyboard(message.chat.id),
-            parse_mode="markdown",
-        )
-        await call.answer()
-        await States.choose_delete_child.set()
-
-    # =============================
-    @dp.callback_query_handler(
-        cf.filter(action=["submit_delete_child"]),
-        state=[States.choose_delete_child],
-    )
-    async def submit_delete_child_handler(
-        call: CallbackQuery, state: FSMContext, callback_data: dict
-    ):
-        logger.debug(f"submit delete child callback: {callback_data}")
-
-        message = call.message
-        data = ujson.loads(callback_data["data"].replace("'", '"'))
-        child_name, child_id = data
-        await state.update_data({"delete_child_name": child_name})
-        await state.update_data({"delete_child_id": child_id})
-        await send_message(
-            message,
-            text=Texts.submit_delete_child.format(child_name=child_name),
-            keyboard=SUBMIT_DELETE_CHILD_KEYBOARD,
-            parse_mode="markdown",
-        )
-        await call.answer()
-        await States.submit_delete_child.set()
