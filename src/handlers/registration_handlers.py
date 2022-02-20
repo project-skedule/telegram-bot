@@ -442,7 +442,7 @@ async def register_registration_handlers():
 
             await send_message(
                 message,
-                text="hz",
+                text=Texts.successful_reg_child,
                 keyboard=await get_child_keyboard(message.chat.id),
                 parse_mode="markdown",
             )
@@ -480,7 +480,7 @@ async def register_registration_handlers():
         message = call.message
         await send_message(
             message,
-            text="Register you?",
+            text=Texts.confirm_reg_parent,
             keyboard=SUBMIT_PARENT_REGISTRATION,
             parse_mode="markdown",
         )
@@ -504,7 +504,7 @@ async def register_registration_handlers():
 
         await send_message(
             message,
-            text="Successfully registered, add children",
+            text=Texts.successful_reg_parent,
             keyboard=await get_child_keyboard(message.chat.id),
             parse_mode="markdown",
         )
