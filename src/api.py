@@ -435,6 +435,8 @@ async def get_allowed_group(parallel, letter, telegram_id=None):
 async def is_registered(telegram_id):
     logger.debug(f"request is_registered for {telegram_id}")
     data = await get_request("/info/check/telegramid", {"telegram_id": telegram_id})
+    if data is None:
+        return False
     return data["data"]
 
 
