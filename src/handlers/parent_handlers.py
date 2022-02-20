@@ -70,7 +70,9 @@ async def register_parent_handlers():
 
         await send_message(
             message,
-            f"child menu {(await state.get_data())['current_child_name']}",
+            Texts.child_menu.format(
+                child_menu=(await state.get_data())["current_child_name"]
+            ),
             CHILD_MAIN_KEYBOARD,
         )
         await call.answer()
