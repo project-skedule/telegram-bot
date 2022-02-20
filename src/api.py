@@ -514,13 +514,33 @@ async def register_child(telegram_id, subclass_id, name):
     )
 
     school_id = data["school"]["id"]
+    child_id = data["child_id"]
 
     storage_data = (await storage.get_data(user=telegram_id))["children"]
     storage_data.append(
-        {"name": name, "subclass_id": subclass_id, "school_id": school_id}
+        {
+            "name": name,
+            "subclass_id": subclass_id,
+            "school_id": school_id,
+            "child_id": child_id,
+        }
     )
     await storage.update_data(data={"children": storage_data}, user=telegram_id)
     logger.debug(f"{await storage.get_data(user=telegram_id)}")
+
+
+async def delete_child(telegram_id, child_id):
+    data = await put_request(
+        "/rolemanagement/delete/child",
+        {"telegram_id": telegram_id, "child_id": child_id},
+    )
+
+    children = (await storage.get_data(user=telegram_id))["children"]
+    for child in children:
+        if child["child_id"] == child_id:
+            children.remove(child)
+            break
+    await storage.update_data(data={"children": children}, user=telegram_id)
 
 
 async def register_teacher(telegram_id, teacher_id):
@@ -647,4 +667,3 @@ async def save_to_redis(telegram_id):
 async def get_all_corpuses(school_id):
     data = await get_request("/info/corpuses/all", {"school_id": school_id})
     return data["data"]
-

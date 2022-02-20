@@ -40,12 +40,14 @@ async def get_children(telegram_id: int):
                 "name": child["name"],
                 "subclass_id": child["subclass_id"],
                 "school_id": child["school_id"],
+                "child_id": child["child_id"],
             }
         )
 
     return answer
 
+
 async def get_premium_status(telegram_id: int):
     data = (await storage.get_data(user=telegram_id))["premium_status"]
-    
+
     return data

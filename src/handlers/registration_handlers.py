@@ -23,8 +23,8 @@ from src.keyboards import (
     STUDENT_MAIN_KEYBOARD,
     STUDENT_SUBMIT_KEYBOARD,
     SUBMIT_ADMINISTRATION_KEYBOARD,
-    SUBMIT_CHILD_NAME,
-    SUBMIT_PARENT_REGISTRATION,
+    SUBMIT_CHILD_NAME_KEYBOARD,
+    SUBMIT_PARENT_REGISTRATION_KEYBOARD,
     TEACHER_MAIN_KEYBOARD,
     TEACHER_SUBMIT_KEYBOARD,
     cf,
@@ -442,7 +442,9 @@ async def register_registration_handlers():
 
             await send_message(
                 message,
-                text=Texts.successful_reg_child,
+                text=Texts.successful_reg_child.format(
+                    child_name=(await state.get_data())["reg_child_name"]
+                ),
                 keyboard=await get_child_keyboard(message.chat.id),
                 parse_mode="markdown",
             )
@@ -481,7 +483,7 @@ async def register_registration_handlers():
         await send_message(
             message,
             text=Texts.confirm_reg_parent,
-            keyboard=SUBMIT_PARENT_REGISTRATION,
+            keyboard=SUBMIT_PARENT_REGISTRATION_KEYBOARD,
             parse_mode="markdown",
         )
         await call.answer()
@@ -551,7 +553,7 @@ async def register_registration_handlers():
         await state.update_data({"reg_child_name": message.text})
         await message.answer(
             text=Texts.submit_child_name.format(child_name=message.text),
-            reply_markup=SUBMIT_CHILD_NAME,  # add back button
+            reply_markup=SUBMIT_CHILD_NAME_KEYBOARD,  # add back button
             parse_mode="markdown",
         )
 

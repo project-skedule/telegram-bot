@@ -53,3 +53,5 @@ class States(StatesGroup):
     register_parent = State()
     enter_child_name = State()
     submit_child_name = State()
+    submit_delete_child = State()
+    choose_delete_child = State()

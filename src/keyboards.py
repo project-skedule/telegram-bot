@@ -238,6 +238,7 @@ async def get_child_keyboard(telegram_id: int):
         for child in children
     ]
     keyboard += [[("Добавить ребёнка", cf.new(action="enter_child_name", data=0))]]
+    keyboard += [[("Удалить ребёнка", cf.new(action="delete_child", data=0))]]
     keyboard += [[("Меню родителя", cf.new(action="parent_misc_menu_first", data=0))]]
     return generate_markup(keyboard)
 
@@ -483,16 +484,42 @@ BACK_FROM_FIND_TEACHER_KEYBOARD = generate_markup(
     [[("Назад", cf.new(action="main_menu", data="None"))]]
 )
 
-SUBMIT_PARENT_REGISTRATION = generate_markup(
+SUBMIT_PARENT_REGISTRATION_KEYBOARD = generate_markup(
     [
         [("Да", cf.new(action="register_parent_yes", data=0))],
         [("Нет", cf.new(action="choose_role", data=0))],
     ]
 )
 
-SUBMIT_CHILD_NAME = generate_markup(
+SUBMIT_CHILD_NAME_KEYBOARD = generate_markup(
     [
         [("Да", cf.new(action="input_school", data=0))],
         [("Нет", cf.new(action="enter_child_name", data=0))],
+    ]
+)
+
+
+async def get_childs_to_delete_keyboard(telegram_id: int):
+    children = await get_children(telegram_id)
+    keyboard = [
+        [
+            (
+                child["name"],
+                cf.new(
+                    action="submit_delete_child",
+                    data=[child["name"], child["child_id"]],
+                ),
+            )
+        ]
+        for child in children
+    ]
+    keyboard += [[("Назад", cf.new(action="show_childs", data=0))]]
+    return generate_markup(keyboard)
+
+
+SUBMIT_DELETE_CHILD_KEYBOARD = generate_markup(
+    [
+        [("Да", cf.new(action="show_childs", data="delete_child"))],
+        [("Нет", cf.new(action="delete_child", data=0))],
     ]
 )
