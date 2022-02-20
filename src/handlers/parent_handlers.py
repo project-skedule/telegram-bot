@@ -320,3 +320,37 @@ async def register_parent_handlers():
         )
         await call.answer()
         await States.submit_delete_child.set()
+
+    # =============================
+    @dp.callback_query_handler(
+        cf.filter(action=["support_devs"]),
+        state=[States.parent_misc_menu_first],
+    )
+    async def support_devs_parent_handler(
+        call: CallbackQuery, state: FSMContext, callback_data: dict
+    ):
+        message = call.message
+        await send_message(
+            message,
+            text=Texts.donate_message,
+            keyboard=PARENT_MISC_MENU_FIRST_KEYBOARD,
+            parse_mode="markdown",
+        )
+        await call.answer()
+
+    # =============================
+    @dp.callback_query_handler(
+        cf.filter(action=["contact_devs"]),
+        state=[States.parent_misc_menu_first],
+    )
+    async def contact_devs_parent_handler(
+        call: CallbackQuery, state: FSMContext, callback_data: dict
+    ):
+        message = call.message
+        await send_message(
+            message,
+            text=Texts.help_message,
+            keyboard=PARENT_MISC_MENU_FIRST_KEYBOARD,
+            parse_mode="markdown",
+        )
+        await call.answer()
