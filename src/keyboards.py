@@ -254,7 +254,7 @@ async def get_child_keyboard(telegram_id: int):
                 child["name"],
                 cf.new(
                     action="child_menu",
-                    data=[child["subclass_id"], child["name"], child["school_id"]],
+                    data=child["child_id"],
                 ),
             )
         ]
@@ -530,7 +530,7 @@ async def get_childs_to_delete_keyboard(telegram_id: int):
                 child["name"],
                 cf.new(
                     action="submit_delete_child",
-                    data=[child["name"], child["child_id"]],
+                    data=child["child_id"],
                 ),
             )
         ]

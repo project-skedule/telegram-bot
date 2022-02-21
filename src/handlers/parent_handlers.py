@@ -22,6 +22,7 @@ from src.keyboards import (
     get_childs_to_delete_keyboard,
 )
 from src.logger import logger
+from src.redis import get_child_by_id
 from src.some_functions import send_message
 from src.states import States
 from src.texts import Texts
@@ -75,18 +76,18 @@ async def register_parent_handlers():
     async def child_menu_handler(
         call: CallbackQuery, state: FSMContext, callback_data: dict
     ):
-        logger.debug(f"{callback_data}")
-        if callback_data["data"] != "0":
-            data = ujson.loads(callback_data["data"].replace("'", '"'))
-
-            await state.update_data({"current_child_id": data[0]})
-            await state.update_data({"current_child_name": data[1]})
-            await state.update_data({"current_child_school_id": data[2]})
-
         message = call.message
-        # if callback_data["data"] != "0":
-        #     await state.update_data({"child": callback_data["data"]})
+        if callback_data["data"] != "0":
+            child_id = int(callback_data["data"])
+            child = await get_child_by_id(message.chat.id, child_id)
 
+
+
+            await state.update_data({"current_child_id": child_id})
+            await state.update_data({"current_child_name": child["name"]})
+            await state.update_data({"current_child_school_id": child["school_id"]})
+
+        
         await send_message(
             message,
             Texts.child_menu.format(
@@ -308,8 +309,8 @@ async def register_parent_handlers():
         logger.debug(f"submit delete child callback: {callback_data}")
 
         message = call.message
-        data = ujson.loads(callback_data["data"].replace("'", '"'))
-        child_name, child_id = data
+        child_id = int(callback_data["data"])
+        child_name = await get_child_by_id(message.chat.id, child_id)["name"]
         await state.update_data({"delete_child_name": child_name})
         await state.update_data({"delete_child_id": child_id})
         await send_message(

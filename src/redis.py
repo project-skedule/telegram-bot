@@ -51,3 +51,10 @@ async def get_premium_status(telegram_id: int):
     data = (await storage.get_data(user=telegram_id))["premium_status"]
 
     return data
+
+
+async def get_child_by_id(telegram_id: int, child_id: int):
+    children = (await storage.get_data(user=telegram_id))["children"]
+    for child in children:
+        if child["child_id"] == child_id:
+            return child
