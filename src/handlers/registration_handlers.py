@@ -2,13 +2,13 @@ from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery, Message
 from src.api import (
     change_role,
-    get_children,
     get_school_name_by_id,
     get_subclass_by_params,
     get_teacher_name_by_id,
     is_registered,
     register_administration,
     register_child,
+    register_parent,
     register_student,
     register_teacher,
     save_to_redis,
@@ -23,6 +23,8 @@ from src.keyboards import (
     STUDENT_MAIN_KEYBOARD,
     STUDENT_SUBMIT_KEYBOARD,
     SUBMIT_ADMINISTRATION_KEYBOARD,
+    SUBMIT_CHILD_NAME_KEYBOARD,
+    SUBMIT_PARENT_REGISTRATION_KEYBOARD,
     TEACHER_MAIN_KEYBOARD,
     TEACHER_SUBMIT_KEYBOARD,
     cf,
@@ -35,7 +37,7 @@ from src.keyboards import (
     get_teachers_keyboard,
 )
 from src.logger import logger
-from src.redis import get_school_id
+from src.redis import get_premium_status, get_school_id, get_children
 from src.some_functions import send_message
 from src.states import States
 from src.texts import Texts
@@ -66,7 +68,7 @@ async def register_registration_handlers():
                     reply_markup=await get_child_keyboard(message.chat.id),
                     parse_mode="markdown",
                 )
-                await States.choose_child.set()
+                await States.show_childs.set()
             elif role == "Student":
                 await message.answer(
                     text=Texts.student_main_menu,
@@ -96,6 +98,7 @@ async def register_registration_handlers():
             States.student_misc_menu_second,
             States.teacher_misc_menu_second,
             States.administration_menu_second,
+            States.parent_misc_menu_first,
         ],
     )
     async def changing_role(call: CallbackQuery, state: FSMContext):
@@ -124,6 +127,7 @@ async def register_registration_handlers():
             States.teacher_misc_menu_second,
             States.administration_submit,
             States.input_school,
+            States.register_parent,
         ],
     )
     async def choose_role_handler(
@@ -143,7 +147,7 @@ async def register_registration_handlers():
     # =============================
     @dp.callback_query_handler(
         cf.filter(action=["input_school"]),
-        state=[States.choose_role, States.show_childs, States.choose_school],
+        state=[States.choose_role, States.choose_school, States.submit_child_name],
     )
     async def input_school_handler(
         call: CallbackQuery, state: FSMContext, callback_data: dict
@@ -317,9 +321,14 @@ async def register_registration_handlers():
     ):
         logger.debug(f"enter parallel")
         message = call.message
+        role = (await state.get_data())["role"]
+        if role == "Student":
+            text = Texts.enter_parallel_on_register_student
+        else:
+            text = Texts.enter_parallel_on_register_parent
         await send_message(
             message,
-            text=Texts.enter_parallel,
+            text=text,
             keyboard=(await get_enter_parallel_keyboard(message.chat.id)),
             parse_mode="markdown",
         )
@@ -385,12 +394,19 @@ async def register_registration_handlers():
         logger.debug(f"submit student")
         await state.update_data({"group": f"{callback_data['data']}"})
         message = call.message
+        role = (await state.get_data())["role"]
         parallel = (await state.get_data())["parallel"]
         letter = (await state.get_data())["letter"]
         group = (await state.get_data())["group"]
+
+        if role == "student":
+            text = Texts.confirm_class.format(subclass=parallel + letter + group)
+        else:
+            text = Texts.confirm_child_class.format(subclass=parallel + letter + group)
+
         await send_message(
             message,
-            text=Texts.confirm_class.format(subclass=parallel + letter + group),
+            text=text,
             keyboard=STUDENT_SUBMIT_KEYBOARD,
             parse_mode="markdown",
         )
@@ -418,13 +434,18 @@ async def register_registration_handlers():
 
         role = (await state.get_data())["role"]
         if role == "Parent":
-            await register_child(telegram_id=message.chat.id, subclass_id=subclass_id)
-            children = await get_children(message.chat.id)
+            await register_child(
+                telegram_id=message.chat.id,
+                subclass_id=subclass_id,
+                name=(await state.get_data())["reg_child_name"],
+            )
+
             await send_message(
                 message,
-                text="\n".join(children.keys())
-                + "\nwanna more?",  # FIX: children names from redis
-                keyboard=ADD_MORE_CHILDREN_KEYBOARD,
+                text=Texts.successful_reg_child.format(
+                    child_name=(await state.get_data())["reg_child_name"]
+                ),
+                keyboard=await get_child_keyboard(message.chat.id),
                 parse_mode="markdown",
             )
             await States.show_childs.set()
@@ -436,8 +457,6 @@ async def register_registration_handlers():
                 )
             else:
                 await change_role(telegram_id=message.chat.id, subclass_id=subclass_id)
-                await save_to_redis(message.chat.id)
-                await state.update_data({"changed": None})
 
             await send_message(
                 message,
@@ -452,25 +471,93 @@ async def register_registration_handlers():
         await call.answer()
 
     # =============================
+
     @dp.callback_query_handler(
-        cf.filter(action=["show_childs"]),
-        state=[States.choose_child, States.choose_role],
+        cf.filter(action=["register_parent"]),
+        state=[States.choose_role],
+    )
+    async def register_parent_handler(
+        call: CallbackQuery, state: FSMContext, callback_data: dict
+    ):
+        message = call.message
+        await send_message(
+            message,
+            text=Texts.confirm_reg_parent,
+            keyboard=SUBMIT_PARENT_REGISTRATION_KEYBOARD,
+            parse_mode="markdown",
+        )
+        await call.answer()
+        await States.register_parent.set()
+
+    # =============================
+
+    @dp.callback_query_handler(
+        cf.filter(action=["register_parent_yes"]),
+        state=[States.register_parent],
     )
     async def show_children_handler(
         call: CallbackQuery, state: FSMContext, callback_data: dict
     ):
         message = call.message
-        await state.update_data({"role": "Parent"})
-        children = await get_children(message.chat.id)
+        if (await state.get_data()).get("changed") is None:
+            await register_parent(telegram_id=message.chat.id)
+        else:
+            await change_role(telegram_id=message.chat.id)
+
         await send_message(
             message,
-            text="\n".join(children.keys())
-            + "\nwanna more?",  # FIX: children names from redis
-            keyboard=ADD_MORE_CHILDREN_KEYBOARD,
+            text=Texts.successful_reg_parent,
+            keyboard=await get_child_keyboard(message.chat.id),
             parse_mode="markdown",
         )
         await call.answer()
         await States.show_childs.set()
+
+    # =============================
+    @dp.callback_query_handler(
+        cf.filter(action=["enter_child_name"]),
+        state=[States.show_childs, States.submit_child_name],
+    )
+    async def enter_child_name_handler(
+        call: CallbackQuery, state: FSMContext, callback_data: dict
+    ):
+        message = call.message
+
+        if (
+            await get_premium_status(message.chat.id) == 0
+            and len(await get_children(message.chat.id)) == 1
+        ):
+            await send_message(
+                message,
+                text=Texts.not_enough_premium_children,
+                keyboard=await get_child_keyboard(message.chat.id),  # add back button
+                parse_mode="markdown",
+            )
+            await States.show_childs.set()
+
+        else:
+            await send_message(
+                message,
+                text=Texts.enter_child_name,
+                keyboard=None,  # add back button
+                parse_mode="markdown",
+            )
+            await States.enter_child_name.set()
+        await call.answer()
+
+    # =============================
+    @dp.message_handler(
+        state=[States.enter_child_name],
+    )
+    async def submit_child_name_handler(message: Message, state: FSMContext):
+        await state.update_data({"reg_child_name": message.text})
+        await message.answer(
+            text=Texts.submit_child_name.format(child_name=message.text),
+            reply_markup=SUBMIT_CHILD_NAME_KEYBOARD,  # add back button
+            parse_mode="markdown",
+        )
+
+        await States.submit_child_name.set()
 
     # =============================
     @dp.callback_query_handler(
@@ -489,8 +576,6 @@ async def register_registration_handlers():
 
         else:
             await change_role(telegram_id=message.chat.id, teacher_id=teacher_id)
-            await save_to_redis(message.chat.id)
-            await state.update_data({"changed": None})
 
         await send_message(
             message,
@@ -518,8 +603,6 @@ async def register_registration_handlers():
             )
         else:
             await change_role(telegram_id=message.chat.id, school_id=school_id)
-            await save_to_redis(message.chat.id)
-            await state.update_data({"changed": None})
         await send_message(
             message,
             text=Texts.successful_reg_admin.format(school_name=school_name),
