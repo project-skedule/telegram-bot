@@ -8,11 +8,11 @@ from src.api import (
     get_allowed_group,
     get_allowed_letter,
     get_allowed_parallel,
+    get_children,
     get_similar_schools,
     get_similar_teachers,
 )
 from src.logger import logger
-from src.redis import get_children
 
 cf = CallbackData("callback", "action", "data")
 
@@ -87,6 +87,7 @@ TEACHER_MAIN_KEYBOARD = generate_markup(
 
 CHILD_MAIN_KEYBOARD = generate_markup(
     [
+        # [("Следующий урок", cf.new(action="next_lesson", data=0))],
         [
             ("Сегодня", cf.new(action="today", data=0)),
             ("Завтра", cf.new(action="tomorrow", data=0)),
@@ -94,7 +95,7 @@ CHILD_MAIN_KEYBOARD = generate_markup(
         [("Определённый день недели", cf.new(action="child_day_of_week", data=0))],
         [("Неделя", cf.new(action="week", data=0))],
         [("Другое меню", cf.new(action="child_misc_menu_first", data=0))],
-        [("Выбрать другого ребёнка", cf.new(action="show_childs", data=0))],
+        [("Go back", cf.new(action="choose_child", data=0))],
     ]
 )
 
@@ -246,23 +247,14 @@ TEACHER_DAY_OF_WEEK_KEYBOARD = generate_markup(
 )
 
 
-async def get_child_keyboard(telegram_id: int):
-    children = await get_children(telegram_id)
+async def get_child_keyboard(name: int):
+    children = await get_children(name)
     keyboard = [
-        [
-            (
-                child["name"],
-                cf.new(
-                    action="child_menu",
-                    data=[child["subclass_id"], child["name"], child["school_id"]],
-                ),
-            )
-        ]
-        for child in children
+        [(child_name, cf.new(action="child_menu", data=child_id))]
+        for child_name, child_id in children.items()
     ]
-    keyboard += [[("Добавить ребёнка", cf.new(action="enter_child_name", data=0))]]
-    keyboard += [[("Удалить ребёнка", cf.new(action="delete_child", data=0))]]
-    keyboard += [[("Меню родителя", cf.new(action="parent_misc_menu_first", data=0))]]
+
+    keyboard += [[("parent menu #1", cf.new(action="parent_misc_menu_first", data=0))]]
     return generate_markup(keyboard)
 
 
@@ -505,44 +497,4 @@ BACK_FROM_INPUT_TEACHER_NAME_KEYBOARD = generate_markup(
 
 BACK_FROM_FIND_TEACHER_KEYBOARD = generate_markup(
     [[("Назад", cf.new(action="main_menu", data="None"))]]
-)
-
-SUBMIT_PARENT_REGISTRATION_KEYBOARD = generate_markup(
-    [
-        [("Да", cf.new(action="register_parent_yes", data=0))],
-        [("Нет", cf.new(action="choose_role", data=0))],
-    ]
-)
-
-SUBMIT_CHILD_NAME_KEYBOARD = generate_markup(
-    [
-        [("Да", cf.new(action="input_school", data=0))],
-        [("Нет", cf.new(action="enter_child_name", data=0))],
-    ]
-)
-
-
-async def get_childs_to_delete_keyboard(telegram_id: int):
-    children = await get_children(telegram_id)
-    keyboard = [
-        [
-            (
-                child["name"],
-                cf.new(
-                    action="submit_delete_child",
-                    data=[child["name"], child["child_id"]],
-                ),
-            )
-        ]
-        for child in children
-    ]
-    keyboard += [[("Назад", cf.new(action="show_childs", data=0))]]
-    return generate_markup(keyboard)
-
-
-SUBMIT_DELETE_CHILD_KEYBOARD = generate_markup(
-    [
-        [("Да", cf.new(action="show_childs", data="delete_child"))],
-        [("Нет", cf.new(action="delete_child", data=0))],
-    ]
 )
