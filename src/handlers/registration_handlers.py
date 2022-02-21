@@ -399,7 +399,7 @@ async def register_registration_handlers():
         letter = (await state.get_data())["letter"]
         group = (await state.get_data())["group"]
 
-        if role == "student":
+        if role == "Student":
             text = Texts.confirm_class.format(subclass=parallel + letter + group)
         else:
             text = Texts.confirm_child_class.format(subclass=parallel + letter + group)
