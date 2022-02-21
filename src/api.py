@@ -113,16 +113,16 @@ async def get_student_day_of_week(
     day_of_week = DAYS_OF_WEEK[day_of_week]
     if result.strip() == "":
         if child_name is not None:
-            return f"У ребёнка {child_name} нет уроков *{day_of_week}*\n"
+            return f'У ребёнка "{child_name}" нет уроков *{day_of_week}*\n'
         elif subclass_name is not None:
-            return f"У класса {subclass_name} нет уроков *{day_of_week}*\n"
+            return f'У класса "{subclass_name}" нет уроков *{day_of_week}*\n'
         else:
             return f"У вас нет уроков *{day_of_week}*\n"
     else:
         if child_name is not None:
-            return f"Расписание ребёнка {child_name} *{day_of_week}*:\n" + result
+            return f'Расписание ребёнка "{child_name}" *{day_of_week}*:\n' + result
         elif subclass_name is not None:
-            return f"Расписание класса {subclass_name} *{day_of_week}*:\n" + result
+            return f'Расписание класса "{subclass_name}" *{day_of_week}*:\n' + result
         else:
             return f"Ваше расписание *{day_of_week}*:\n" + result
 
@@ -242,11 +242,11 @@ async def get_student_week(
         name_day = DAYS_OF_WEEK[day_of_week]
         if child_name is not None:
             result += markdown.underline(
-                f"Расписание ребёнка {child_name} {name_day}:\n"
+                f'Расписание ребёнка "{child_name}" {name_day}:\n'
             )
         elif subclass_name is not None:
             result += markdown.underline(
-                f"Расписание класса {subclass_name} {name_day}:\n"
+                f'Расписание класса "{subclass_name}" {name_day}:\n'
             )
         else:
             result += markdown.underline(f"Ваше расписание {name_day}:\n")
