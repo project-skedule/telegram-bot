@@ -436,9 +436,9 @@ async def get_teachers_keyboard(teacher, school_id):
 
 CHOOSE_ROLE_KEYBOARD = generate_markup(
     [
-        [("Parent", cf.new(action="register_parent", data=0))],
         [("Ученик", cf.new(action="input_school", data="Student"))],
         [("Учитель", cf.new(action="input_school", data="Teacher"))],
+        [("Родитель", cf.new(action="register_parent", data=0))],
         [
             (
                 "Работник администрации",
