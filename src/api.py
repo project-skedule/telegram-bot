@@ -28,8 +28,9 @@ async def get_request(request: str, data=None):
     async with aiohttp.ClientSession() as session:
         async with session.get(f"{url}/api{request}", json=data) as response:
             response = await response.read()
-            logger.debug(f"answer to request: {response}")
-            return ujson.loads(response)
+            answer = ujson.loads(response)
+            logger.debug(f"answer to request: {answer}")
+            return answer
 
 
 async def post_request(request: str, data=None):
@@ -37,17 +38,18 @@ async def post_request(request: str, data=None):
     async with aiohttp.ClientSession() as session:
         async with session.post(f"{url}/api{request}", json=data) as response:
             response = await response.read()
-            logger.debug(f"answer to request: {response}")
-            return ujson.loads(response)
+            answer = ujson.loads(response)
+            logger.debug(f"answer to request: {answer}")
+            return answer
 
 
 async def put_request(request: str, data=None):
     logger.debug(f"put_request to {url}/api{request} with data: {data}")
     async with aiohttp.ClientSession() as session:
         async with session.put(f"{url}/api{request}", json=data) as response:
-            response = await response.read()
-            logger.debug(f"answer to request: {response}")
-            return ujson.loads(response)
+            answer = ujson.loads(response)
+            logger.debug(f"answer to request: {answer}")
+            return answer
 
 
 # ~=============================
@@ -113,16 +115,16 @@ async def get_student_day_of_week(
     day_of_week = DAYS_OF_WEEK[day_of_week]
     if result.strip() == "":
         if child_name is not None:
-            return f"У ребёнка {child_name} нет уроков *{day_of_week}*\n"
+            return f'У ребёнка "{child_name}" нет уроков *{day_of_week}*\n'
         elif subclass_name is not None:
-            return f"У класса {subclass_name} нет уроков *{day_of_week}*\n"
+            return f'У класса "{subclass_name}" нет уроков *{day_of_week}*\n'
         else:
             return f"У вас нет уроков *{day_of_week}*\n"
     else:
         if child_name is not None:
-            return f"Расписание ребёнка {child_name} *{day_of_week}*:\n" + result
+            return f'Расписание ребёнка "{child_name}" *{day_of_week}*:\n' + result
         elif subclass_name is not None:
-            return f"Расписание класса {subclass_name} *{day_of_week}*:\n" + result
+            return f'Расписание класса "{subclass_name}" *{day_of_week}*:\n' + result
         else:
             return f"Ваше расписание *{day_of_week}*:\n" + result
 
@@ -242,11 +244,11 @@ async def get_student_week(
         name_day = DAYS_OF_WEEK[day_of_week]
         if child_name is not None:
             result += markdown.underline(
-                f"Расписание ребёнка {child_name} {name_day}:\n"
+                f'Расписание ребёнка "{child_name}" {name_day}:\n'
             )
         elif subclass_name is not None:
             result += markdown.underline(
-                f"Расписание класса {subclass_name} {name_day}:\n"
+                f'Расписание класса "{subclass_name}" {name_day}:\n'
             )
         else:
             result += markdown.underline(f"Ваше расписание {name_day}:\n")
@@ -369,17 +371,17 @@ async def get_ring_timetable(telegram_id: int = None, school_id=None):
 async def get_canteen_timetable(telegram_id: int = None, school_id=None):
     if school_id is None:
         school_id = await get_school_id(telegram_id)
-    corpuses = await get_request("/info/corpuses/all", data={"school_id": school_id})
-    corpuses = list(map(lambda c: (c["name"], c["id"]), corpuses["data"]))
+    corpora = await get_request("/info/corpuses/all", data={"school_id": school_id})
+    corpora = list(map(lambda c: (c["name"], c["id"]), corpora["data"]))
+    result = markdown.escape_md(Texts.canteen_timetable_header)
+    for corpus_name, corpus_id in corpora:
+        canteen_text = (
+            await get_request("/info/corpus/canteen", data={"corpus_id": corpus_id})
+        )["data"]
+        result += markdown.underline(corpus_name) + "\n\n"
+        result += markdown.escape_md(canteen_text) + "\n\n"
 
-    canteen_texts = {}
-    for corpus_name, corpus_id in corpuses:
-        canteen_text = await get_request(
-            "/info/corpus/canteen", data={"corpus_id": corpus_id}
-        )
-        canteen_texts[corpus_name] = canteen_text["data"]
-
-    return canteen_texts
+    return result
 
 
 # ~=============================

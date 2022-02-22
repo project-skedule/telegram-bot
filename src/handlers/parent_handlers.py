@@ -22,6 +22,7 @@ from src.keyboards import (
     get_childs_to_delete_keyboard,
 )
 from src.logger import logger
+from src.redis import get_child_by_id
 from src.some_functions import send_message
 from src.states import States
 from src.texts import Texts
@@ -75,17 +76,14 @@ async def register_parent_handlers():
     async def child_menu_handler(
         call: CallbackQuery, state: FSMContext, callback_data: dict
     ):
-        logger.debug(f"{callback_data}")
-        if callback_data["data"] != "0":
-            data = ujson.loads(callback_data["data"].replace("'", '"'))
-
-            await state.update_data({"current_child_id": data[0]})
-            await state.update_data({"current_child_name": data[1]})
-            await state.update_data({"current_child_school_id": data[2]})
-
         message = call.message
-        # if callback_data["data"] != "0":
-        #     await state.update_data({"child": callback_data["data"]})
+        if callback_data["data"] != "0":
+            child_id = int(callback_data["data"])
+            child = await get_child_by_id(message.chat.id, child_id)
+
+            await state.update_data({"current_child_id": child_id})
+            await state.update_data({"current_child_name": child["name"]})
+            await state.update_data({"current_child_school_id": child["school_id"]})
 
         await send_message(
             message,
@@ -264,17 +262,15 @@ async def register_parent_handlers():
     )
     async def child_canteen_timetable_handler(call: CallbackQuery, state: FSMContext):
         message = call.message
-        canteens = await get_canteen_timetable(
+
+        text = await get_canteen_timetable(
             school_id=(await state.get_data())["current_child_school_id"]
         )
-        text = Texts.canteen_timetable_header + "".join(
-            Texts.canteen_timetable_format.format(
-                corpus_name=corpus_name, canteen_text=canteen_text
-            )
-            for corpus_name, canteen_text in canteens.items()
-        )
         await send_message(
-            message, text=text, keyboard=CHILD_MAIN_KEYBOARD, parse_mode="markdown"
+            message,
+            text=text,
+            keyboard=CHILD_MAIN_KEYBOARD,
+            parse_mode="MarkdownV2",
         )
         await call.answer()
         await States.child_menu.set()
@@ -308,8 +304,8 @@ async def register_parent_handlers():
         logger.debug(f"submit delete child callback: {callback_data}")
 
         message = call.message
-        data = ujson.loads(callback_data["data"].replace("'", '"'))
-        child_name, child_id = data
+        child_id = int(callback_data["data"])
+        child_name = await get_child_by_id(message.chat.id, child_id)["name"]
         await state.update_data({"delete_child_name": child_name})
         await state.update_data({"delete_child_id": child_id})
         await send_message(
@@ -349,7 +345,7 @@ async def register_parent_handlers():
         message = call.message
         await send_message(
             message,
-            text=Texts.help_message,
+            text=Texts.help_message.format(telegram_id=message.chat.id),
             keyboard=PARENT_MISC_MENU_FIRST_KEYBOARD,
             parse_mode="markdown",
         )

@@ -7,11 +7,6 @@ class Texts:
 """
     canteen_timetable_header = """Расписание столовой для вашей школы:
 """
-    canteen_timetable_format = """
-*{corpus_name}*
-
-{canteen_text}
-"""
     certain_day_timetable = """Уроки в {day_of_week}:
 {lessons}
 """
@@ -114,6 +109,8 @@ P.S. То что вы введёте, будет видно только вам
 то смело пишите: 
 @Dartt0n - Кудрявцев Антон, CTO проекта;
 @mrcatcis - Доможиров Антон, программист бота, CI/CD Engineer
+Возможно, мы попросим у вас это число: 
+```{telegram_id}```
 
 Если вы:
 - хотите подключить Skeдуль-бот в вашу школу,

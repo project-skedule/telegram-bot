@@ -203,18 +203,14 @@ async def register_student_handlers():
     async def student_canteen_timetable_handler(call: CallbackQuery):
         logger.debug("canteen timetable")
         message = call.message
-        canteens = await get_canteen_timetable(message.chat.id)
-        text = Texts.canteen_timetable_header + "".join(
-            Texts.canteen_timetable_format.format(
-                corpus_name=corpus_name, canteen_text=canteen_text
-            )
-            for corpus_name, canteen_text in canteens.items()
-        )
+        
+        text = await get_canteen_timetable(message.chat.id)
+
         await send_message(
             message,
             text=text,
             keyboard=STUDENT_MAIN_KEYBOARD,
-            parse_mode="markdown",
+            parse_mode="MarkdownV2",
         )
         await call.answer()
         await States.student_menu.set()
