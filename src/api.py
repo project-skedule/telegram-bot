@@ -28,8 +28,9 @@ async def get_request(request: str, data=None):
     async with aiohttp.ClientSession() as session:
         async with session.get(f"{url}/api{request}", json=data) as response:
             response = await response.read()
-            logger.debug(f"answer to request: {response}")
-            return ujson.loads(response)
+            answer = ujson.loads(response)
+            logger.debug(f"answer to request: {answer}")
+            return answer
 
 
 async def post_request(request: str, data=None):
@@ -37,17 +38,18 @@ async def post_request(request: str, data=None):
     async with aiohttp.ClientSession() as session:
         async with session.post(f"{url}/api{request}", json=data) as response:
             response = await response.read()
-            logger.debug(f"answer to request: {response}")
-            return ujson.loads(response)
+            answer = ujson.loads(response)
+            logger.debug(f"answer to request: {answer}")
+            return answer
 
 
 async def put_request(request: str, data=None):
     logger.debug(f"put_request to {url}/api{request} with data: {data}")
     async with aiohttp.ClientSession() as session:
         async with session.put(f"{url}/api{request}", json=data) as response:
-            response = await response.read()
-            logger.debug(f"answer to request: {response}")
-            return ujson.loads(response)
+            answer = ujson.loads(response)
+            logger.debug(f"answer to request: {answer}")
+            return answer
 
 
 # ~=============================
@@ -371,17 +373,13 @@ async def get_canteen_timetable(telegram_id: int = None, school_id=None):
         school_id = await get_school_id(telegram_id)
     corpora = await get_request("/info/corpuses/all", data={"school_id": school_id})
     corpora = list(map(lambda c: (c["name"], c["id"]), corpora["data"]))
-
     result = markdown.escape_md(Texts.canteen_timetable_header)
     for corpus_name, corpus_id in corpora:
-        canteen_text = await get_request(
-            "/info/corpus/canteen", data={"corpus_id": corpus_id}
+        canteen_text = (
+            await get_request("/info/corpus/canteen", data={"corpus_id": corpus_id})
         )["data"]
-        result += markdown.escape_md(
-            Texts.canteen_timetable_format.format(
-                corpus_name=corpus_name, canteen_text=canteen_text
-            )
-        )
+        result += markdown.underline(corpus_name) + "\n\n"
+        result += markdown.escape_md(canteen_text) + "\n\n"
 
     return result
 

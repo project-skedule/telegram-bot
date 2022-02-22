@@ -7,11 +7,6 @@ class Texts:
 """
     canteen_timetable_header = """Расписание столовой для вашей школы:
 """
-    canteen_timetable_format = """
-*{corpus_name}*
-
-{canteen_text}
-"""
     certain_day_timetable = """Уроки в {day_of_week}:
 {lessons}
 """
