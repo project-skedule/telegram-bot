@@ -154,7 +154,7 @@ TEACHER_MISC_MENU_SECOND_KEYBOARD = generate_markup(
 CHILD_MISC_MENU_FIRST_KEYBOARD = generate_markup(
     [
         [("Расписание звонков", cf.new(action="ring_timetable", data=0))],
-        [("Расписание Столовой", cf.new(action="canteen_timetable", data=0))],
+        [("Расписание столовой", cf.new(action="canteen_timetable", data=0))],
         [("↩️", cf.new(action="child_menu", data=0))],
     ]
 )
