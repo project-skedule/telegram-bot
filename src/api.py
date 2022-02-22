@@ -6,7 +6,7 @@ import ujson
 from aiogram.utils import markdown
 
 from src.constants import DAYS_OF_WEEK
-from src.logger import logger
+from loguru import logger
 from src.redis import (
     get_main_role,
     get_school_id,

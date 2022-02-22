@@ -1,5 +1,5 @@
 from .bot import storage
-from .logger import logger
+from loguru import logger
 
 
 async def get_school_id(telegram_id):

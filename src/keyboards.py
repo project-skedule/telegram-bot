@@ -11,7 +11,7 @@ from src.api import (
     get_similar_schools,
     get_similar_teachers,
 )
-from src.logger import logger
+from loguru import logger
 from src.redis import get_children
 
 cf = CallbackData("callback", "action", "data")

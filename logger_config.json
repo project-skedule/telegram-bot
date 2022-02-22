@@ -1,0 +1,11 @@
+{
+  "logger": {
+    "path": "./logs/telegram.log",
+    "level": "INFO",
+    "rotation": "10MB",
+    "format": "{time:DD.MM.YY HH:mm:ss.SSS} | {level} | {message}",
+    "mode": "a",
+    "backtrace": true,
+    "enqueue": true
+  }
+}

@@ -1,6 +1,6 @@
 from aiogram.types import Update
 from src.bot import dp
-from src.logger import logger
+from loguru import logger
 from src.texts import Texts
 
 

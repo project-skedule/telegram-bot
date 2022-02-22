@@ -36,7 +36,7 @@ from src.keyboards import (
     get_schools_keyboard,
     get_teachers_keyboard,
 )
-from src.logger import logger
+from loguru import logger
 from src.redis import get_premium_status, get_school_id, get_children
 from src.some_functions import send_message
 from src.states import States

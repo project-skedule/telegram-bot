@@ -16,7 +16,7 @@ from src.keyboards import (
     STUDENT_MISC_MENU_SECOND_KEYBOARD,
     cf,
 )
-from src.logger import logger
+from loguru import logger
 from src.some_functions import send_message
 from src.states import States
 from src.texts import Texts

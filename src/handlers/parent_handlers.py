@@ -21,7 +21,7 @@ from src.keyboards import (
     get_child_keyboard,
     get_childs_to_delete_keyboard,
 )
-from src.logger import logger
+from loguru import logger
 from src.redis import get_child_by_id
 from src.some_functions import send_message
 from src.states import States

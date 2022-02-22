@@ -16,8 +16,7 @@ from src.handlers.registration_handlers import register_registration_handlers
 from src.handlers.student_handers import register_student_handlers
 from src.handlers.teacher_handers import register_teacher_handlers
 from src.handlers.universal_handler import register_universal_handlers
-from src.logger import logger
-
+from loguru import logger
 
 async def web():
 

@@ -21,7 +21,7 @@ from src.keyboards import (
     get_find_enter_letter_keyboard,
     get_find_enter_parallel_keyboard,
 )
-from src.logger import logger
+from loguru import logger
 from src.redis import get_school_id
 from src.some_functions import dispatcher_menu, is_find_for_student, send_message
 from src.states import States
