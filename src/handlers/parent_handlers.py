@@ -262,17 +262,15 @@ async def register_parent_handlers():
     )
     async def child_canteen_timetable_handler(call: CallbackQuery, state: FSMContext):
         message = call.message
-        canteens = await get_canteen_timetable(
+
+        text = await get_canteen_timetable(
             school_id=(await state.get_data())["current_child_school_id"]
         )
-        text = Texts.canteen_timetable_header + "".join(
-            Texts.canteen_timetable_format.format(
-                corpus_name=corpus_name, canteen_text=canteen_text
-            )
-            for corpus_name, canteen_text in canteens.items()
-        )
         await send_message(
-            message, text=text, keyboard=CHILD_MAIN_KEYBOARD, parse_mode="markdown"
+            message,
+            text=text,
+            keyboard=CHILD_MAIN_KEYBOARD,
+            parse_mode="MarkdownV2",
         )
         await call.answer()
         await States.child_menu.set()

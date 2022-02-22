@@ -85,18 +85,12 @@ async def register_administration_handlers():
     )
     async def administration_canteen_timetable_handler(call: CallbackQuery):
         message = call.message
-        canteens = await get_canteen_timetable(message.chat.id)
-        text = Texts.canteen_timetable_header + "".join(
-            Texts.canteen_timetable_format.format(
-                corpus_name=corpus_name, canteen_text=canteen_text
-            )
-            for corpus_name, canteen_text in canteens.items()
-        )
+        text = await get_canteen_timetable(message.chat.id)
         await send_message(
             message,
             text=text,
             keyboard=ADMINISTRATION_MENU_SECOND_KEYBOARD,
-            parse_mode="markdown",
+            parse_mode="MarkdownV2",
         )
         await call.answer()
 

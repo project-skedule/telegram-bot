@@ -369,17 +369,21 @@ async def get_ring_timetable(telegram_id: int = None, school_id=None):
 async def get_canteen_timetable(telegram_id: int = None, school_id=None):
     if school_id is None:
         school_id = await get_school_id(telegram_id)
-    corpuses = await get_request("/info/corpuses/all", data={"school_id": school_id})
-    corpuses = list(map(lambda c: (c["name"], c["id"]), corpuses["data"]))
+    corpora = await get_request("/info/corpuses/all", data={"school_id": school_id})
+    corpora = list(map(lambda c: (c["name"], c["id"]), corpora["data"]))
 
-    canteen_texts = {}
-    for corpus_name, corpus_id in corpuses:
+    result = markdown.escape_md(Texts.canteen_timetable_header)
+    for corpus_name, corpus_id in corpora:
         canteen_text = await get_request(
             "/info/corpus/canteen", data={"corpus_id": corpus_id}
+        )["data"]
+        result += markdown.escape_md(
+            Texts.canteen_timetable_format.format(
+                corpus_name=corpus_name, canteen_text=canteen_text
+            )
         )
-        canteen_texts[corpus_name] = canteen_text["data"]
 
-    return canteen_texts
+    return result
 
 
 # ~=============================
