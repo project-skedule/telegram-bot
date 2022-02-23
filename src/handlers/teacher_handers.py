@@ -29,15 +29,25 @@ async def register_teacher_handlers():
     @dp.callback_query_handler(
         cf.filter(action=["teacher_menu"]),
         state=[
-            States.find_menu,
-            States.find_day_of_week,
             States.teacher_day_of_week,
             States.teacher_misc_menu_first,
             States.teacher_misc_menu_second,
         ],
     )
-    async def teacher_menu_handler(call: CallbackQuery):
+    async def teacher_menu_handler(call: CallbackQuery, state: FSMContext):
         message = call.message
+        if await state.get_state() == States.teacher_day_of_week:
+            logger.info(
+                f"{message.chat.id} | {message.chat.username} | Teacher | teacher_menu | back_day_of_week_button"
+            )
+        elif await state.get_state() == States.teacher_misc_menu_first:
+            logger.info(
+                f"{message.chat.id} | {message.chat.username} | Teacher | teacher_menu | back_misc_menu_first_button"
+            )
+        else:
+            logger.info(
+                f"{message.chat.id} | {message.chat.username} | Teacher | teacher_menu | back_misc_menu_second_button"
+            )
         await send_message(
             message,
             text=Texts.teacher_main_menu,
@@ -54,6 +64,9 @@ async def register_teacher_handlers():
     )
     async def teacher_day_of_week_handler(call: CallbackQuery):
         message = call.message
+        logger.info(
+            f"{message.chat.id} | {message.chat.username} | Teacher | teacher_day_of_week_menu | day_of_week_menu_button"
+        )
         await send_message(
             message,
             text=Texts.select_day_of_week,
@@ -72,6 +85,9 @@ async def register_teacher_handlers():
         call: CallbackQuery, callback_data: dict
     ):
         message = call.message
+        logger.info(
+            f"{message.chat.id} | {message.chat.username} | Teacher | teacher_day_of_week | day_of_week_button"
+        )
         text = await get_user_day_of_week(
             telegram_id=message.chat.id,
             day_of_week=int(callback_data["data"]),
@@ -91,8 +107,19 @@ async def register_teacher_handlers():
         cf.filter(action=["teacher_misc_menu_first"]),
         state=[States.teacher_menu, States.teacher_misc_menu_second],
     )
-    async def teacher_misc_menu_first_handler(call: CallbackQuery, callback_data: dict):
+    async def teacher_misc_menu_first_handler(
+        call: CallbackQuery, state: FSMContext, callback_data: dict
+    ):
         message = call.message
+        if await state.get_state() == States.teacher_menu:
+            logger.info(
+                f"{message.chat.id} | {message.chat.username} | Teacher | teacher_misc_menu_first | misc_menu_menu_button"
+            )
+        else:
+            logger.info(
+                f"{message.chat.id} | {message.chat.username} | Teacher | teacher_misc_menu_first | arrow_button"
+            )
+
         await send_message(
             message,
             text=Texts.teacher_misc_menu,
@@ -106,12 +133,15 @@ async def register_teacher_handlers():
 
     @dp.callback_query_handler(
         cf.filter(action=["teacher_misc_menu_second"]),
-        state=[States.teacher_menu, States.teacher_misc_menu_first],
+        state=[States.teacher_misc_menu_first],
     )
     async def teacher_misc_menu_second_handler(
         call: CallbackQuery, callback_data: dict
     ):
         message = call.message
+        logger.info(
+            f"{message.chat.id} | {message.chat.username} | Teacher | teacher_misc_menu_second | arrow_button"
+        )
         await send_message(
             message,
             text=Texts.teacher_misc_menu,
@@ -128,6 +158,9 @@ async def register_teacher_handlers():
     )
     async def teacher_today_handler(call: CallbackQuery):
         message = call.message
+        logger.info(
+            f"{message.chat.id} | {message.chat.username} | Teacher | teacher_today | today_button"
+        )
         text = await get_user_today(telegram_id=message.chat.id, is_searching=False)
         await send_message(
             message,
@@ -144,6 +177,9 @@ async def register_teacher_handlers():
     )
     async def teacher_tomorrow_handler(call: CallbackQuery):
         message = call.message
+        logger.info(
+            f"{message.chat.id} | {message.chat.username} | Teacher | teacher_tomorrow | tomorrow_button"
+        )
         text = await get_user_tomorrow(telegram_id=message.chat.id, is_searching=False)
         await send_message(
             message,
@@ -160,6 +196,9 @@ async def register_teacher_handlers():
     )
     async def teacher_week_handler(call: CallbackQuery):
         message = call.message
+        logger.info(
+            f"{message.chat.id} | {message.chat.username} | Teacher | teacher_week | week_button"
+        )
         text = await get_user_week(telegram_id=message.chat.id, is_searching=False)
         await send_message(
             message,
@@ -176,6 +215,9 @@ async def register_teacher_handlers():
     )
     async def teacher_ring_timetable_handler(call: CallbackQuery):
         message = call.message
+        logger.info(
+            f"{message.chat.id} | {message.chat.username} | Teacher | teacher_ring_timetable | ring_timetable_button"
+        )
         data = await get_ring_timetable(message.chat.id)
         text = Texts.rings_timetable_header + "".join(
             Texts.rings_timetable_format.format(
@@ -200,6 +242,10 @@ async def register_teacher_handlers():
     )
     async def teacher_canteen_timetable_handler(call: CallbackQuery):
         message = call.message
+        logger.info(
+            f"{message.chat.id}| {message.chat.username} | Teacher | teacher_canteen_timetable | canteen_timetable_button"
+        )
+
         text = await get_canteen_timetable(message.chat.id)
         await send_message(
             message,
@@ -217,6 +263,9 @@ async def register_teacher_handlers():
     )
     async def teacher_contact_devs_handler(call: CallbackQuery):
         message = call.message
+        logger.info(
+            f"{message.chat.id}| {message.chat.username} | Teacher | teacher_contact_devs | contact_devs_button"
+        )
         text = Texts.help_message.format(telegram_id=message.chat.id)
         await send_message(
             message,
@@ -234,6 +283,9 @@ async def register_teacher_handlers():
     )
     async def teacher_support_devs_handler(call: CallbackQuery):
         message = call.message
+        logger.info(
+            f"{message.chat.id}| {message.chat.username} | Teacher | teacher_support_devs | support_devs_button"
+        )
         text = Texts.donate_message
         await send_message(
             message,
@@ -252,6 +304,9 @@ async def register_teacher_handlers():
     )
     async def teacher_announcements_handler(call: CallbackQuery):
         message = call.message
+        logger.info(
+            f"{message.chat.id}| {message.chat.username} | Teacher | teacher_announcements | announcements_button"
+        )
         text = Texts.announcements
         await send_message(
             message,
