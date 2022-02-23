@@ -11,13 +11,12 @@ async def register_error_handlers():
         try:
             chat_id = update.message.chat.id
             username = update.message.chat.username
+            logger.error(
+                f"{chat_id} | {username} | {exception.__class__.__name__}: {exception}",
+            )
         except:
-            chat_id = -1
-            username = ""
-        finally:
             logger.error(
                 f"{exception.__class__.__name__}: {exception}",
-                chat_id=chat_id,
-                username=username,
             )
+
         return True

@@ -1,7 +1,8 @@
 import re
+import sys
 from pathlib import Path
-from loguru import logger
 from jproperties import Properties
+from loguru import logger
 
 DEBUG = "DEBUG"
 PRODUCTION = "production"
@@ -39,21 +40,33 @@ elif PROFILE == PRODUCTION:
 else:
     raise NameError("Unknown profile")
 
+logger.remove()
+logger.add(
+    sys.stdout,
+    level="TRACE",
+    format="<green>{time:DD.MM.YY HH:mm:ss.SSS}</green> | <level>{level: <8}</level> | <cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - <level>{message}</level>",  # format for messages
+    enqueue=True,
+    backtrace=True,
+    colorize=True,
+)
+
 logger.add(
     "logs/telegram.log",  # filename
     level="INFO",
     mode="a",  # filemode
     rotation="50MB",  # Max file size
-    format="{time:DD.MM.YY HH:mm:ss.SSS} | {level} | {message}",  # format for messages
+    format="{time:DD.MM.YY HH:mm:ss.SSS} | {level:5} | {message}",  # format for messages
     enqueue=True,  # for async
     backtrace=False,
+    colorize=True,
 )
 logger.add(
     "logs/telegram_debug.log",  # filename
-    leve="DEBUG",
+    level="DEBUG",
     mode="a",  # filemode
     rotation="50MB",  # Max file size
-    format="{time:DD.MM.YY HH:mm:ss.SSS} | {level} | {message}",  # format for messages
+    format="{time:DD.MM.YY HH:mm:ss.SSS} | {level:5} | {message}",  # format for messages
     enqueue=True,  # for async
     backtrace=True,
+    colorize=True,
 )
