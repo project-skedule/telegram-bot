@@ -24,8 +24,9 @@ async def register_administration_handlers():
             States.administration_menu_second,
         ],
     )
-    async def administration_menu_first_handler(call: CallbackQuery):
+    async def administration_menu_first_handler(call: CallbackQuery, state: FSMContext):
         message = call.message
+        
         await send_message(
             message,
             text=Texts.admin_main_menu,

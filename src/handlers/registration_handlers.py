@@ -217,7 +217,7 @@ async def register_registration_handlers():
         message = call.message
 
         if callback_data["data"] != "None":
-            school = callback_data["data"]
+            school = int(callback_data["data"])
             school_name = await get_school_name_by_id(school)
 
             await state.update_data(

@@ -47,6 +47,7 @@ async def put_request(request: str, data=None):
     logger.debug(f"put_request to {url}/api{request} with data: {data}")
     async with aiohttp.ClientSession() as session:
         async with session.put(f"{url}/api{request}", json=data) as response:
+            response = await response.read()
             answer = ujson.loads(response)
             logger.debug(f"answer to request: {answer}")
             return answer
@@ -658,7 +659,6 @@ async def save_to_redis(telegram_id):
             await storage.update_data(data={"children": []}, user=telegram_id)
 
     elif role["role_type"] == 3:  # Administration
-        await storage.update_data(data={"role": "Administration"}, user=telegram_id)
         await storage.update_data(
             data={"role": "Administration", "school": role["data"]["school"]["id"]},
             user=telegram_id,
