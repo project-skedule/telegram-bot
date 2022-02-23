@@ -26,15 +26,26 @@ async def register_student_handlers():
     @dp.callback_query_handler(
         cf.filter(action=["student_menu"]),
         state=[
-            States.find_menu,
-            States.find_day_of_week,
             States.student_day_of_week,
             States.student_misc_menu_first,
             States.student_misc_menu_second,
         ],
     )
-    async def student_menu_handler(call: CallbackQuery):
+    async def student_menu_handler(call: CallbackQuery, state: FSMContext):
         message = call.message
+        if await state.get_state() == States.student_day_of_week:
+            logger.info(
+                f"{message.chat.id} | {message.chat.username} | Student | student_menu | back_day_of_week_button"
+            )
+        elif await state.get_state() == States.student_misc_menu_first:
+            logger.info(
+                f"{message.chat.id} | {message.chat.username} | Student | student_menu | back_misc_menu_first_button"
+            )
+        else:
+            logger.info(
+                f"{message.chat.id} | {message.chat.username} | Student | student_menu | back_misc_menu_second_button"
+            )
+
         await send_message(
             message,
             text=Texts.student_main_menu,
@@ -51,6 +62,9 @@ async def register_student_handlers():
     )
     async def student_day_of_week_handler(call: CallbackQuery, state: FSMContext):
         message = call.message
+        logger.info(
+            f"{message.chat.id} | {message.chat.username} | Student | student_day_of_week_menu | day_of_week_menu_button"
+        )
         await send_message(
             message,
             text=Texts.select_day_of_week,
@@ -69,6 +83,9 @@ async def register_student_handlers():
         call: CallbackQuery, callback_data: dict
     ):
         message = call.message
+        logger.info(
+            f"{message.chat.id} | {message.chat.username} | Student | student_day_of_week | day_of_week_button"
+        )
         text = await get_user_day_of_week(
             telegram_id=message.chat.id,
             day_of_week=int(callback_data["data"]),
@@ -86,10 +103,23 @@ async def register_student_handlers():
     # =============================
     @dp.callback_query_handler(
         cf.filter(action=["student_misc_menu_first"]),
-        state=[States.student_menu, States.student_misc_menu_second],
+        state=[
+            States.student_menu,
+            States.student_misc_menu_second,
+        ],
     )
-    async def student_misc_menu_first_handler(call: CallbackQuery, callback_data: dict):
+    async def student_misc_menu_first_handler(
+        call: CallbackQuery, state: FSMContext, callback_data: dict
+    ):
         message = call.message
+        if await state.get_state() == States.student_menu:
+            logger.info(
+                f"{message.chat.id} | {message.chat.username} | Student | student_misc_menu_first | misc_menu_menu_button"
+            )
+        else:
+            logger.info(
+                f"{message.chat.id} | {message.chat.username} | Student | student_misc_menu_first | arrow_button"
+            )
         await send_message(
             message,
             text=Texts.student_misc_menu,
@@ -108,6 +138,9 @@ async def register_student_handlers():
         call: CallbackQuery, callback_data: dict
     ):
         message = call.message
+        logger.info(
+            f"{message.chat.id} | {message.chat.username} | Student | student_misc_menu_second | arrow_button"
+        )
         await send_message(
             message,
             text=Texts.student_misc_menu,
@@ -123,9 +156,10 @@ async def register_student_handlers():
         state=[States.student_menu],
     )
     async def student_today_handler(call: CallbackQuery, callback_data: dict):
-        logger.debug("today for student")
         message = call.message
-        logger.debug(f"{callback_data}")
+        logger.info(
+            f"{message.chat.id} | {message.chat.username} | Student | student_today | today_button"
+        )
         text = await get_user_today(telegram_id=message.chat.id, is_searching=False)
         await send_message(
             message,
@@ -141,8 +175,10 @@ async def register_student_handlers():
         state=[States.student_menu],
     )
     async def student_tomorrow_handler(call: CallbackQuery):
-        logger.debug("tomorrow for student")
         message = call.message
+        logger.info(
+            f"{message.chat.id} | {message.chat.username} | Student | student_tomorrow | tomorrow_button"
+        )
         text = await get_user_tomorrow(telegram_id=message.chat.id, is_searching=False)
         await send_message(
             message,
@@ -158,8 +194,10 @@ async def register_student_handlers():
         state=[States.student_menu],
     )
     async def student_week_handler(call: CallbackQuery):
-        logger.debug("week for student")
         message = call.message
+        logger.info(
+            f"{message.chat.id} | {message.chat.username} | Student | student_week | week_button"
+        )
         text = await get_user_week(telegram_id=message.chat.id, is_searching=False)
 
         await send_message(
@@ -176,8 +214,10 @@ async def register_student_handlers():
         state=[States.student_misc_menu_first],
     )
     async def student_ring_timetable_handler(call: CallbackQuery):
-        logger.debug("ring timetable")
         message = call.message
+        logger.info(
+            f"{message.chat.id} | {message.chat.username} | Student | student_ring_timetable | ring_timetable_button"
+        )
         data = await get_ring_timetable(message.chat.id)
         text = Texts.rings_timetable_header + "".join(
             Texts.rings_timetable_format.format(
@@ -201,8 +241,10 @@ async def register_student_handlers():
         state=[States.student_misc_menu_second],
     )
     async def student_canteen_timetable_handler(call: CallbackQuery):
-        logger.debug("canteen timetable")
         message = call.message
+        logger.info(
+            f"{message.chat.id}| {message.chat.username} | Student | student_canteen_timetable | canteen_timetable_button"
+        )
 
         text = await get_canteen_timetable(message.chat.id)
 
@@ -222,6 +264,9 @@ async def register_student_handlers():
     )
     async def student_contact_devs_handler(call: CallbackQuery):
         message = call.message
+        logger.info(
+            f"{message.chat.id}| {message.chat.username} | Student | student_contact_devs | contact_devs_button"
+        )
         text = Texts.help_message.format(telegram_id=message.chat.id)
         await send_message(
             message,
@@ -239,6 +284,9 @@ async def register_student_handlers():
     )
     async def student_support_devs_handler(call: CallbackQuery):
         message = call.message
+        logger.info(
+            f"{message.chat.id}| {message.chat.username} | Student | student_support_devs | support_devs_button"
+        )
         text = Texts.donate_message
         await send_message(
             message,
@@ -257,6 +305,9 @@ async def register_student_handlers():
     )
     async def student_announcements_handler(call: CallbackQuery):
         message = call.message
+        logger.info(
+            f"{message.chat.id}| {message.chat.username} | Student | student_announcements | announcements_button"
+        )
         text = Texts.announcements
         await send_message(
             message,
