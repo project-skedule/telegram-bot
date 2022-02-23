@@ -203,7 +203,7 @@ async def register_student_handlers():
     async def student_canteen_timetable_handler(call: CallbackQuery):
         logger.debug("canteen timetable")
         message = call.message
-        
+
         text = await get_canteen_timetable(message.chat.id)
 
         await send_message(

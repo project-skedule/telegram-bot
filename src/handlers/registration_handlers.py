@@ -49,7 +49,7 @@ async def register_registration_handlers():
         commands=["start"],
     )
     async def registration_message(message: Message, state: FSMContext):
-        logger.debug("/start")
+        logger.info("/start")
         logger.debug(f"{await state.get_data()}")
         if not await is_registered(message.chat.id):
             await States.choose_role.set()

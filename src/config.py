@@ -1,6 +1,6 @@
 import re
 from pathlib import Path
-
+from loguru import logger
 from jproperties import Properties
 
 DEBUG = "DEBUG"
@@ -38,3 +38,22 @@ elif PROFILE == PRODUCTION:
     TELEGRAM_TOKEN = config["TG_TOKEN"]
 else:
     raise NameError("Unknown profile")
+
+logger.add(
+    "logs/telegram.log",  # filename
+    level="INFO",
+    mode="a",  # filemode
+    rotation="50MB",  # Max file size
+    format="{time:DD.MM.YY HH:mm:ss.SSS} | {level} | {message}",  # format for messages
+    enqueue=True,  # for async
+    backtrace=False,
+)
+logger.add(
+    "logs/telegram_debug.log",  # filename
+    leve="DEBUG",
+    mode="a",  # filemode
+    rotation="50MB",  # Max file size
+    format="{time:DD.MM.YY HH:mm:ss.SSS} | {level} | {message}",  # format for messages
+    enqueue=True,  # for async
+    backtrace=True,
+)
