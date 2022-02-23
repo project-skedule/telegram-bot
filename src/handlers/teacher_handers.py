@@ -113,7 +113,7 @@ async def register_teacher_handlers():
         message = call.message
         if await state.get_state() == States.teacher_menu:
             logger.info(
-                f"{message.chat.id} | {message.chat.username} | Teacher | teacher_misc_menu_first | misc_menu_menu_button"
+                f"{message.chat.id} | {message.chat.username} | Teacher | teacher_misc_menu_first | misc_menu_button"
             )
         else:
             logger.info(
@@ -243,7 +243,7 @@ async def register_teacher_handlers():
     async def teacher_canteen_timetable_handler(call: CallbackQuery):
         message = call.message
         logger.info(
-            f"{message.chat.id}| {message.chat.username} | Teacher | teacher_canteen_timetable | canteen_timetable_button"
+            f"{message.chat.id} | {message.chat.username} | Teacher | teacher_canteen_timetable | canteen_timetable_button"
         )
 
         text = await get_canteen_timetable(message.chat.id)
@@ -264,7 +264,7 @@ async def register_teacher_handlers():
     async def teacher_contact_devs_handler(call: CallbackQuery):
         message = call.message
         logger.info(
-            f"{message.chat.id}| {message.chat.username} | Teacher | teacher_contact_devs | contact_devs_button"
+            f"{message.chat.id} | {message.chat.username} | Teacher | teacher_contact_devs | contact_devs_button"
         )
         text = Texts.help_message.format(telegram_id=message.chat.id)
         await send_message(
@@ -284,7 +284,7 @@ async def register_teacher_handlers():
     async def teacher_support_devs_handler(call: CallbackQuery):
         message = call.message
         logger.info(
-            f"{message.chat.id}| {message.chat.username} | Teacher | teacher_support_devs | support_devs_button"
+            f"{message.chat.id} | {message.chat.username} | Teacher | teacher_support_devs | support_devs_button"
         )
         text = Texts.donate_message
         await send_message(
@@ -305,7 +305,7 @@ async def register_teacher_handlers():
     async def teacher_announcements_handler(call: CallbackQuery):
         message = call.message
         logger.info(
-            f"{message.chat.id}| {message.chat.username} | Teacher | teacher_announcements | announcements_button"
+            f"{message.chat.id} | {message.chat.username} | Teacher | teacher_announcements | announcements_button"
         )
         text = Texts.announcements
         await send_message(
