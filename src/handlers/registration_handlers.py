@@ -62,7 +62,7 @@ async def register_registration_handlers():
         else:
             await save_to_redis(message.chat.id)
             data = await state.get_data()
-            role = data["role"]
+            role = data.get("role")
             logger.info(
                 f"{message.chat.id} | {message.chat.username} | {role} | /start | start_command"
             )
@@ -558,7 +558,7 @@ async def register_registration_handlers():
         call: CallbackQuery, state: FSMContext, callback_data: dict
     ):
         message = call.message
-        role = (await state.get_data())["role"]
+        role = (await state.get_data()).get("role")
         logger.info(
             f"{message.chat.id} | {message.chat.username} | {role} | confirm_parent | parent_button"
         )

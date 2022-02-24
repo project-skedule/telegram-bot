@@ -75,7 +75,7 @@ async def register_find_handlers():
         call: CallbackQuery, state: FSMContext, callback_data: dict
     ):
         role = (await state.get_data())["role"]
-
+        message = call.message
         if callback_data["data"] != "None":
             logger.info(
                 f"{message.chat.id} | {message.chat.username} | {role} | find_enter_letter | find_parallel_button"
@@ -427,7 +427,7 @@ async def register_find_handlers():
         logger.info(
             f"{message.chat.id} | {message.chat.username} | {role} | find_enter_teacher | find_enter_teacher_message"
         )
-        
+
         await message.answer(
             text=Texts.select_teacher_from_list,
             reply_markup=await find_get_teachers_keyboard(
