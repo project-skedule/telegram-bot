@@ -112,7 +112,7 @@ async def register_parent_handlers():
             child_id = int(callback_data["data"])
             child = await get_child_by_id(message.chat.id, child_id)
 
-            await state.update_data({"current_child_id": child_id})
+            await state.update_data({"current_child_id": child["subclass_id"]}) # FIXME
             await state.update_data({"current_child_name": child["name"]})
             await state.update_data({"current_child_school_id": child["school_id"]})
 
