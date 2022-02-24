@@ -581,7 +581,7 @@ async def register_registration_handlers():
         call: CallbackQuery, state: FSMContext, callback_data: dict
     ):
         message = call.message
-        role = (await state.get_data())["role"]
+        role = (await state.get_data()).get("role")
         logger.info(
             f"{message.chat.id} | {message.chat.username} | {role} | confirm_parent_yes | confirm_parent_yes_button"
         )
