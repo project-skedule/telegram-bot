@@ -51,7 +51,7 @@ async def register_registration_handlers():
     async def registration_message(message: Message, state: FSMContext):
         if not await is_registered(message.chat.id):
             logger.info(
-                f"{message.chat.id} | {message.chat.username} | None | /start | start_command"
+                f"{message.chat.id} | {message.chat.username} | None | start | start_command"
             )
             await message.answer(
                 text=Texts.greeting,
@@ -64,7 +64,7 @@ async def register_registration_handlers():
             data = await state.get_data()
             role = data.get("role")
             logger.info(
-                f"{message.chat.id} | {message.chat.username} | {role} | /start | start_command"
+                f"{message.chat.id} | {message.chat.username} | {role} | start | start_command"
             )
             if role == "Parent":
                 await message.answer(
