@@ -21,6 +21,9 @@ async def register_universal_handlers():
         role = (await state.get_data())["role"]
 
         if role == "Parent":
+            logger.info(
+                f"{message.chat.id} | {message.chat.username} | {role} | parent_show_childs | main_menu_callback | None"
+            )
             await send_message(
                 message,
                 text=Texts.parent_main_menu,
@@ -29,6 +32,9 @@ async def register_universal_handlers():
             )
             await States.child_menu.set()
         elif role == "Student":
+            logger.info(
+                f"{message.chat.id} | {message.chat.username} | {role} | student_menu | main_menu_callback | None"
+            )
             await send_message(
                 message,
                 text=Texts.student_main_menu,
@@ -37,6 +43,9 @@ async def register_universal_handlers():
             )
             await States.student_menu.set()
         elif role == "Teacher":
+            logger.info(
+                f"{message.chat.id} | {message.chat.username} | {role} | teacher_menu | main_menu_callback | None"
+            )
             await send_message(
                 message,
                 text=Texts.teacher_main_menu,
@@ -45,6 +54,9 @@ async def register_universal_handlers():
             )
             await States.teacher_menu.set()
         elif role == "Administration":
+            logger.info(
+                f"{message.chat.id} | {message.chat.username} | {role} | administration_menu_first | main_menu_callback | None"
+            )
             await send_message(
                 message,
                 text=Texts.admin_main_menu,

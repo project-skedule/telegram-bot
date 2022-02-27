@@ -46,19 +46,19 @@ async def register_parent_handlers():
         last_state = await state.get_state()
         if last_state == States.child_menu:
             logger.info(
-                f"{message.chat.id} | {message.chat.username} | Parent | parent_show_childs | back_child_button"
+                f"{message.chat.id} | {message.chat.username} | Parent | parent_show_childs | back_child_button | None"
             )
         elif last_state == States.parent_misc_menu_first:
             logger.info(
-                f"{message.chat.id} | {message.chat.username} | Parent | parent_show_childs | back_parent_misc_menu_button"
+                f"{message.chat.id} | {message.chat.username} | Parent | parent_show_childs | back_parent_misc_menu_button | None"
             )
         elif last_state == States.choose_delete_child:
             logger.info(
-                f"{message.chat.id} | {message.chat.username} | Parent | parent_show_childs | back_delete_child_button"
+                f"{message.chat.id} | {message.chat.username} | Parent | parent_show_childs | back_delete_child_button | None"
             )
         else:
             logger.info(
-                f"{message.chat.id} | {message.chat.username} | Parent | parent_show_childs | submit_delete_child_button_yes"
+                f"{message.chat.id} | {message.chat.username} | Parent | parent_show_childs | submit_delete_child_button_yes | None"
             )
 
         if callback_data["data"] == "delete_child":
@@ -100,21 +100,20 @@ async def register_parent_handlers():
             logger.info(
                 f"{message.chat.id} | {message.chat.username} | Parent | child_menu | child_button"
             )
+            child_id = int(callback_data["data"])
+            child = await get_child_by_id(message.chat.id, child_id)
+            await state.update_data({"current_child_id": child["subclass_id"]})  # FIXME
+            await state.update_data({"current_child_name": child["name"]})
+            await state.update_data({"current_child_school_id": child["school_id"]})
+
         elif last_state == States.child_day_of_week:
             logger.info(
-                f"{message.chat.id} | {message.chat.username} | Parent | child_menu | back_day_of_week_menu_button"
+                f"{message.chat.id} | {message.chat.username} | Parent | child_menu | back_day_of_week_menu_button | None"
             )
         else:
             logger.info(
-                f"{message.chat.id} | {message.chat.username} | Parent | child_menu | back_misc_menu_first_button"
+                f"{message.chat.id} | {message.chat.username} | Parent | child_menu | back_misc_menu_first_button | None"
             )
-        if callback_data["data"] != "0":
-            child_id = int(callback_data["data"])
-            child = await get_child_by_id(message.chat.id, child_id)
-
-            await state.update_data({"current_child_id": child["subclass_id"]}) # FIXME
-            await state.update_data({"current_child_name": child["name"]})
-            await state.update_data({"current_child_school_id": child["school_id"]})
 
         await send_message(
             message,
@@ -134,7 +133,7 @@ async def register_parent_handlers():
     async def child_day_of_week_handler(call: CallbackQuery):
         message = call.message
         logger.info(
-            f"{message.chat.id} | {message.chat.username} | Parent | child_day_of_week_menu | day_of_week_menu_button"
+            f"{message.chat.id} | {message.chat.username} | Parent | child_day_of_week_menu | day_of_week_menu_button | None"
         )
         await send_message(
             message,
@@ -155,15 +154,16 @@ async def register_parent_handlers():
         call: CallbackQuery, callback_data: dict, state: FSMContext
     ):
         message = call.message
+        day_of_week = int(callback_data["data"])
         logger.info(
-            f"{message.chat.id} | {message.chat.username} | Parent | child_day_of_week | day_of_week_button"
+            f"{message.chat.id} | {message.chat.username} | Parent | child_day_of_week | day_of_week_button | {day_of_week}"
         )
         text = await get_user_day_of_week(
             telegram_id=message.chat.id,
             is_searching=True,
             subclass_id=(await state.get_data())["current_child_id"],
             child_name=(await state.get_data())["current_child_name"],
-            day_of_week=int(callback_data["data"]),
+            day_of_week=day_of_week,
         )
         await send_message(
             message,
@@ -182,7 +182,7 @@ async def register_parent_handlers():
     async def child_misc_menu_first_handler(call: CallbackQuery, callback_data: dict):
         message = call.message
         logger.info(
-            f"{message.chat.id} | {message.chat.username} | Parent | child_misc_menu_first | misc_menu_button"
+            f"{message.chat.id} | {message.chat.username} | Parent | child_misc_menu_first | misc_menu_button | None"
         )
         await send_message(
             message,
@@ -201,7 +201,7 @@ async def register_parent_handlers():
     async def parent_misc_menu_first_handler(call: CallbackQuery, callback_data: dict):
         message = call.message
         logger.info(
-            f"{message.chat.id} | {message.chat.username} | Parent | parent_misc_menu_first | misc_menu_button"
+            f"{message.chat.id} | {message.chat.username} | Parent | parent_misc_menu_first | misc_menu_button | None"
         )
         await send_message(
             message,
@@ -220,7 +220,7 @@ async def register_parent_handlers():
     async def child_today_handler(call: CallbackQuery, state: FSMContext):
         message = call.message
         logger.info(
-            f"{message.chat.id} | {message.chat.username} | Parent | child_today | today_button"
+            f"{message.chat.id} | {message.chat.username} | Parent | child_today | today_button | None"
         )
         text = await get_user_today(
             telegram_id=message.chat.id,
@@ -242,7 +242,7 @@ async def register_parent_handlers():
     async def child_tomorrow_handler(call: CallbackQuery, state: FSMContext):
         message = call.message
         logger.info(
-            f"{message.chat.id} | {message.chat.username} | Parent | child_tomorrow | tomorrow_button"
+            f"{message.chat.id} | {message.chat.username} | Parent | child_tomorrow | tomorrow_button | None"
         )
         text = await get_user_tomorrow(
             telegram_id=message.chat.id,
@@ -267,7 +267,7 @@ async def register_parent_handlers():
     async def child_week_handler(call: CallbackQuery, state: FSMContext):
         message = call.message
         logger.info(
-            f"{message.chat.id} | {message.chat.username} | Parent | child_week | week_button"
+            f"{message.chat.id} | {message.chat.username} | Parent | child_week | week_button | None"
         )
         text = await get_user_week(
             telegram_id=message.chat.id,
@@ -292,7 +292,7 @@ async def register_parent_handlers():
     async def child_ring_timetable_handler(call: CallbackQuery, state: FSMContext):
         message = call.message
         logger.info(
-            f"{message.chat.id} | {message.chat.username} | Parent | child_ring_timetable | ring_timetable_button"
+            f"{message.chat.id} | {message.chat.username} | Parent | child_ring_timetable | ring_timetable_button | None"
         )
         data = await get_ring_timetable(
             school_id=(await state.get_data())["current_child_school_id"]
@@ -318,7 +318,7 @@ async def register_parent_handlers():
     async def child_canteen_timetable_handler(call: CallbackQuery, state: FSMContext):
         message = call.message
         logger.info(
-            f"{message.chat.id} | {message.chat.username} | Parent | child_canteen_timetable | canteen_timetable_button"
+            f"{message.chat.id} | {message.chat.username} | Parent | child_canteen_timetable | canteen_timetable_button | None"
         )
         text = await get_canteen_timetable(
             school_id=(await state.get_data())["current_child_school_id"]
@@ -340,7 +340,7 @@ async def register_parent_handlers():
     async def delete_child_handler(call: CallbackQuery, state: FSMContext):
         message = call.message
         logger.info(
-            f"{message.chat.id} | {message.chat.username} | Parent | delete_child_menu | delete_child_button"
+            f"{message.chat.id} | {message.chat.username} | Parent | delete_child_menu | delete_child_button | None"
         )
 
         await send_message(
@@ -362,12 +362,12 @@ async def register_parent_handlers():
     ):
         message = call.message
 
-        logger.info(
-            f"{message.chat.id} | {message.chat.username} | Parent | submit_delete_child_menu | submit_delete_child_button"
-        )
-
         child_id = int(callback_data["data"])
         child_name = (await get_child_by_id(message.chat.id, child_id))["name"]
+        logger.info(
+            f"{message.chat.id} | {message.chat.username} | Parent | submit_delete_child_menu | submit_delete_child_button | {child_name}"
+        )
+
         await state.update_data({"delete_child_name": child_name})
         await state.update_data({"delete_child_id": child_id})
         await send_message(
@@ -389,7 +389,7 @@ async def register_parent_handlers():
     ):
         message = call.message
         logger.info(
-            f"{message.chat.id} | {message.chat.username} | Parent | parent_support_devs | support_devs_button"
+            f"{message.chat.id} | {message.chat.username} | Parent | parent_support_devs | support_devs_button | None"
         )
         await send_message(
             message,
@@ -409,7 +409,7 @@ async def register_parent_handlers():
     ):
         message = call.message
         logger.info(
-            f"{message.chat.id} | {message.chat.username} | Parent | parent_contact_devs | contact_devs_button"
+            f"{message.chat.id} | {message.chat.username} | Parent | parent_contact_devs | contact_devs_button | None"
         )
         await send_message(
             message,

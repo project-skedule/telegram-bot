@@ -47,15 +47,15 @@ async def register_find_handlers():
         role = (await state.get_data())["role"]
         if await state.get_state() == States.find_enter_letter:
             logger.info(
-                f"{message.chat.id} | {message.chat.username} | {role} | find_class | back_find_choose_letter_button"
+                f"{message.chat.id} | {message.chat.username} | {role} | find_class | back_find_choose_letter_button | None"
             )
         elif await state.get_state() == States.find_student_submit:
             logger.info(
-                f"{message.chat.id} | {message.chat.username} | {role} | find_class | back_find_student_submit_button"
+                f"{message.chat.id} | {message.chat.username} | {role} | find_class | back_find_student_submit_button | None"
             )
         else:
             logger.info(
-                f"{message.chat.id} | {message.chat.username} | {role} | find_class | find_class_button"
+                f"{message.chat.id} | {message.chat.username} | {role} | find_class | find_class_button | None"
             )
 
         await send_message(
@@ -76,11 +76,12 @@ async def register_find_handlers():
     ):
         role = (await state.get_data())["role"]
         message = call.message
-        if callback_data["data"] != "None":
+        callback_data = callback_data["data"]
+        if callback_data != "None":
             logger.info(
-                f"{message.chat.id} | {message.chat.username} | {role} | find_enter_letter | find_parallel_button"
+                f"{message.chat.id} | {message.chat.username} | {role} | find_enter_letter | find_parallel_button | {callback_data}"
             )
-            parallel = callback_data["data"]
+            parallel = callback_data
             await state.update_data({"find_parallel": f"{parallel}"})
         else:
             logger.info(
@@ -106,13 +107,13 @@ async def register_find_handlers():
     ):
         message = call.message
         role = (await state.get_data())["role"]
-
+        letter = callback_data["data"]
         logger.info(
-            f"{message.chat.id} | {message.chat.username} | {role} | find_enter_group | find_letter_button"
+            f"{message.chat.id} | {message.chat.username} | {role} | find_enter_group | find_letter_button | {letter}"
         )
 
         parallel = (await state.get_data())["find_parallel"]
-        letter = callback_data["data"]
+
         await state.update_data({"find_letter": letter})
         await send_message(
             message,
@@ -134,13 +135,13 @@ async def register_find_handlers():
     ):
         message = call.message
         role = (await state.get_data())["role"]
+        group = callback_data["data"]
         logger.info(
-            f"{message.chat.id} | {message.chat.username} | {role} | find_student_submit | find_group_button"
+            f"{message.chat.id} | {message.chat.username} | {role} | find_student_submit | find_group_button | {group}"
         )
-        await state.update_data({"find_group": callback_data["data"]})
         parallel = (await state.get_data())["find_parallel"]
         letter = (await state.get_data())["find_letter"]
-        group = (await state.get_data())["find_group"]
+        await state.update_data({"find_group": callback_data["data"]})
         subclass_id = await get_subclass_by_params(
             await get_school_id(message.chat.id), parallel, letter, group
         )
@@ -245,18 +246,12 @@ async def register_find_handlers():
     ):
         message = call.message
         role = (await state.get_data())["role"]
-
-        if await is_find_for_student(state):
-            logger.info(
-                f"{message.chat.id} | {message.chat.username} | {role} | find_student_day_of_week | find_menu_student_day_of_week_button"
-            )
-        else:
-            logger.info(
-                f"{message.chat.id} | {message.chat.username} | {role} | find_teacher_day_of_week | find_menu_teacher_day_of_week_button"
-            )
-
         day_of_week = int(callback_data["data"])
+
         if await is_find_for_student(state):
+            logger.info(
+                f"{message.chat.id} | {message.chat.username} | {role} | find_student_day_of_week | find_menu_student_day_of_week_button | {day_of_week}"
+            )
             text = await get_user_day_of_week(
                 telegram_id=message.chat.id,
                 subclass_id=(await state.get_data())["find_subclass_id"],
@@ -264,6 +259,9 @@ async def register_find_handlers():
                 is_searching=True,
             )
         else:
+            logger.info(
+                f"{message.chat.id} | {message.chat.username} | {role} | find_teacher_day_of_week | find_menu_teacher_day_of_week_button | {day_of_week}"
+            )
             text = await get_user_day_of_week(
                 telegram_id=message.chat.id,
                 teacher_id=(await state.get_data())["find_teacher_id"],
@@ -287,7 +285,7 @@ async def register_find_handlers():
 
         if await is_find_for_student(state):
             logger.info(
-                f"{message.chat.id} | {message.chat.username} | {role} | find_student_today | find_student_today_button"
+                f"{message.chat.id} | {message.chat.username} | {role} | find_student_today | find_student_today_button | None"
             )
             text = await get_user_today(
                 telegram_id=message.chat.id,
@@ -296,7 +294,7 @@ async def register_find_handlers():
             )
         else:
             logger.info(
-                f"{message.chat.id} | {message.chat.username} | {role} | find_teacher_today | find_student_today_button"
+                f"{message.chat.id} | {message.chat.username} | {role} | find_teacher_today | find_student_today_button | None"
             )
             text = await get_user_today(
                 telegram_id=message.chat.id,
@@ -320,7 +318,7 @@ async def register_find_handlers():
 
         if await is_find_for_student(state):
             logger.info(
-                f"{message.chat.id} | {message.chat.username} | {role} | find_student_tomorrow | find_student_tomorrow_button"
+                f"{message.chat.id} | {message.chat.username} | {role} | find_student_tomorrow | find_student_tomorrow_button | None"
             )
             text = await get_user_tomorrow(
                 telegram_id=message.chat.id,
@@ -329,7 +327,7 @@ async def register_find_handlers():
             )
         else:
             logger.info(
-                f"{message.chat.id} | {message.chat.username} | {role} | find_teacher_tomorrow | find_student_tomorrow_button"
+                f"{message.chat.id} | {message.chat.username} | {role} | find_teacher_tomorrow | find_student_tomorrow_button | None"
             )
             text = await get_user_tomorrow(
                 telegram_id=message.chat.id,
@@ -353,7 +351,7 @@ async def register_find_handlers():
 
         if await is_find_for_student(state):
             logger.info(
-                f"{message.chat.id} | {message.chat.username} | {role} | find_student_week | find_student_week_button"
+                f"{message.chat.id} | {message.chat.username} | {role} | find_student_week | find_student_week_button | None"
             )
             text = await get_user_week(
                 telegram_id=message.chat.id,
@@ -362,7 +360,7 @@ async def register_find_handlers():
             )
         else:
             logger.info(
-                f"{message.chat.id} | {message.chat.username} | {role} | find_teacher_week | find_student_week_button"
+                f"{message.chat.id} | {message.chat.username} | {role} | find_teacher_week | find_student_week_button | None"
             )
             text = await get_user_week(
                 telegram_id=message.chat.id,
@@ -393,15 +391,15 @@ async def register_find_handlers():
 
         if await state.get_state() == States.find_choose_teacher:
             logger.info(
-                f"{message.chat.id} | {message.chat.username} | {role} | find_teacher | back_find_choose_teacher_button"
+                f"{message.chat.id} | {message.chat.username} | {role} | find_teacher | back_find_choose_teacher_button | None"
             )
         elif await state.get_state() == States.find_teacher_submit:
             logger.info(
-                f"{message.chat.id} | {message.chat.username} | {role} | find_teacher | back_find_teacher_submit_button"
+                f"{message.chat.id} | {message.chat.username} | {role} | find_teacher | back_find_teacher_submit_button | None"
             )
         else:
             logger.info(
-                f"{message.chat.id} | {message.chat.username} | {role} | find_teacher | find_teacher_button"
+                f"{message.chat.id} | {message.chat.username} | {role} | find_teacher | find_teacher_button | None"
             )
 
         await state.update_data({"find_subclass_id": None})
@@ -425,7 +423,7 @@ async def register_find_handlers():
         role = (await state.get_data())["role"]
 
         logger.info(
-            f"{message.chat.id} | {message.chat.username} | {role} | find_enter_teacher | find_enter_teacher_message"
+            f"{message.chat.id} | {message.chat.username} | {role} | find_enter_teacher | find_enter_teacher_message | {message.text}"
         )
 
         await message.answer(
@@ -448,13 +446,13 @@ async def register_find_handlers():
         message = call.message
 
         role = (await state.get_data())["role"]
-
-        logger.info(
-            f"{message.chat.id} | {message.chat.username} | {role} | find_teacher_submit | find_teacher_name_button"
-        )
-
         teacher_id = callback_data["data"]
         teacher_name = await get_teacher_name_by_id(teacher_id)
+
+        logger.info(
+            f"{message.chat.id} | {message.chat.username} | {role} | find_teacher_submit | find_teacher_name_button | {teacher_name}"
+        )
+
         await state.update_data({"find_teacher_id": teacher_id})
         await state.update_data({"find_teacher_name": teacher_name})
         text = Texts.confirm_another_teacher.format(teacher_name=teacher_name)

@@ -2,6 +2,7 @@ from aiogram.types import Update
 from src.bot import dp
 from loguru import logger
 from src.texts import Texts
+from src.redis import storage
 
 
 async def register_error_handlers():
@@ -11,12 +12,14 @@ async def register_error_handlers():
         try:
             chat_id = update.message.chat.id
             username = update.message.chat.username
-            logger.error(
-                f"{chat_id} | {username} | {exception.__class__.__name__}: {exception}",
-            )
+            role = (await storage.get_data(chat_id)).get("role")
         except:
+            chat_id = None
+            username = None
+            role = None
+        finally:
             logger.error(
-                f"{exception.__class__.__name__}: {exception}",
+                f"{chat_id} | {username} | {role} | Error | {exception.__class__.__name__} | {exception}",
             )
 
         return True

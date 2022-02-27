@@ -1,6 +1,11 @@
 from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery
-from src.api import get_canteen_timetable, get_free_cabinets, get_ring_timetable
+from src.api import (
+    get_canteen_timetable,
+    get_free_cabinets,
+    get_ring_timetable,
+    get_corpus_name_by_id,
+)
 from src.bot import dp
 from src.keyboards import (
     ADMINISTRATION_MENU_FIRST_KEYBOARD,
@@ -18,14 +23,12 @@ from src.texts import Texts
 async def register_administration_handlers():
     @dp.callback_query_handler(
         cf.filter(action=["administration_menu_first"]),
-        state=[
-            States.administration_menu_second,
-        ],
+        state=[States.administration_menu_second],
     )
     async def administration_menu_first_handler(call: CallbackQuery, state: FSMContext):
         message = call.message
         logger.info(
-            f"{message.chat.id} | {message.chat.username} | Administration | administration_menu_first | arrow_button"
+            f"{message.chat.id} | {message.chat.username} | Administration | administration_menu_first | arrow_button | None"
         )
         await send_message(
             message,
@@ -45,7 +48,7 @@ async def register_administration_handlers():
     async def administration_menu_second_handler(call: CallbackQuery):
         message = call.message
         logger.info(
-            f"{message.chat.id} | {message.chat.username} | Administration | administration_menu_second | arrow_button"
+            f"{message.chat.id} | {message.chat.username} | Administration | administration_menu_second | arrow_button | None"
         )
         await send_message(
             message,
@@ -65,7 +68,7 @@ async def register_administration_handlers():
     async def administration_ring_timetable_handler(call: CallbackQuery):
         message = call.message
         logger.info(
-            f"{message.chat.id} | {message.chat.username} | Administration | administration_ring_timetable | ring_timetable_button"
+            f"{message.chat.id} | {message.chat.username} | Administration | administration_ring_timetable | ring_timetable_button | None"
         )
         data = await get_ring_timetable(message.chat.id)
         text = Texts.rings_timetable_header + "".join(
@@ -92,7 +95,7 @@ async def register_administration_handlers():
     async def administration_canteen_timetable_handler(call: CallbackQuery):
         message = call.message
         logger.info(
-            f"{message.chat.id} | {message.chat.username} | Administration | administration_canteen_timetable | canteen_timetable_button"
+            f"{message.chat.id} | {message.chat.username} | Administration | administration_canteen_timetable | canteen_timetable_button | None"
         )
         text = await get_canteen_timetable(message.chat.id)
         await send_message(
@@ -111,7 +114,7 @@ async def register_administration_handlers():
     async def administration_contact_devs(call: CallbackQuery):
         message = call.message
         logger.info(
-            f"{message.chat.id} | {message.chat.username} | Administration | administration_contact_devs | contact_devs_button"
+            f"{message.chat.id} | {message.chat.username} | Administration | administration_contact_devs | contact_devs_butto | None"
         )
         text = Texts.help_message.format(telegram_id=message.chat.id)
         await send_message(
@@ -132,7 +135,7 @@ async def register_administration_handlers():
     async def administration_support_devs(call: CallbackQuery):
         message = call.message
         logger.info(
-            f"{message.chat.id} | {message.chat.username} | Administration | administration_support_devs_timetable | support_devs_button"
+            f"{message.chat.id} | {message.chat.username} | Administration | administration_support_devs_timetable | support_devs_button | None"
         )
         text = Texts.donate_message
         await send_message(
@@ -154,7 +157,7 @@ async def register_administration_handlers():
     async def administration_announcements_handler(call: CallbackQuery):
         message = call.message
         logger.info(
-            f"{message.chat.id} | {message.chat.username} | Administration | administration_announcements | announcements_button"
+            f"{message.chat.id} | {message.chat.username} | Administration | administration_announcements | announcements_button | None"
         )
         text = Texts.announcements
         await send_message(
@@ -172,7 +175,7 @@ async def register_administration_handlers():
     async def administration_free_cabinets_handler(call: CallbackQuery):
         message = call.message
         logger.info(
-            f"{message.chat.id} | {message.chat.username} | Administration | administration_free_cabinets | free_cabinets_button"
+            f"{message.chat.id} | {message.chat.username} | Administration | administration_free_cabinets | free_cabinets_button | None"
         )
         text = Texts.free_cabinets_choose_corpuses
         await send_message(
@@ -194,11 +197,13 @@ async def register_administration_handlers():
         call: CallbackQuery, state: FSMContext, callback_data: dict
     ):
         message = call.message
+        corpus_id = callback_data["data"]
+        corpus_name = await get_corpus_name_by_id(corpus_id)
         logger.info(
-            f"{message.chat.id} | {message.chat.username} | Administration | administration_free_cabinets_corpuses | corpus_button"
+            f"{message.chat.id} | {message.chat.username} | Administration | administration_free_cabinets_corpuses | corpus_button | {corpus_name}"
         )
         text = await get_free_cabinets(
-            await get_school_id(message.chat.id), callback_data["data"]
+            await get_school_id(message.chat.id), corpus_id, corpus_name
         )
         await send_message(
             message,
