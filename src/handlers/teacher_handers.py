@@ -37,11 +37,11 @@ async def register_teacher_handlers():
     )
     async def teacher_menu_handler(call: CallbackQuery, state: FSMContext):
         message = call.message
-        if await state.get_state() == States.teacher_day_of_week:
+        if await state.get_state() == States.teacher_day_of_week.state:
             logger.info(
                 f"{message.chat.id} | {message.chat.username} | Teacher | teacher_menu | back_day_of_week_button | None"
             )
-        elif await state.get_state() == States.teacher_misc_menu_first:
+        elif await state.get_state() == States.teacher_misc_menu_first.state:
             logger.info(
                 f"{message.chat.id} | {message.chat.username} | Teacher | teacher_menu | back_misc_menu_first_button | None"
             )
@@ -113,7 +113,7 @@ async def register_teacher_handlers():
         call: CallbackQuery, state: FSMContext, callback_data: dict
     ):
         message = call.message
-        if await state.get_state() == States.teacher_menu:
+        if await state.get_state() == States.teacher_menu.state:
             logger.info(
                 f"{message.chat.id} | {message.chat.username} | Teacher | teacher_misc_menu_first | misc_menu_button | None"
             )

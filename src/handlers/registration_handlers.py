@@ -166,15 +166,15 @@ async def register_registration_handlers():
         call: CallbackQuery, state: FSMContext, callback_data: dict
     ):
         message = call.message
-        role = (await state.get_data()).get("role")
+        role = None
         last_state = await state.get_state()
-        if last_state == States.choose_role:
-            new_role = callback_data["data"]
-            await state.update_data({"role": new_role})
+        if last_state == States.choose_role.state:
+            role = callback_data["data"]
+            await state.update_data({"role": role})
             logger.info(
-                f"{message.chat.id} | {message.chat.username} | {role} | input_school | role_button | {new_role}"
+                f"{message.chat.id} | {message.chat.username} | {role} | input_school | role_button | {role}"
             )
-        elif last_state == States.choose_school:
+        elif last_state == States.choose_school.state:
             logger.info(
                 f"{message.chat.id} | {message.chat.username} | {role} | input_school | back_choose_school_button | None"
             )
@@ -263,6 +263,7 @@ async def register_registration_handlers():
 
         school_name = (await state.get_data()).get("school_name")
 
+        
         if role == "Student":
             logger.info(
                 f"{message.chat.id} | {message.chat.username} | {role} | enter_parallel | school_button | {school_name}"
@@ -399,7 +400,7 @@ async def register_registration_handlers():
     ):
         message = call.message
         role = (await state.get_data()).get("role")
-        if await state.get_state() == States.enter_parallel:
+        if await state.get_state() == States.enter_parallel.state:
             parallel = callback_data["data"]
             await state.update_data({"parallel": f"{parallel}"})
             logger.info(
@@ -608,7 +609,7 @@ async def register_registration_handlers():
     ):
         message = call.message
         role = (await state.get_data())["role"]
-        if await state.get_state() == States.show_childs:
+        if await state.get_state() == States.show_childs.state:
             logger.info(
                 f"{message.chat.id} | {message.chat.username} | {role} | enter_child_name | add_child_button | None"
             )

@@ -45,11 +45,11 @@ async def register_find_handlers():
 
         message = call.message
         role = (await state.get_data())["role"]
-        if await state.get_state() == States.find_enter_letter:
+        if await state.get_state() == States.find_enter_letter.state:
             logger.info(
                 f"{message.chat.id} | {message.chat.username} | {role} | find_class | back_find_choose_letter_button | None"
             )
-        elif await state.get_state() == States.find_student_submit:
+        elif await state.get_state() == States.find_student_submit.state:
             logger.info(
                 f"{message.chat.id} | {message.chat.username} | {role} | find_class | back_find_student_submit_button | None"
             )
@@ -175,7 +175,7 @@ async def register_find_handlers():
         role = (await state.get_data())["role"]
 
         if await is_find_for_student(state):
-            if await state.get_state() == States.find_day_of_week:
+            if await state.get_state() == States.find_day_of_week.state:
                 logger.info(
                     f"{message.chat.id} | {message.chat.username} | {role} | find_student_menu | find_student_back_day_of_week_button"
                 )
@@ -185,7 +185,7 @@ async def register_find_handlers():
                 )
             text = f"Расписание ученика *{(await state.get_data())['find_subclass_name']}* класса"
         else:
-            if await state.get_state() == States.find_day_of_week:
+            if await state.get_state() == States.find_day_of_week.state:
                 logger.info(
                     f"{message.chat.id} | {message.chat.username} | {role} | find_teacher_menu | find_teacher_back_day_of_week_button"
                 )
@@ -389,11 +389,11 @@ async def register_find_handlers():
         message = call.message
         role = (await state.get_data())["role"]
 
-        if await state.get_state() == States.find_choose_teacher:
+        if await state.get_state() == States.find_choose_teacher.state:
             logger.info(
                 f"{message.chat.id} | {message.chat.username} | {role} | find_teacher | back_find_choose_teacher_button | None"
             )
-        elif await state.get_state() == States.find_teacher_submit:
+        elif await state.get_state() == States.find_teacher_submit.state:
             logger.info(
                 f"{message.chat.id} | {message.chat.username} | {role} | find_teacher | back_find_teacher_submit_button | None"
             )

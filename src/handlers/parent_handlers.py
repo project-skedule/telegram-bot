@@ -44,15 +44,15 @@ async def register_parent_handlers():
         message = call.message
 
         last_state = await state.get_state()
-        if last_state == States.child_menu:
+        if last_state == States.child_menu.state:
             logger.info(
                 f"{message.chat.id} | {message.chat.username} | Parent | parent_show_childs | back_child_button | None"
             )
-        elif last_state == States.parent_misc_menu_first:
+        elif last_state == States.parent_misc_menu_first.state:
             logger.info(
                 f"{message.chat.id} | {message.chat.username} | Parent | parent_show_childs | back_parent_misc_menu_button | None"
             )
-        elif last_state == States.choose_delete_child:
+        elif last_state == States.choose_delete_child.state:
             logger.info(
                 f"{message.chat.id} | {message.chat.username} | Parent | parent_show_childs | back_delete_child_button | None"
             )
@@ -96,7 +96,7 @@ async def register_parent_handlers():
     ):
         message = call.message
         last_state = await state.get_state()
-        if last_state == States.show_childs:
+        if last_state == States.show_childs.state:
             logger.info(
                 f"{message.chat.id} | {message.chat.username} | Parent | child_menu | child_button"
             )
@@ -106,7 +106,7 @@ async def register_parent_handlers():
             await state.update_data({"current_child_name": child["name"]})
             await state.update_data({"current_child_school_id": child["school_id"]})
 
-        elif last_state == States.child_day_of_week:
+        elif last_state == States.child_day_of_week.state:
             logger.info(
                 f"{message.chat.id} | {message.chat.username} | Parent | child_menu | back_day_of_week_menu_button | None"
             )
