@@ -105,7 +105,7 @@ STUDENT_MISC_MENU_FIRST_KEYBOARD = generate_markup(
         [("Поддержать разработчиков", cf.new(action="support_devs", data=0))],
         [
             ("⬅️", cf.new(action="student_misc_menu_second", data=0)),
-            ("↩️", cf.new(action="student_menu", data=0)),
+            ("Назад↩️", cf.new(action="student_menu", data=0)),
             ("➡️", cf.new(action="student_misc_menu_second", data=0)),
         ],
     ]
@@ -118,7 +118,7 @@ STUDENT_MISC_MENU_SECOND_KEYBOARD = generate_markup(
         [("Изменить тип аккаунта", cf.new(action="registration", data=0))],
         [
             ("⬅️", cf.new(action="student_misc_menu_first", data=0)),
-            ("↩️", cf.new(action="student_menu", data=0)),
+            ("Назад↩️", cf.new(action="student_menu", data=0)),
             ("➡️", cf.new(action="student_misc_menu_first", data=0)),
         ],
     ]
@@ -132,7 +132,7 @@ TEACHER_MISC_MENU_FIRST_KEYBOARD = generate_markup(
         [("Поддержать разработчиков", cf.new(action="support_devs", data=0))],
         [
             ("⬅️", cf.new(action="teacher_misc_menu_second", data=0)),
-            ("↩️", cf.new(action="teacher_menu", data=0)),
+            ("Назад↩️", cf.new(action="teacher_menu", data=0)),
             ("➡️", cf.new(action="teacher_misc_menu_second", data=0)),
         ],
     ]
@@ -145,7 +145,7 @@ TEACHER_MISC_MENU_SECOND_KEYBOARD = generate_markup(
         [("Изменить тип аккаунта", cf.new(action="registration", data=0))],
         [
             ("⬅️", cf.new(action="teacher_misc_menu_first", data=0)),
-            ("↩️", cf.new(action="teacher_menu", data=0)),
+            ("Назад↩️", cf.new(action="teacher_menu", data=0)),
             ("➡️", cf.new(action="teacher_misc_menu_first", data=0)),
         ],
     ]
@@ -155,7 +155,7 @@ CHILD_MISC_MENU_FIRST_KEYBOARD = generate_markup(
     [
         [("Расписание звонков", cf.new(action="ring_timetable", data=0))],
         [("Расписание столовой", cf.new(action="canteen_timetable", data=0))],
-        [("↩️", cf.new(action="child_menu", data=0))],
+        [("Назад↩️", cf.new(action="child_menu", data=0))],
     ]
 )
 PARENT_MISC_MENU_FIRST_KEYBOARD = generate_markup(
@@ -163,7 +163,7 @@ PARENT_MISC_MENU_FIRST_KEYBOARD = generate_markup(
         [("Поддержать разработчиков", cf.new(action="support_devs", data=0))],
         [("Связаться с разработчиками", cf.new(action="contact_devs", data=0))],
         [("Изменить тип аккаунта", cf.new(action="registration", data=0))],
-        [("↩️", cf.new(action="show_childs", data=0))],
+        [("Назад↩️", cf.new(action="show_childs", data=0))],
     ]
 )
 
@@ -175,7 +175,7 @@ MISC_MENU_SECOND_KEYBOARD = generate_markup(
         [("Изменить тип аккаунта", cf.new(action="registration", data=0))],
         [
             ("⬅️", cf.new(action="misc_menu_first", data=0)),
-            ("↩️", cf.new(action="main_menu", data=0)),
+            ("Назад↩️", cf.new(action="main_menu", data=0)),
             ("➡️", cf.new(action="misc_menu_first", data=0)),
         ],
     ]
