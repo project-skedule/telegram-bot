@@ -85,7 +85,7 @@ async def register_find_handlers():
             await state.update_data({"find_parallel": f"{parallel}"})
         else:
             logger.info(
-                f"{message.chat.id} | {message.chat.username} | {role} | find_enter_letter | back_find_enter_group_button"
+                f"{message.chat.id} | {message.chat.username} | {role} | find_enter_letter | back_find_enter_group_button | None"
             )
         parallel = (await state.get_data())["find_parallel"]
         message = call.message
@@ -177,21 +177,21 @@ async def register_find_handlers():
         if await is_find_for_student(state):
             if await state.get_state() == States.find_day_of_week.state:
                 logger.info(
-                    f"{message.chat.id} | {message.chat.username} | {role} | find_student_menu | find_student_back_day_of_week_button"
+                    f"{message.chat.id} | {message.chat.username} | {role} | find_student_menu | find_student_back_day_of_week_button | None"
                 )
             else:
                 logger.info(
-                    f"{message.chat.id} | {message.chat.username} | {role} | find_student_menu | find_submit_student_yes_button"
+                    f"{message.chat.id} | {message.chat.username} | {role} | find_student_menu | find_submit_student_yes_button | None"
                 )
             text = f"Расписание ученика *{(await state.get_data())['find_subclass_name']}* класса"
         else:
             if await state.get_state() == States.find_day_of_week.state:
                 logger.info(
-                    f"{message.chat.id} | {message.chat.username} | {role} | find_teacher_menu | find_teacher_back_day_of_week_button"
+                    f"{message.chat.id} | {message.chat.username} | {role} | find_teacher_menu | find_teacher_back_day_of_week_button | None"
                 )
             else:
                 logger.info(
-                    f"{message.chat.id} | {message.chat.username} | {role} | find_teacher_menu | find_submit_teacher_yes_button"
+                    f"{message.chat.id} | {message.chat.username} | {role} | find_teacher_menu | find_submit_teacher_yes_button | None"
                 )
 
             text = (
@@ -220,11 +220,11 @@ async def register_find_handlers():
 
         if await is_find_for_student(state):
             logger.info(
-                f"{message.chat.id} | {message.chat.username} | {role} | find_student_day_of_week_menu | find_menu_student_button"
+                f"{message.chat.id} | {message.chat.username} | {role} | find_student_day_of_week_menu | find_menu_student_button | None"
             )
         else:
             logger.info(
-                f"{message.chat.id} | {message.chat.username} | {role} | find_teacher_day_of_week_menu | find_menu_teacher_button"
+                f"{message.chat.id} | {message.chat.username} | {role} | find_teacher_day_of_week_menu | find_menu_teacher_button | None"
             )
 
         await send_message(
