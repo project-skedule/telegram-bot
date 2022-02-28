@@ -199,7 +199,7 @@ async def register_registration_handlers():
     async def input_school_message(message: Message, state: FSMContext):
         role = (await state.get_data()).get("role")
         logger.info(
-            f"{message.chat.id} | {message.chat.username} | {role} | show_schools | input_school_message | None"
+            f"{message.chat.id} | {message.chat.username} | {role} | show_schools | input_school_message | {message.text}"
         )
 
         await message.answer(
