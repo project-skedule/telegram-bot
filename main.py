@@ -75,13 +75,13 @@ async def zmq(socket):
         args = json.get("args", {})
 
         for id in ids:
-            logger.info(f"| {id} | None | None | send_announcement | None | None")
+            logger.info(f"{id} | None | None | send_announcement | None | None")
             try:
                 await bot.send_message(
                     chat_id=id, text=text, parse_mode="markdown", **args
                 )
             except Exception as e:
-                logger.warning(f"| {id} | None | None | user_block_bot | None | None")
+                logger.warning(f"{id} | None | None | user_block_bot | None | None")
 
             await asyncio.sleep(0.05)
 
