@@ -75,7 +75,7 @@ async def zmq(socket):
         args = json.get("args", {})
 
         for id in ids:
-            logger.info(f"| {id} | None | send_announcementet | None | None")
+            logger.info(f"| {id} | None | send_announcement | None | None")
             try:
                 await bot.send_message(
                     chat_id=id, text=text, parse_mode="markdown", **args
