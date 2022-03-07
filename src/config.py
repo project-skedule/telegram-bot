@@ -1,6 +1,8 @@
 import re
 import sys
+from os import getenv
 from pathlib import Path
+
 from jproperties import Properties
 from loguru import logger
 
@@ -18,25 +20,19 @@ NAME_PATTERN = re.compile(
 ####################################################################
 
 
-PROPERTIES_FILE = Path(__file__).parent.parent / ".properties"
 RESOURCE_PATH = Path(__file__).parent.parent / "resources"
 ANNOUNCEMENTS_PATH = RESOURCE_PATH / "announcements.json"
 TEXTS_PATH = RESOURCE_PATH / "texts.toml"
 UPDATE_MESSAGE_PATH = RESOURCE_PATH / "update_message.md"
 
-with PROPERTIES_FILE.open("rb") as config_file:
-    properties = Properties()
-    properties.load(config_file)
 
-    config = {}
-
-    for key in properties.keys():
-        config[key] = properties[key].data
+TG_TEST_TOKEN = getenv("TG_TEST_TOKEN")
+TG_TOKEN = getenv("TG_TOKEN")
 
 if PROFILE == DEBUG:
-    TELEGRAM_TOKEN = config["TG_TEST_TOKEN"]
+    TELEGRAM_TOKEN = TG_TEST_TOKEN
 elif PROFILE == PRODUCTION:
-    TELEGRAM_TOKEN = config["TG_TOKEN"]
+    TELEGRAM_TOKEN = TG_TOKEN
 else:
     raise NameError("Unknown profile")
 

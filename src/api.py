@@ -26,7 +26,7 @@ def get_current_day_of_week():
 async def get_request(request: str, data=None):
     logger.debug(f"get_request to {url}/api{request} with data: {data}")
     async with aiohttp.ClientSession() as session:
-        async with session.get(f"{url}/api{request}", json=data) as response:
+        async with session.get(f"{url}/api{request}", params=data) as response:
             response = await response.read()
             answer = ujson.loads(response)
             logger.debug(f"answer to request: {answer}")
@@ -87,11 +87,13 @@ async def get_student_day_of_week(
 ):
     school_id = await get_school_id(telegram_id)
 
-    data = {"subclass_id": subclass_id}
-
     data = await get_request(
         "/lesson/get/day",
-        data={"data": data, "school_id": school_id, "day_of_week": day_of_week},
+        data={
+            "subclass_id": subclass_id,
+            "school_id": school_id,
+            "day_of_week": day_of_week,
+        },
     )
 
     lessons = data["lessons"]
@@ -135,11 +137,13 @@ async def get_teacher_day_of_week(
 ):
     school_id = await get_school_id(telegram_id)
 
-    data = {"teacher_id": teacher_id}
-
     data = await get_request(
         "/lesson/get/day",
-        data={"data": data, "school_id": school_id, "day_of_week": day_of_week},
+        data={
+            "teacher_id": teacher_id,
+            "school_id": school_id,
+            "day_of_week": day_of_week,
+        },
     )
 
     lessons = data["lessons"]
@@ -224,12 +228,10 @@ async def get_student_week(
 ):
     school_id = await get_school_id(telegram_id)
 
-    data = {"subclass_id": subclass_id}
-
     data = await get_request(
         "/lesson/get/range",
         data={
-            "data": data,
+            "subclass_id": subclass_id,
             "start_index": 1,
             "end_index": 7,
             "school_id": school_id,
@@ -277,12 +279,10 @@ async def get_student_week(
 async def get_teacher_week(telegram_id, teacher_id, teacher_name=None):
     school_id = await get_school_id(telegram_id)
 
-    data = {"teacher_id": teacher_id}
-
     data = await get_request(
         "/lesson/get/range",
         data={
-            "data": data,
+            "teacher_id": teacher_id,
             "start_index": 1,
             "end_index": 7,
             "school_id": school_id,
@@ -297,7 +297,7 @@ async def get_teacher_week(telegram_id, teacher_id, teacher_name=None):
         name_day = DAYS_OF_WEEK[day_of_week]
         if teacher_name is not None:
             result += markdown.underline(
-                f"Расписание учителя {markdown.escape_md(teacher_name)} {name_day}:\n"
+                f"Расписание учителя {teacher_name} {name_day}:\n"
             )
         else:
             result += markdown.underline(f"Ваше расписание {name_day}:\n")
@@ -445,7 +445,6 @@ async def is_registered(telegram_id):
 
 async def get_similar_schools(school):
     data = await get_request("/info/schools/distance", {"name": school})
-    # data = {"data": [{"id": 2147483647, "name": "1580"}]}
     logger.debug(f"get_similar_schools for {school}; answer: {data}")
     return data["data"]
 

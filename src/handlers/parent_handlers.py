@@ -205,7 +205,7 @@ async def register_parent_handlers():
         )
         await send_message(
             message,
-            text=Texts.parent_main_menu,
+            text=Texts.parent_misc_menu,
             keyboard=PARENT_MISC_MENU_FIRST_KEYBOARD,
             parse_mode="markdown",
         )

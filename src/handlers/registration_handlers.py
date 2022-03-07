@@ -263,7 +263,6 @@ async def register_registration_handlers():
 
         school_name = (await state.get_data()).get("school_name")
 
-        
         if role == "Student":
             logger.info(
                 f"{message.chat.id} | {message.chat.username} | {role} | enter_parallel | school_button | {school_name}"
