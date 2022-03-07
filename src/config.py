@@ -10,8 +10,7 @@ DEBUG = "DEBUG"
 PRODUCTION = "production"
 ####################################################################
 
-PROFILE = DEBUG
-# PROFILE=PRODUCTION
+PROFILE = getenv("PROFILE")
 
 ####################################################################
 NAME_PATTERN = re.compile(
