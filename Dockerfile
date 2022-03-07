@@ -9,6 +9,6 @@ WORKDIR /skedule-telegram
 # copy all files
 COPY . /skedule-telegram/
 # compile texts
-RUN python3 compile_texts.py
+# RUN python3 compile_texts.py
 # Run app
 CMD ["python3", "main.py"]
