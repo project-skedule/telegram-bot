@@ -11,6 +11,7 @@ PRODUCTION = "production"
 ####################################################################
 
 PROFILE = getenv("PROFILE")
+logger.debug("PROFILE")
 
 ####################################################################
 NAME_PATTERN = re.compile(
