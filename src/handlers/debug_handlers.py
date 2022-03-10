@@ -36,3 +36,13 @@ async def register_debug_handlers():
         await message.answer(f"current redis state:\n{data}")
 
     # =============================
+
+    @dp.message_handler(
+        state="*",
+        commands=["error"],
+    )
+    async def clear_redis_data(message: Message, state: FSMContext):
+        await message.answer(f"oops error after message")
+        raise Exception("Test error")
+
+    # =============================
