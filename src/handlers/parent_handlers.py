@@ -97,14 +97,14 @@ async def register_parent_handlers():
         message = call.message
         last_state = await state.get_state()
         if last_state == States.show_childs.state:
-            logger.info(
-                f"{message.chat.id} | {message.chat.username} | Parent | child_menu | child_button"
-            )
             child_id = int(callback_data["data"])
             child = await get_child_by_id(message.chat.id, child_id)
             await state.update_data({"current_child_id": child["subclass_id"]})  # FIXME
             await state.update_data({"current_child_name": child["name"]})
             await state.update_data({"current_child_school_id": child["school_id"]})
+            logger.info(
+                f"{message.chat.id} | {message.chat.username} | Parent | child_menu | child_button | child['name']"
+            )
 
         elif last_state == States.child_day_of_week.state:
             logger.info(
