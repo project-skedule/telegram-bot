@@ -68,6 +68,7 @@ async def register_universal_handlers():
             await States.administration_menu_first.set()
 
         await call.answer()
+
     # =================================================================
 
     @dp.callback_query_handler(
@@ -85,7 +86,7 @@ async def register_universal_handlers():
         cabinets = (await state.get_data())["cabinets"]
         cabinets["page"] = cabinets["page"] - 1
         if cabinets["page"] == -1:
-            cabinets["page"] = len(cabinets["cabinets"])//COUNT_CABINETS_PER_PAGE
+            cabinets["page"] = len(cabinets["cabinets"]) // COUNT_CABINETS_PER_PAGE
         await state.update_data({"cabinets": cabinets})
         text_cabinets = ""
         for cabinet in cabinets["cabinets"][
@@ -122,7 +123,7 @@ async def register_universal_handlers():
         )
         cabinets = (await state.get_data())["cabinets"]
         cabinets["page"] = cabinets["page"] + 1
-        if cabinets["page"] > len(cabinets["cabinets"])//COUNT_CABINETS_PER_PAGE:
+        if cabinets["page"] > len(cabinets["cabinets"]) // COUNT_CABINETS_PER_PAGE:
             cabinets["page"] = 0
         await state.update_data({"cabinets": cabinets})
         text_cabinets = ""
