@@ -458,16 +458,21 @@ async def get_similar_teachers(teacher_name, school_id):
 
 async def get_current_lesson(school_id):
     data = await get_request("/info/lessontimetables/all", {"school_id": school_id})
+    now = datetime.now().time()
+    first_lesson_start = datetime.strptime(
+        data["data"][0]["time_start"], "%H:%M"
+    ).time()
+    if now < first_lesson_start:
+        return
     for lesson in data["data"]:
         start = datetime.strptime(lesson["time_start"], "%H:%M").time()
         end = datetime.strptime(lesson["time_end"], "%H:%M").time()
-        now = datetime.now().time()
         if start <= now <= end or start >= now:
             return lesson["number"]
-    return None
+    return
 
 
-async def get_free_cabinets(school_id, corpus_id, corpus_name):
+async def get_free_cabinets(school_id, corpus_id, corpus_name, lesson_number):
     lesson_number = await get_current_lesson(school_id)
     if lesson_number is None:
         return Texts.no_current_lessons
@@ -479,6 +484,7 @@ async def get_free_cabinets(school_id, corpus_id, corpus_name):
             "lesson_number": lesson_number,
         },
     )
+    return data["data"]
     if not data["data"]:
         return Texts.no_free_cabinets
     result = Texts.free_cabinets.format(

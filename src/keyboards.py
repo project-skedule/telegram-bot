@@ -546,3 +546,10 @@ SUBMIT_DELETE_CHILD_KEYBOARD = generate_markup(
         [("Нет", cf.new(action="delete_child", data=0))],
     ]
 )
+
+FREE_CABINET_ARROW_KEYBOARD = generate_markup(
+    [
+        [("⬅️", cf.new(action="left", data=0)), ("➡️", cf.new(action="right", data=0))],
+        [("Главное меню", cf.new(action="main_menu", data=0))],
+    ]
+)

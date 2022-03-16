@@ -4,6 +4,7 @@ from loguru import logger
 from src.api import (
     get_canteen_timetable,
     get_corpus_name_by_id,
+    get_current_lesson,
     get_free_cabinets,
     get_ring_timetable,
     get_user_day_of_week,
@@ -12,7 +13,9 @@ from src.api import (
     get_user_week,
 )
 from src.bot import dp
+from src.config import COUNT_CABINETS_PER_PAGE
 from src.keyboards import (
+    FREE_CABINET_ARROW_KEYBOARD,
     TEACHER_DAY_OF_WEEK_KEYBOARD,
     TEACHER_MAIN_KEYBOARD,
     TEACHER_MISC_MENU_FIRST_KEYBOARD,
@@ -353,17 +356,53 @@ async def register_teacher_handlers():
         logger.info(
             f"{message.chat.id} | {message.chat.username} | Teacher | teacher_free_cabinets_corpuses | corpus_button | {corpus_name}"
         )
-        text = await get_free_cabinets(
-            await get_school_id(message.chat.id), corpus_id, corpus_name
-        )
+        school_id = await get_school_id(message.chat.id)
+        lesson_number = await get_current_lesson(school_id)
+        if lesson_number is None:
+            await send_message(
+                message,
+                text=Texts.no_current_lessons,
+                keyboard=TEACHER_MAIN_KEYBOARD,
+                parse_mode="markdown",
+            )
+            await States.teacher_menu.set()
+        else:
+            cabinets = await get_free_cabinets(
+                school_id, corpus_id, corpus_name, lesson_number
+            )
+            if not cabinets:
+                await send_message(
+                    message,
+                    text=Texts.no_free_cabinets,
+                    keyboard=TEACHER_MAIN_KEYBOARD,
+                    parse_mode="markdown",
+                )
+                await States.teacher_menu.set()
+            else:
+                await state.update_data(
+                    {
+                        "cabinets": {
+                            "cabinets": cabinets,
+                            "page": 0,
+                            "lesson_number": lesson_number,
+                            "corpus_name": corpus_name,
+                        }
+                    }
+                )
+                text_cabinets = ""
+                for cabinet in cabinets[:COUNT_CABINETS_PER_PAGE]:
+                    text_cabinets += cabinet["name"] + "\n"
+                await send_message(
+                    message,
+                    text=Texts.free_cabinets.format(
+                        lesson_number=lesson_number, corpus_name=corpus_name
+                    )
+                    + text_cabinets,
+                    keyboard=FREE_CABINET_ARROW_KEYBOARD,
+                    parse_mode="markdown",
+                )
+                await States.show_free_cabinets.set()
 
-        await send_message(
-            message,
-            text=text,
-            keyboard=TEACHER_MAIN_KEYBOARD,
-            parse_mode="markdown",
-        )
         await call.answer()
-        await States.teacher_menu.set()
 
     # =============================

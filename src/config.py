@@ -65,3 +65,5 @@ logger.add(
     backtrace=True,
     colorize=True,
 )
+
+COUNT_CABINETS_PER_PAGE = 10

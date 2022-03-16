@@ -4,6 +4,7 @@ from src.bot import dp
 from src.keyboards import (
     ADMINISTRATION_MENU_FIRST_KEYBOARD,
     CHILD_MAIN_KEYBOARD,
+    FREE_CABINET_ARROW_KEYBOARD,
     STUDENT_MAIN_KEYBOARD,
     TEACHER_MAIN_KEYBOARD,
     cf,
@@ -12,6 +13,7 @@ from loguru import logger
 from src.some_functions import send_message
 from src.states import States
 from src.texts import Texts
+from src.config import COUNT_CABINETS_PER_PAGE
 
 
 async def register_universal_handlers():
@@ -65,4 +67,80 @@ async def register_universal_handlers():
             )
             await States.administration_menu_first.set()
 
+        await call.answer()
+
+    # =================================================================
+
+    @dp.callback_query_handler(
+        cf.filter(action=["left"]),
+        state=[States.show_free_cabinets],
+    )
+    async def free_cabinets_left_arrow_handler(
+        call: CallbackQuery, state: FSMContext, callback_data: dict
+    ):
+        message = call.message
+        role = (await state.get_data())["role"]
+        logger.info(
+            f"{message.chat.id} | {message.chat.username} | {role} | show_free_cabinets | arrow_button | left"
+        )
+        cabinets = (await state.get_data())["cabinets"]
+        cabinets["page"] = cabinets["page"] - 1
+        if cabinets["page"] == -1:
+            cabinets["page"] = len(cabinets["cabinets"]) // COUNT_CABINETS_PER_PAGE
+        await state.update_data({"cabinets": cabinets})
+        text_cabinets = ""
+        for cabinet in cabinets["cabinets"][
+            cabinets["page"]
+            * COUNT_CABINETS_PER_PAGE : COUNT_CABINETS_PER_PAGE
+            * (cabinets["page"] + 1)
+        ]:
+            text_cabinets += cabinet["name"] + "\n"
+        await send_message(
+            message,
+            text=Texts.free_cabinets.format(
+                lesson_number=cabinets["lesson_number"],
+                corpus_name=cabinets["corpus_name"],
+            )
+            + text_cabinets,
+            keyboard=FREE_CABINET_ARROW_KEYBOARD,
+            parse_mode="markdown",
+        )
+        await call.answer()
+
+    # =============================
+
+    @dp.callback_query_handler(
+        cf.filter(action=["right"]),
+        state=[States.show_free_cabinets],
+    )
+    async def free_cabinets_left_arrow_handler(
+        call: CallbackQuery, state: FSMContext, callback_data: dict
+    ):
+        message = call.message
+        role = (await state.get_data())["role"]
+        logger.info(
+            f"{message.chat.id} | {message.chat.username} | {role} | show_free_cabinets | arrow_button | right"
+        )
+        cabinets = (await state.get_data())["cabinets"]
+        cabinets["page"] = cabinets["page"] + 1
+        if cabinets["page"] > len(cabinets["cabinets"]) // COUNT_CABINETS_PER_PAGE:
+            cabinets["page"] = 0
+        await state.update_data({"cabinets": cabinets})
+        text_cabinets = ""
+        for cabinet in cabinets["cabinets"][
+            cabinets["page"]
+            * COUNT_CABINETS_PER_PAGE : COUNT_CABINETS_PER_PAGE
+            * (cabinets["page"] + 1)
+        ]:
+            text_cabinets += cabinet["name"] + "\n"
+        await send_message(
+            message,
+            text=Texts.free_cabinets.format(
+                lesson_number=cabinets["lesson_number"],
+                corpus_name=cabinets["corpus_name"],
+            )
+            + text_cabinets,
+            keyboard=FREE_CABINET_ARROW_KEYBOARD,
+            parse_mode="markdown",
+        )
         await call.answer()

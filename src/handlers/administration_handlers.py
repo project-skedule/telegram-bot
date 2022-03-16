@@ -2,6 +2,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery
 from src.api import (
     get_canteen_timetable,
+    get_current_lesson,
     get_free_cabinets,
     get_ring_timetable,
     get_corpus_name_by_id,
@@ -10,6 +11,7 @@ from src.bot import dp
 from src.keyboards import (
     ADMINISTRATION_MENU_FIRST_KEYBOARD,
     ADMINISTRATION_MENU_SECOND_KEYBOARD,
+    FREE_CABINET_ARROW_KEYBOARD,
     cf,
     get_corpuses_keyboard,
 )
@@ -18,6 +20,7 @@ from src.redis import get_school_id
 from src.some_functions import send_message
 from src.states import States
 from src.texts import Texts
+from src.config import COUNT_CABINETS_PER_PAGE
 
 
 async def register_administration_handlers():
@@ -200,18 +203,55 @@ async def register_administration_handlers():
         corpus_id = callback_data["data"]
         corpus_name = await get_corpus_name_by_id(corpus_id)
         logger.info(
-            f"{message.chat.id} | {message.chat.username} | Administration | administration_free_cabinets_corpuses | corpus_button | {corpus_name}"
+            f"{message.chat.id} | {message.chat.username} | Teacher | teacher_free_cabinets_corpuses | corpus_button | {corpus_name}"
         )
-        text = await get_free_cabinets(
-            await get_school_id(message.chat.id), corpus_id, corpus_name
-        )
-        await send_message(
-            message,
-            text=text,
-            keyboard=ADMINISTRATION_MENU_FIRST_KEYBOARD,
-            parse_mode="markdown",
-        )
+        school_id = await get_school_id(message.chat.id)
+        lesson_number = await get_current_lesson(school_id)
+        if lesson_number is None:
+            await send_message(
+                message,
+                text=Texts.no_current_lessons,
+                keyboard=ADMINISTRATION_MENU_FIRST_KEYBOARD,
+                parse_mode="markdown",
+            )
+            await States.teacher_menu.set()
+        else:
+            cabinets = await get_free_cabinets(
+                school_id, corpus_id, corpus_name, lesson_number
+            )
+            if not cabinets:
+                await send_message(
+                    message,
+                    text=Texts.no_free_cabinets,
+                    keyboard=ADMINISTRATION_MENU_FIRST_KEYBOARD,
+                    parse_mode="markdown",
+                )
+                await States.teacher_menu.set()
+            else:
+                await state.update_data(
+                    {
+                        "cabinets": {
+                            "cabinets": cabinets,
+                            "page": 0,
+                            "lesson_number": lesson_number,
+                            "corpus_name": corpus_name,
+                        }
+                    }
+                )
+                text_cabinets = ""
+                for cabinet in cabinets[:COUNT_CABINETS_PER_PAGE]:
+                    text_cabinets += cabinet["name"] + "\n"
+                await send_message(
+                    message,
+                    text=Texts.free_cabinets.format(
+                        lesson_number=lesson_number, corpus_name=corpus_name
+                    )
+                    + text_cabinets,
+                    keyboard=FREE_CABINET_ARROW_KEYBOARD,
+                    parse_mode="markdown",
+                )
+                await States.show_free_cabinets.set()
+
         await call.answer()
-        await States.administration_menu_first.set()
 
     # =============================
