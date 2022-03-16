@@ -55,3 +55,5 @@ class States(StatesGroup):
     submit_child_name = State()
     submit_delete_child = State()
     choose_delete_child = State()
+
+    show_free_cabinets = State()

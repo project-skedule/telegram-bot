@@ -467,7 +467,7 @@ async def get_current_lesson(school_id):
     return None
 
 
-async def get_free_cabinets(school_id, corpus_id, corpus_name):
+async def get_free_cabinets(school_id, corpus_id, corpus_name, lesson_number):
     lesson_number = await get_current_lesson(school_id)
     if lesson_number is None:
         return Texts.no_current_lessons
@@ -479,6 +479,7 @@ async def get_free_cabinets(school_id, corpus_id, corpus_name):
             "lesson_number": lesson_number,
         },
     )
+    return data["data"]
     if not data["data"]:
         return Texts.no_free_cabinets
     result = Texts.free_cabinets.format(
