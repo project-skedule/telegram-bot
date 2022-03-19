@@ -1,5 +1,6 @@
 from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery
+from loguru import logger
 from src.api import (
     get_canteen_timetable,
     get_ring_timetable,
@@ -16,7 +17,6 @@ from src.keyboards import (
     STUDENT_MISC_MENU_SECOND_KEYBOARD,
     cf,
 )
-from loguru import logger
 from src.some_functions import send_message
 from src.states import States
 from src.texts import Texts

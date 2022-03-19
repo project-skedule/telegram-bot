@@ -1,12 +1,12 @@
 import asyncio
 from os import getenv
-from src.config import DEBUG, PROFILE
 
 import aiohttp
 import zmq
 import zmq.asyncio as azmq
-
+from loguru import logger
 from src.bot import bot, dp
+from src.config import DEBUG, PROFILE
 from src.handlers.administration_handlers import register_administration_handlers
 from src.handlers.debug_handlers import register_debug_handlers
 from src.handlers.error_handlers import register_error_handlers
@@ -16,7 +16,6 @@ from src.handlers.registration_handlers import register_registration_handlers
 from src.handlers.student_handers import register_student_handlers
 from src.handlers.teacher_handers import register_teacher_handlers
 from src.handlers.universal_handler import register_universal_handlers
-from loguru import logger
 
 
 async def web():

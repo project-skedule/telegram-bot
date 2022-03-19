@@ -1,6 +1,8 @@
 from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery
+from loguru import logger
 from src.bot import dp
+from src.config import COUNT_CABINETS_PER_PAGE
 from src.keyboards import (
     ADMINISTRATION_MENU_FIRST_KEYBOARD,
     CHILD_MAIN_KEYBOARD,
@@ -9,11 +11,9 @@ from src.keyboards import (
     TEACHER_MAIN_KEYBOARD,
     cf,
 )
-from loguru import logger
 from src.some_functions import send_message
 from src.states import States
 from src.texts import Texts
-from src.config import COUNT_CABINETS_PER_PAGE
 
 
 async def register_universal_handlers():

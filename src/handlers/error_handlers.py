@@ -1,8 +1,8 @@
 from aiogram.types import Update
-from src.bot import dp
 from loguru import logger
-from src.texts import Texts
+from src.bot import dp
 from src.redis import storage
+from src.texts import Texts
 
 
 async def register_error_handlers():

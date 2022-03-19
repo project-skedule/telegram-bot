@@ -2,7 +2,7 @@ from typing import List, Tuple
 
 from aiogram.types.inline_keyboard import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.callback_data import CallbackData
-
+from loguru import logger
 from src.api import (
     get_all_corpuses,
     get_allowed_group,
@@ -11,7 +11,6 @@ from src.api import (
     get_similar_schools,
     get_similar_teachers,
 )
-from loguru import logger
 from src.redis import get_children
 
 cf = CallbackData("callback", "action", "data")

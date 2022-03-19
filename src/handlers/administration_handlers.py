@@ -1,13 +1,15 @@
 from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery
+from loguru import logger
 from src.api import (
     get_canteen_timetable,
+    get_corpus_name_by_id,
     get_current_lesson,
     get_free_cabinets,
     get_ring_timetable,
-    get_corpus_name_by_id,
 )
 from src.bot import dp
+from src.config import COUNT_CABINETS_PER_PAGE
 from src.keyboards import (
     ADMINISTRATION_MENU_FIRST_KEYBOARD,
     ADMINISTRATION_MENU_SECOND_KEYBOARD,
@@ -15,12 +17,10 @@ from src.keyboards import (
     cf,
     get_corpuses_keyboard,
 )
-from loguru import logger
 from src.redis import get_school_id
 from src.some_functions import send_message
 from src.states import States
 from src.texts import Texts
-from src.config import COUNT_CABINETS_PER_PAGE
 
 
 async def register_administration_handlers():

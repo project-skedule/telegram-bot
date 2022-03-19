@@ -1,7 +1,8 @@
 # use this file to compile texts.py file
-from src.config import TEXTS_PATH
 from pathlib import Path
+
 import toml
+from src.config import TEXTS_PATH
 
 path = Path(__file__).parent / "src" / "texts.py"
 

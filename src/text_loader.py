@@ -1,5 +1,6 @@
-from .config import TEXTS_PATH
 import toml
+
+from .config import TEXTS_PATH
 
 
 class TextFactory:

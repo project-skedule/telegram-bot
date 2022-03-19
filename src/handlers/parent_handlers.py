@@ -1,6 +1,7 @@
 import ujson
 from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery, Message
+from loguru import logger
 from src.api import (
     delete_child,
     get_canteen_timetable,
@@ -21,7 +22,6 @@ from src.keyboards import (
     get_child_keyboard,
     get_childs_to_delete_keyboard,
 )
-from loguru import logger
 from src.redis import get_child_by_id
 from src.some_functions import send_message
 from src.states import States

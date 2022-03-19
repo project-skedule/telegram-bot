@@ -4,9 +4,8 @@ from typing import Union
 import aiohttp
 import ujson
 from aiogram.utils import markdown
-
-from src.constants import DAYS_OF_WEEK
 from loguru import logger
+from src.constants import DAYS_OF_WEEK
 from src.redis import (
     get_main_role,
     get_school_id,

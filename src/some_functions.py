@@ -1,7 +1,6 @@
 from aiogram.dispatcher import FSMContext
 from aiogram.types import Message
 from aiogram.types.inline_keyboard import InlineKeyboardMarkup
-
 from src.bot import bot, dp
 from src.keyboards import (
     ADMINISTRATION_MENU_FIRST_KEYBOARD,

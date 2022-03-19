@@ -1,7 +1,7 @@
 from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery, Message
-from src.bot import dp
 from loguru import logger
+from src.bot import dp
 from src.states import States
 
 

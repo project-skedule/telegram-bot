@@ -1,5 +1,6 @@
 from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery, Message
+from loguru import logger
 from src.api import (
     change_role,
     get_school_name_by_id,
@@ -36,8 +37,7 @@ from src.keyboards import (
     get_schools_keyboard,
     get_teachers_keyboard,
 )
-from loguru import logger
-from src.redis import get_premium_status, get_school_id, get_children
+from src.redis import get_children, get_premium_status, get_school_id
 from src.some_functions import send_message
 from src.states import States
 from src.texts import Texts
