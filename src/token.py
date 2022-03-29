@@ -1,6 +1,6 @@
 import ujson
 import base64
-import datetime
+from datetime import datetime
 import requests
 from src.config import API_TELEGRAM_ACCOUNT_NAME, API_TELEGRAM_ACCOUNT_PASSWORD, URL
 from loguru import logger
