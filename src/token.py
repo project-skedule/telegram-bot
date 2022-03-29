@@ -6,6 +6,7 @@ from src.config import API_TELEGRAM_ACCOUNT_NAME, API_TELEGRAM_ACCOUNT_PASSWORD,
 from loguru import logger
 import urllib.parse
 
+
 class Token:
     def __init__(self):
         self.token = None
@@ -20,8 +21,11 @@ class Token:
         return expire_time > datetime.now()
 
     def update_token(self):
-        credentials={"username": API_TELEGRAM_ACCOUNT_NAME, "password": API_TELEGRAM_ACCOUNT_PASSWORD}
-        credentials=urllib.parse.urlencode(credentials)
+        credentials = {
+            "username": API_TELEGRAM_ACCOUNT_NAME,
+            "password": API_TELEGRAM_ACCOUNT_PASSWORD,
+        }
+        credentials = urllib.parse.urlencode(credentials)
         logger.debug(f"{credentials}")
         r = requests.post(
             f"{URL}/api/service/login",
