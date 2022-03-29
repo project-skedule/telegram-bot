@@ -2,20 +2,41 @@ from datetime import datetime
 from typing import Union
 
 import aiohttp
+import base64
 import ujson
 from aiogram.utils import markdown
 from loguru import logger
+
 from src.constants import DAYS_OF_WEEK
-from src.redis import (
-    get_main_role,
-    get_school_id,
-    get_subclass_id,
-    get_teacher_id,
-    storage,
-)
+from src.redis import (get_main_role, get_school_id, get_subclass_id,
+                       get_teacher_id, storage)
 from src.texts import Texts
 
-url = "http://172.0.0.7:8009"
+url = "http://172.0.0.7:8009А"
+
+class Token:
+    def __init__(self):
+        self.token = None
+    def is_expired(self):
+        if self.token is None:
+            return True
+        decoded = ujson.loads(base64.b64decode(self.token.split('.')[1]+'=='))
+        expire_at = int(decoded['exp'])
+        expire_at -= 60 # one minute less for fix internet loading
+        expire_time = datetime.fromtimestamp(expire_at)
+        return expire_time > datetime.now()
+        
+    def update_token(self):
+        pass
+
+    def get_token(self):
+        if self.is_expired():
+            self.update_token()
+        return self.token
+
+api_token=Token()
+
+
 
 
 def get_current_day_of_week():
