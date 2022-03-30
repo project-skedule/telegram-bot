@@ -18,7 +18,7 @@ class Token:
         expire_at = int(decoded["exp"])
         expire_at -= 60  # one minute less for fix internet loading
         expire_time = datetime.fromtimestamp(expire_at)
-        return expire_time > datetime.now()
+        return expire_time < datetime.now()
 
     def update_token(self):
         credentials = {
