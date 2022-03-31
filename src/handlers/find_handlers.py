@@ -91,7 +91,7 @@ async def register_find_handlers():
         message = call.message
         await send_message(
             message,
-            text=Texts.enter_letter,
+            text=Texts.enter_letter.format(parallel=parallel),
             keyboard=await get_find_enter_letter_keyboard(message.chat.id, parallel),
         )
         await call.answer()
@@ -117,7 +117,7 @@ async def register_find_handlers():
         await state.update_data({"find_letter": letter})
         await send_message(
             message,
-            text=Texts.enter_group,
+            text=Texts.enter_group.format(parallel=parallel, letter=letter),
             keyboard=await get_find_enter_group_keyboard(
                 message.chat.id, parallel, letter
             ),

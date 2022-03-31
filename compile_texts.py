@@ -2,12 +2,13 @@
 from pathlib import Path
 
 import toml
-from src.config import TEXTS_PATH
 
 path = Path(__file__).parent / "src" / "texts.py"
 
 
-texts = toml.load(TEXTS_PATH.open("r", encoding="utf-8"))["russian"]
+texts = toml.load(
+    (Path(__file__).parent / "resources" / "texts.toml").open("r", encoding="utf-8")
+)["russian"]
 
 with path.open("w", encoding="utf-8") as source_file:
     source_file.write(

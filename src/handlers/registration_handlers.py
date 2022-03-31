@@ -269,7 +269,9 @@ async def register_registration_handlers():
             )
             await send_message(
                 message,
-                text=Texts.enter_parallel_on_register_student,
+                text=Texts.enter_parallel_on_register_student.format(
+                    school_name=school_name
+                ),
                 keyboard=(await get_enter_parallel_keyboard(message.chat.id)),
                 parse_mode="markdown",
             )
@@ -281,7 +283,9 @@ async def register_registration_handlers():
             )
             await send_message(
                 message,
-                text=Texts.enter_parallel_on_register_parent,
+                text=Texts.enter_parallel_on_register_parent.format(
+                    school_name=school_name
+                ),
                 keyboard=(await get_enter_parallel_keyboard(message.chat.id)),
                 parse_mode="markdown",
             )
@@ -293,7 +297,7 @@ async def register_registration_handlers():
             )
             await send_message(
                 message,
-                text=Texts.enter_name_on_register,
+                text=Texts.enter_name_on_register.format(school_name=school_name),
                 keyboard=BACK_FROM_INPUT_TEACHER_NAME_KEYBOARD,
                 parse_mode="markdown",
             )
@@ -413,7 +417,7 @@ async def register_registration_handlers():
         parallel = (await state.get_data())["parallel"]
         await send_message(
             message,
-            text=Texts.enter_letter,
+            text=Texts.enter_letter.format(parallel=parallel),
             keyboard=(await get_enter_letter_keyboard(message.chat.id, parallel)),
             parse_mode="markdown",
         )
@@ -439,7 +443,7 @@ async def register_registration_handlers():
         parallel = (await state.get_data())["parallel"]
         await send_message(
             message,
-            text=Texts.enter_group,
+            text=Texts.enter_group.format(parallel=parallel, letter=letter),
             keyboard=(
                 await get_enter_group_keyboard(message.chat.id, parallel, letter)
             ),
