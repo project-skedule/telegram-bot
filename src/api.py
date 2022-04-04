@@ -582,13 +582,8 @@ async def register_administration(telegram_id, school_id):
 # ~=============================
 
 
-async def get_user_roles(telegram_id):
-    """
-    Returns all user roles by telegram_id
-    """
+async def get_role_id(telegram_id):
     data = await post_request("/rolemanagement/get", {"telegram_id": telegram_id})
-    await save_to_redis(telegram_id)
-
 
 # ~=============================
 
@@ -675,6 +670,11 @@ async def save_to_redis(telegram_id):
             user=telegram_id,
         )
 
+async def get_main_role_id(telegram_id):
+    data = await get_request("/rolemanagement/get", data={"telegram_id": telegram_id})
+    for role in data["roles"]:
+        if role["is_main_role"]:
+            return role["id"]
 
 # ~=============================
 
