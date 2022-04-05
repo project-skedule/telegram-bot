@@ -2,6 +2,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery
 from loguru import logger
 from src.api import (
+    get_announcements_history,
     get_canteen_timetable,
     get_corpus_name_by_id,
     get_current_lesson,
@@ -312,12 +313,14 @@ async def register_teacher_handlers():
         logger.info(
             f"{message.chat.id} | {message.chat.username} | Teacher | teacher_announcements | announcements_button | None"
         )
-        text = Texts.announcements
+        text = Texts.announcements + await get_announcements_history(message.chat.id)
+
         await send_message(
             message,
             text=text,
             keyboard=TEACHER_MAIN_KEYBOARD,
-            parse_mode="markdown",
+            parse_mode="MarkdownV2",
+            disable_web_page_preview=True,
         )
         await call.answer()
         await States.teacher_menu.set()

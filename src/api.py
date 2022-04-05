@@ -585,6 +585,7 @@ async def register_administration(telegram_id, school_id):
 async def get_role_id(telegram_id):
     data = await post_request("/rolemanagement/get", {"telegram_id": telegram_id})
 
+
 # ~=============================
 
 
@@ -670,6 +671,7 @@ async def save_to_redis(telegram_id):
             user=telegram_id,
         )
 
+
 async def get_main_role_id(telegram_id):
     data = await get_request("/rolemanagement/get", data={"telegram_id": telegram_id})
     for role in data["roles"]:
@@ -680,12 +682,17 @@ async def get_main_role_id(telegram_id):
 async def get_announcements_history(telegram_id):
     role_id = await get_main_role_id(telegram_id)
     data = await get_request("/announcements/history", data={"role_id": role_id})
+    if not data["data"]:
+        return "Вам ещё не отправляли объявлений\n"
     text = ""
     for announcement in data["data"]:
         title = markdown.escape_md(announcement["title"])
         link = markdown.escape_md(announcement["link"])
-        text += f"({title})[{link}]\n\n"
+        logger.debug(f"{title} {link}")
+        hyperlink = markdown.link(title, link)
+        text += f"🔸 {hyperlink}\n\n"
     return text
+
 
 # ~=============================
 
