@@ -676,6 +676,17 @@ async def get_main_role_id(telegram_id):
         if role["is_main_role"]:
             return role["id"]
 
+
+async def get_announcements_history(telegram_id):
+    role_id = await get_main_role_id(telegram_id)
+    data = await get_request("/announcements/history", data={"role_id": role_id})
+    text = ""
+    for announcement in data["data"]:
+        title = markdown.escape_md(announcement["title"])
+        link = markdown.escape_md(announcement["link"])
+        text += f"({title})[{link}]\n\n"
+    return text
+
 # ~=============================
 
 
