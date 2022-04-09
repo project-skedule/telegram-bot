@@ -28,6 +28,7 @@ from src.keyboards import (
     SUBMIT_PARENT_REGISTRATION_KEYBOARD,
     TEACHER_MAIN_KEYBOARD,
     TEACHER_SUBMIT_KEYBOARD,
+    START_KEYBOARD,
     cf,
     generate_markup,
     get_child_keyboard,
@@ -55,7 +56,7 @@ async def register_registration_handlers():
             )
             await message.answer(
                 text=Texts.greeting,
-                reply_markup=CHOOSE_ROLE_KEYBOARD,
+                reply_markup=START_KEYBOARD,
                 parse_mode="markdown",
             )
             await States.choose_role.set()
@@ -94,6 +95,26 @@ async def register_registration_handlers():
                     parse_mode="markdown",
                 )
                 await States.administration_menu_first.set()
+
+    @dp.callback_query_handler(
+        cf.filter(action=["contact_devs"]),
+        state=[States.choose_role],
+    )
+    async def new_user_contact_devs(call: CallbackQuery):
+        message = call.message
+        logger.info(
+            f"{message.chat.id} | {message.chat.username} | None | new_user_contact_devs | contact_devs_button | None"
+        )
+        text = Texts.help_message_before_reg.format(telegram_id=message.chat.id)
+        await send_message(
+            message,
+            text=text,
+            keyboard=START_KEYBOARD,
+            parse_mode="markdown",
+        )
+
+        await call.answer()
+        await States.choose_role.set()
 
     # =============================
     @dp.callback_query_handler(
