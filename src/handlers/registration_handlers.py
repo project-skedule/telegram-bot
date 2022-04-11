@@ -168,7 +168,7 @@ async def register_registration_handlers():
         await send_message(
             message,
             text=Texts.choose_role,
-            keyboard=CHOOSE_ROLE_KEYBOARD,
+            keyboard=START_KEYBOARD,
             parse_mode="markdown",
         )
         await call.answer()
