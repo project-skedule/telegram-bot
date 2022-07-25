@@ -447,6 +447,21 @@ CHOOSE_ROLE_KEYBOARD = generate_markup(
     ]
 )
 
+START_KEYBOARD = generate_markup(
+    [
+        [("Ученик", cf.new(action="input_school", data="Student"))],
+        [("Учитель", cf.new(action="input_school", data="Teacher"))],
+        [("Родитель", cf.new(action="register_parent", data=0))],
+        [
+            (
+                "Работник администрации",
+                cf.new(action="input_school", data="Administration"),
+            )
+        ],
+        [("Связаться с разработчиками", cf.new(action="contact_devs", data=0))],
+    ]
+)
+
 
 async def get_schools_keyboard(school: str):
     logger.debug(f"get_schools_keyboard for {school}")
